@@ -1,0 +1,2 @@
+include ':app', ':puppet', ':transmit', ':puppetmodel', ':hookdemo', ':hookdemoplugin'
+rootProject.name='puppetsystem'
