@@ -19,6 +19,14 @@ public interface ISystemPluginExecute {
     int execRootCmd(String commandString);
 
     /**
+     * root权限执行命令行并输出结果
+     *
+     * @param commandString 内容
+     * @return 结果
+     */
+    String execRootCmdWithResult(String commandString);
+
+    /**
      * 更改前台应用
      *
      * @param packageName 要切换到前台的应用的包名

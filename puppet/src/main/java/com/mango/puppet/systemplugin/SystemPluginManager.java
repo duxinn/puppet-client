@@ -33,8 +33,14 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
     }
 
     @Override
-    public void changeForegroundApplication(String packageName, ISystemPluginResult result) {
+    public String execRootCmdWithResult(String commandString) {
+        return null;
+    }
 
+    @Override
+    public void changeForegroundApplication(String packageName, ISystemPluginResult result) {
+        // TODO
+        result.onFinished(true, "");
     }
 
     @Override
