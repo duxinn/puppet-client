@@ -23,4 +23,11 @@ public interface IJob {
      * @param jobResult 任务执行结果
      */
     void receiveJobResult(Job jobResult);
+
+
+    /**
+     * 启动系统
+     * @return 启动是否成功
+     */
+    boolean startJobSystem();
 }
