@@ -1,5 +1,7 @@
 package com.mango.puppet.log.i;
 
+import android.content.Context;
+
 /**
  * ILog
  * 日志相关
