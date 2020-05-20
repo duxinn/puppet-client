@@ -55,6 +55,11 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent {
 
     }
 
+    @Override
+    public boolean startPluginSystem() {
+        return false;
+    }
+
     /************   IPluginEvent   ************/
     @Override
     public void distributeEventWatcher(EventWatcher eventWatcher, IPluginControlResult result) {

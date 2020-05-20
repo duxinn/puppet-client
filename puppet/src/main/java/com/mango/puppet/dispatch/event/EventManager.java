@@ -1,5 +1,7 @@
 package com.mango.puppet.dispatch.event;
 
+import android.os.Environment;
+
 import com.mango.puppet.dispatch.event.i.IEvent;
 import com.mango.puppetmodel.Event;
 
@@ -30,5 +32,10 @@ public class EventManager implements IEvent {
     @Override
     public void setEventWatcher(String packageName, String eventName, boolean isValid) {
 
+    }
+
+    @Override
+    public boolean startEventSystem() {
+        return false;
     }
 }
