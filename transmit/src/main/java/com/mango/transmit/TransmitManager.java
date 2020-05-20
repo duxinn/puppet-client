@@ -1,5 +1,7 @@
 package com.mango.transmit;
 
+import android.content.Context;
+
 import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.EventWatcher;
 import com.mango.puppetmodel.Job;
@@ -9,6 +11,8 @@ import com.mango.transmit.i.ITransmitReceiver;
 import com.mango.transmit.i.ITransmitSender;
 
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * TransmitManager
@@ -28,6 +32,12 @@ public class TransmitManager implements IRunStatus, ITransmitSender, IEventTrans
     }
 
     /************   public   ************/
+
+    // 用于registerReceiver和Filter用以接收数据
+    public void setRegister(Context context, ArrayList<String> filters) {
+
+    }
+
     public void setTransmitReceiver(ITransmitReceiver receiver) {
 
     }
