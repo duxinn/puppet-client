@@ -13,6 +13,12 @@ import java.util.ArrayList;
  */
 @SuppressWarnings("unused")
 public interface IPluginControl {
+    
+    /**
+     * 启动系统
+     * @return 启动是否成功
+     */
+    boolean startPluginSystem();
 
     /**
      * 运行木马插件

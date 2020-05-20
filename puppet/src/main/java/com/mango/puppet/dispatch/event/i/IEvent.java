@@ -27,4 +27,10 @@ public interface IEvent {
     void setEventWatcher(String packageName,
                          String eventName,
                          boolean isValid);
+
+    /**
+     * 启动系统
+     * @return 启动是否成功
+     */
+    boolean startEventSystem();
 }
