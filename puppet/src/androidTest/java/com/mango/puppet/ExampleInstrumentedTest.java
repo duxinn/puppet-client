@@ -1,12 +1,19 @@
 package com.mango.puppet;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.mango.puppet.log.LogManager;
+import com.mango.puppet.log.LogUtil;
+import com.mango.puppet.log.i.ILog;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.File;
 
 import static org.junit.Assert.*;
 
@@ -23,5 +30,18 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         assertEquals("com.mango.puppet.test", appContext.getPackageName());
+    }
+    @Test
+    public void ILogUsingTest() {
+        String log = "124test";
+        LogManager mLog = LogManager.getInstance();
+        mLog.setNewLogListener(new ILog.ILogListener(){
+            @Override
+            public void onNewLog(String log) {
+                Log.e("writeLog",log);
+            }
+        });
+        mLog.recordLog(log);
+//        File file = new File(LogUtil.getLogStorePath());
     }
 }
