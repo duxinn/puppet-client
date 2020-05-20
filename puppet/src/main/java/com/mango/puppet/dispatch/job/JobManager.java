@@ -30,4 +30,9 @@ public class JobManager implements IJob {
     public void receiveJobResult(Job jobResult) {
 
     }
+
+    @Override
+    public boolean startJobSystem() {
+        return false;
+    }
 }
