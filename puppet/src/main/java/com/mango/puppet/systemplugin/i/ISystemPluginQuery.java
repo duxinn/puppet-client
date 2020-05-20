@@ -1,5 +1,7 @@
 package com.mango.puppet.systemplugin.i;
 
+import android.content.Context;
+
 /**
  * ISystemPluginQuery
  *
@@ -25,8 +27,9 @@ public interface ISystemPluginQuery {
     /**
      * 获取目标应用版本号
      *
+     * @param context context
      * @param packageName 目标应用包名
      * @return 目标应用版本号 空为获取失败或者未安装
      */
-    String getApplicationVersion(String packageName);
+    String getApplicationVersion(Context context, String packageName);
 }

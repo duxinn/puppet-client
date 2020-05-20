@@ -11,12 +11,6 @@ package com.mango.puppet.systemplugin.i;
 public interface ISystemPluginListener {
 
     /**
-     * 前台应用发生改变时调用
-     * @param packageName 当前前台应用的包名
-     */
-    void onForegroundApplicationChange(String packageName);
-
-    /**
      * 电池电量改变时调用
      * @param intLevel 当前电量
      * @param intScale 总电量

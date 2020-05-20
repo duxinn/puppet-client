@@ -30,9 +30,11 @@ public interface ISystemPluginExecute {
      * 更改前台应用
      *
      * @param packageName 要切换到前台的应用的包名
+     * @param activityName 要切换到前台的应用的activity名称
      * @param result 执行结果
      */
     void changeForegroundApplication(String packageName,
+                                     String activityName,
                                      ISystemPluginResult result);
 
     /**
@@ -66,9 +68,11 @@ public interface ISystemPluginExecute {
      * 重启应用
      *
      * @param packageName 要重启应用的包名
+     * @param activityName 要重启应用的activity名称
      * @param result 执行结果
      */
     void restartApplication(String packageName,
+                            String activityName,
                             ISystemPluginResult result);
 
     /**
