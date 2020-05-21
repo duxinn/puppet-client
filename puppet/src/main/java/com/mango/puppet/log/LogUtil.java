@@ -1,5 +1,6 @@
 package com.mango.puppet.log;
 
+import android.content.Context;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -16,16 +17,16 @@ import java.util.Locale;
 public class LogUtil {
     static private SimpleDateFormat dateFormat1 = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
 
-    public static void writeLog(String log) {
+    public static void writeLog(String log, Context context) {
 //        if (TextUtils.isEmpty(log)) return;
         if (log.length() <= 0) return;
-        File file = new File(getLogStorePath());
+        File file = new File(getLogStorePath(context));
         boolean flag = true;
         if (!file.exists()) {
             flag = file.mkdirs();
         }
         if (!flag) return;
-        String fp = getLogStorePath() + ymd() + ".txt";
+        String fp = getLogStorePath(context) + ymd() + ".txt";
         file = new File(fp);
         if (!file.exists()) {
             try {
@@ -59,12 +60,12 @@ public class LogUtil {
         }
     }
 
-    public static String getLogStorePath() {
-        return getStorePath() + "log" + File.separator;
+    public static String getLogStorePath(Context context) {
+        return getStorePath(context) + "log" + File.separator;
     }
 
-    public static String getStorePath() {
-        return MyApplication.getInstance().getFilesDir().getAbsolutePath() + File.separator + "mango/";
+    public static String getStorePath(Context context) {
+        return context.getFilesDir().getAbsolutePath() + File.separator + "mango/";
     }
 
     static String ymd() {

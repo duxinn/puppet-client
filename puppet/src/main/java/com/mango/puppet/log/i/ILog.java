@@ -1,5 +1,7 @@
 package com.mango.puppet.log.i;
 
+import android.content.Context;
+
 /**
  * ILog
  * 日志相关
@@ -22,7 +24,7 @@ public interface ILog {
      *
      * @param log 日志内容
      */
-    void recordLog(String log);
+    void recordLog(String log, Context context);
 
     /**
      * 新日志监听者

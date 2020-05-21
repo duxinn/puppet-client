@@ -1,5 +1,7 @@
 package com.mango.puppet.log;
 
+import android.content.Context;
+
 import com.mango.puppet.log.i.ILog;
 
 /**
@@ -28,10 +30,10 @@ public class LogManager implements ILog {
     }
 
     @Override
-    public void recordLog(String log) {
+    public void recordLog(String log, Context context) {
         log = LogUtil.timeString(System.currentTimeMillis() / 1000) + " "+log;
 //        存储拼接上时间的log
-        LogUtil.writeLog(log);
+        LogUtil.writeLog(log,context);
 //        把拼接好的日志通知给观察者
         if (mLogListener != null) {
             mLogListener.onNewLog(log);
