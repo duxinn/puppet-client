@@ -1,5 +1,7 @@
 package com.mango.puppet.network;
 
+import android.content.Context;
+
 import com.mango.puppet.network.i.INetwork;
 import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.Job;
@@ -23,7 +25,7 @@ public class NetworkManager implements INetwork {
 
     /************   INetwork   ************/
     @Override
-    public void setupNetwork(ISetupResult result) {
+    public void setupNetwork(Context context, ISetupResult result) {
 
     }
 

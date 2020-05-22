@@ -1,5 +1,7 @@
 package com.mango.puppet.dispatch.system.i;
 
+import android.content.Context;
+
 /**
  * ISystem
  * 系统调度
@@ -17,5 +19,5 @@ public interface ISystem {
      * 3 通知任务模块 恢复缓存 开始队列
      * 4 通知事件模块 恢复已注册事件 开始监听新事件
      */
-    void startSystem();
+    void startSystem(Context context);
 }

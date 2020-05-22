@@ -1,5 +1,7 @@
 package com.mango.puppetmodel;
 
+import org.json.JSONObject;
+
 import java.util.Map;
 
 /**
@@ -31,10 +33,10 @@ public class Job {
     public String error_message;
 
     // 任务所需参数
-    public Map job_data;
+    public JSONObject job_data;
 
     // 任务执行结果附带参数
-    public Map result_data;
+    public JSONObject result_data;
 
 
 }

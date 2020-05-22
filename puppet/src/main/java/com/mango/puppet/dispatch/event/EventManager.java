@@ -1,5 +1,6 @@
 package com.mango.puppet.dispatch.event;
 
+import android.content.Context;
 import android.os.Environment;
 
 import com.mango.puppet.dispatch.event.i.IEvent;
@@ -35,7 +36,7 @@ public class EventManager implements IEvent {
     }
 
     @Override
-    public boolean startEventSystem() {
+    public boolean startEventSystem(Context context) {
         return false;
     }
 }

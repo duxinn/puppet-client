@@ -18,7 +18,7 @@ public interface IPluginControl {
      * 启动系统
      * @return 启动是否成功
      */
-    boolean startPluginSystem();
+    boolean startPluginSystem(Context context);
 
     /**
      * 运行木马插件
