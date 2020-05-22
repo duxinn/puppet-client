@@ -56,8 +56,8 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent {
     }
 
     @Override
-    public boolean startPluginSystem(Context context) {
-        return false;
+    public void startPluginSystem(Context context, IPluginControlResult result) {
+
     }
 
     /************   IPluginEvent   ************/

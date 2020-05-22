@@ -38,5 +38,8 @@ public class Job {
     // 任务执行结果附带参数
     public JSONObject result_data;
 
+    // 任务回执url
+    public String callback;
+
 
 }
