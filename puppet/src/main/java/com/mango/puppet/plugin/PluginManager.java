@@ -55,6 +55,12 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent {
 
     }
 
+    /**
+     * 1 检查是否root及是否有读写权限
+     * 2 根据插件管理层暴露的接口 检查目标app是否安装、破解插件是否存在、破解插件的版本和app版本是否一致
+     * 3 启动数据传输模块
+     * 4 运行木马程序
+     */
     @Override
     public void startPluginSystem(Context context, IPluginControlResult result) {
 

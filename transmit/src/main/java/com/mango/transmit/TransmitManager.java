@@ -6,7 +6,6 @@ import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.EventWatcher;
 import com.mango.puppetmodel.Job;
 import com.mango.transmit.i.IEventTransform;
-import com.mango.transmit.i.IRunStatus;
 import com.mango.transmit.i.ITransmitReceiver;
 import com.mango.transmit.i.ITransmitSender;
 
@@ -21,7 +20,7 @@ import java.util.ArrayList;
  * @date: 2020/05/18
  */
 @SuppressWarnings("unused")
-public class TransmitManager implements IRunStatus, ITransmitSender, IEventTransform {
+public class TransmitManager implements ITransmitSender, IEventTransform {
     private static final TransmitManager ourInstance = new TransmitManager();
 
     public static TransmitManager getInstance() {
@@ -33,23 +32,16 @@ public class TransmitManager implements IRunStatus, ITransmitSender, IEventTrans
 
     /************   public   ************/
 
-    // 用于registerReceiver和Filter用以接收数据
+    /**
+     * 用于registerReceiver和Filter用以接收数据
+     * @param context context
+     * @param filters 木马插件所在应用的包名
+     */
     public void setRegister(Context context, ArrayList<String> filters) {
 
     }
 
     public void setTransmitReceiver(ITransmitReceiver receiver) {
-
-    }
-
-    /************   IRunStatus   ************/
-    @Override
-    public void setStatusObserver(String targetPackageName, IRunStatusCallback callback) {
-
-    }
-
-    @Override
-    public void setStatusObserver(String targetPackageName, IRunStatusCallback callback, long timeoutMillis) {
 
     }
 
