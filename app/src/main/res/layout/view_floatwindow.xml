@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/dimens_20_dp"
+        android:layout_marginTop="@dimen/dimens_25_dp"
+        android:layout_marginRight="@dimen/dimens_20_dp"
+        android:layout_marginBottom="@dimen/dimens_100_dp"
+        android:background="@drawable/shape_floatwindow">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/dimens_10_dp"
+            android:layout_height="@dimen/dimens_50_dp">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="false"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="17sp" />
+
+
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimens_30_dp"
+                android:layout_marginTop="@dimen/dimens_60_dp">
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="1dp" />
+
+                <LinearLayout
+                    android:id="@+id/llRetry"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="#eeeeee"
+                        android:text="运行插件"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="1dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvLocalStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_5_dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="所有插件状态:  "
+                android:textColor="#fff"
+                android:textSize="14sp" />
+            <TextView
+                android:id="@+id/tvEventWatcher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_5_dp"
+                android:paddingLeft="@dimen/dimens_10_dp"
+                android:textColor="@color/white"
+                android:text="监听事件: "
+                android:textSize="@dimen/dimens_14_sp" />
+
+            <TextView
+                android:id="@+id/tvJobEngineStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_5_dp"
+                android:paddingLeft="@dimen/dimens_10_dp"
+                android:text="任务引擎状态"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dimens_14_sp" />
+
+            <TextView
+                android:id="@+id/tvNetStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_5_dp"
+                android:paddingLeft="@dimen/dimens_10_dp"
+                android:text="网络状态:"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dimens_14_sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/dimens_5_dp"
+                android:paddingLeft="@dimen/dimens_10_dp"
+                android:paddingRight="@dimen/dimens_10_dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dimens_14_sp"
+                    android:text="待执行任务数:  "/>
+                <TextView
+                    android:id="@+id/tvJob"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="0"
+                    android:textSize="@dimen/dimens_14_sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dimens_14_sp"
+                    android:layout_marginLeft="@dimen/dimens_20_dp"
+                    android:text="待上报任务数:  "/>
+                <TextView
+                    android:id="@+id/tvJobResult"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="0"
+
+                    android:textSize="@dimen/dimens_14_sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvlog"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="@dimen/dimens_10_dp"
+                android:text="..."
+                android:textColor="@color/white"
+                android:textSize="@dimen/dimens_15_sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/btnFloating"
+        android:layout_width="@dimen/dimens_35_dp"
+        android:layout_height="@dimen/dimens_35_dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/dimens_10_dp"
+        android:layout_marginRight="@dimen/dimens_7_dp"
+        android:src="@mipmap/image_float_close"
+       />
+
+</RelativeLayout>
