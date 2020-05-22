@@ -16,7 +16,7 @@ import com.mango.puppetmodel.Event;
 @SuppressWarnings("unused")
 public class EventManager implements IEvent {
     private static final EventManager ourInstance = new EventManager();
-
+    Context mContext;
     public static EventManager getInstance() {
         return ourInstance;
     }
@@ -37,6 +37,7 @@ public class EventManager implements IEvent {
 
     @Override
     public boolean startEventSystem(Context context) {
+        mContext = context;
         return false;
     }
 }
