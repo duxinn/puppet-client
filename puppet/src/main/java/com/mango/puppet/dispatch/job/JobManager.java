@@ -1,5 +1,7 @@
 package com.mango.puppet.dispatch.job;
 
+import android.content.Context;
+
 import com.mango.puppet.dispatch.job.i.IJob;
 import com.mango.puppetmodel.Job;
 
@@ -32,7 +34,7 @@ public class JobManager implements IJob {
     }
 
     @Override
-    public boolean startJobSystem() {
+    public boolean startJobSystem(Context context) {
         return false;
     }
 }

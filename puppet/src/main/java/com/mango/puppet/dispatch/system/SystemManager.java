@@ -1,5 +1,7 @@
 package com.mango.puppet.dispatch.system;
 
+import android.content.Context;
+
 import com.mango.puppet.dispatch.system.i.ISystem;
 import com.mango.puppet.plugin.i.IPluginRunListener;
 
@@ -22,7 +24,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
 
     /************   ISystem   ************/
     @Override
-    public void startSystem() {
+    public void startSystem(Context context) {
 
     }
 

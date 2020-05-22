@@ -12,6 +12,8 @@ import com.mango.puppetmodel.Job;
 import com.mango.transmit.TransmitManager;
 import com.mango.transmit.i.ITransmitReceiver;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -71,7 +73,12 @@ public class Entrance implements ITransmitReceiver {
     public void onReceiveJob(String packageName, Job job) {
         if ("com.mango.hookdemo".equals(packageName)) {
             if (job.job_name.equals("abc")) {
-                String content = (String) job.job_data.get("text");
+                String content = null;
+                try {
+                    content = job.job_data.getString("text");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 MainActivity.mainActivity.mTv.setText(content);
                 job.job_status = 2;
                 TransmitManager.getInstance().sendJob(

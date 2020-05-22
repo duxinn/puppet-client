@@ -1,5 +1,7 @@
 package com.mango.puppet.dispatch.job.i;
 
+import android.content.Context;
+
 import com.mango.puppetmodel.Job;
 
 /**
@@ -29,5 +31,5 @@ public interface IJob {
      * 启动系统
      * @return 启动是否成功
      */
-    boolean startJobSystem();
+    boolean startJobSystem(Context context);
 }

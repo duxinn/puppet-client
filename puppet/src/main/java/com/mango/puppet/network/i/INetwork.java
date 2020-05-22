@@ -1,5 +1,7 @@
 package com.mango.puppet.network.i;
 
+import android.content.Context;
+
 import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.Job;
 
@@ -17,7 +19,7 @@ public interface INetwork {
      * 启动本地server/长连接
      * @param result 启动结果
      */
-    void setupNetwork(ISetupResult result);
+    void setupNetwork(Context context, ISetupResult result);
 
     /**
      * 上报任务结果

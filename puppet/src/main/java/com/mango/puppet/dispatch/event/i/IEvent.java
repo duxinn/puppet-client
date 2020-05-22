@@ -1,5 +1,7 @@
 package com.mango.puppet.dispatch.event.i;
 
+import android.content.Context;
+
 import com.mango.puppetmodel.Event;
 
 /**
@@ -32,5 +34,5 @@ public interface IEvent {
      * 启动系统
      * @return 启动是否成功
      */
-    boolean startEventSystem();
+    boolean startEventSystem(Context context);
 }
