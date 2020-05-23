@@ -53,52 +53,29 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
 
     /************   ITransmitSender   ************/
     @Override
-    public void sendJob(String targetPackageName, String messageId, ITransmitCallback callback, Job job) {
+    public void sendJob(String targetPackageName, Job job) {
 
     }
 
     @Override
-    public void sendJob(String targetPackageName, String messageId, ITransmitCallback callback, Job job, long timeoutMillis) {
+    public void sendEventWatcher(String targetPackageName, EventWatcher eventWatcher) {
 
     }
 
     @Override
-    public void sendEventWatcher(String targetPackageName, String messageId, ITransmitCallback callback, EventWatcher eventWatcher) {
+    public void sendEvent(String targetPackageName, Event event) {
 
     }
 
     @Override
-    public void sendEventWatcher(String targetPackageName, String messageId, ITransmitCallback callback, EventWatcher eventWatcher, long timeoutMillis) {
+    public void sendData(String targetPackageName, String data) {
 
     }
 
     @Override
-    public void sendEvent(String targetPackageName, String messageId, ITransmitCallback callback, Event event) {
+    public void sendMessage(String targetPackageName, JSONObject data) {
 
     }
 
-    @Override
-    public void sendEvent(String targetPackageName, String messageId, ITransmitCallback callback, Event event, long timeoutMillis) {
 
-    }
-
-    @Override
-    public void sendData(String targetPackageName, String messageId, ITransmitCallback callback, byte[] data) {
-
-    }
-
-    @Override
-    public void sendData(String targetPackageName, String messageId, ITransmitCallback callback, byte[] data, long timeoutMillis) {
-
-    }
-
-    @Override
-    public void sendMessage(String targetPackageName, String messageId, ITransmitCallback callback, JSONObject data) {
-
-    }
-
-    @Override
-    public void sendMessage(String targetPackageName, String messageId, ITransmitCallback callback, JSONObject data, long timeoutMillis) {
-
-    }
 }

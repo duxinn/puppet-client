@@ -4,6 +4,8 @@ import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.EventWatcher;
 import com.mango.puppetmodel.Job;
 
+import org.json.JSONObject;
+
 /**
  * ITransmitReceiver
  * 处理收到的数据 其他模块使用transmit模块进行进程间通信时实现
@@ -40,4 +42,22 @@ public interface ITransmitReceiver {
      */
     void onReceiveEventWatcher(String packageName,
                                EventWatcher eventWatcher);
+
+    /**
+     * 收到String内容
+     *
+     * @param packageName 发送消息的应用的包名
+     * @param dataString 收到的内容
+     */
+    void onReceiveEventData(String packageName,
+                            String dataString);
+
+    /**
+     * 收到JSONObject内容
+     *
+     * @param packageName 发送消息的应用的包名
+     * @param jsonObject 收到的内容
+     */
+    void onReceiveEventData(String packageName,
+                            JSONObject jsonObject);
 }
