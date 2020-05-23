@@ -2,6 +2,7 @@ package com.mango.puppet.plugin;
 
 import android.content.Context;
 
+import com.mango.loadlibtool.InjectTool;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginEvent;
 import com.mango.puppet.plugin.i.IPluginJob;
@@ -36,8 +37,8 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent {
 
     /************   IPluginControl   ************/
     @Override
-    public void runPuppetPlugin(Context context, String targetPackageName, String className, String methodName, IPluginControlResult result) {
-
+    public void runPuppetPlugin(Context context, String targetPackageName, String dexName, String className, String methodName, IPluginControlResult result) {
+        InjectTool.inject(context, targetPackageName, dexName, className, methodName);
     }
 
     @Override

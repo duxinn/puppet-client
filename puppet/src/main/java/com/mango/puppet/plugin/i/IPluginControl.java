@@ -28,12 +28,14 @@ public interface IPluginControl {
      *
      * @param context context
      * @param targetPackageName 目标app包名
+     * @param dexName assets 目录下插件名称
      * @param className 要在目标app中运行入口类名
      * @param methodName 该类名下要调用的静态方法的方法名 注:必须是静态方法
      * @param result 运行结果
      */
     void runPuppetPlugin(Context context,
                          String targetPackageName,
+                         String dexName,
                          String className,
                          String methodName,
                          IPluginControlResult result);
