@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.log.i.ILog;
 import com.mango.puppet.plugin.PluginManager;
@@ -106,10 +107,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.llRetry) {
-            injectStatus = PluginManager.getInstance().startPluginSystem() ? 1 : 0;
-            Intent intent = new Intent(this, FloatBallService.class);
-            intent.putExtra("injectStatus", injectStatus);
-            startService(intent);
+            SystemManager.getInstance().startSystem();
         }
     }
 
