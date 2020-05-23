@@ -2,6 +2,7 @@ package com.mango.puppet.status;
 
 import com.mango.puppet.status.i.IStatusControl;
 import com.mango.puppet.status.i.IStatusListener;
+import com.mango.puppetmodel.EventWatcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ public class StatusManager implements IStatusControl {
     int jobEngineStatus = -99;
     int jobCount = 0;
     int jobResultCount = 0;
-    List<EventWatchModel> eventWatchModelList = new ArrayList<>();
+    List<EventWatcher> eventWatchModelList = new ArrayList<>();
     List<PluginRunningModel> pluginRunningModelList = new ArrayList<>();
 //    List<HashMap<String, Object>> evenWatchList = new ArrayList<>();
 //    List<HashMap<String, Boolean>> pluginRunningList = new ArrayList<>();
@@ -119,19 +120,25 @@ public class StatusManager implements IStatusControl {
     @Override
     public void setEventWatcher(String packageName, String eventName, boolean isvalid) {
 //        HashMap<String, Object> eventWatchModel = new HashMap();
-        EventWatchModel eventWatchModel = new EventWatchModel();
+        EventWatcher eventWatchModel = new EventWatcher();
         Boolean isNeed = true;
+        int watchStatus;
+        if (isvalid){
+            watchStatus =1;
+        }else {
+            watchStatus = 0;
+        }
         if (eventWatchModelList.size() > 0) {
             for (int i = 0; i < eventWatchModelList.size(); i++) {
-                EventWatchModel model = eventWatchModelList.get(i);
+                EventWatcher model = eventWatchModelList.get(i);
                 String packageNameIn = model.getPackageName();
                 if (packageName.equals(packageNameIn)) {
                     String eventNameIn = model.getEventName();
                     if (eventName.equals(eventNameIn)) {
-                        Boolean isValidIn = model.getIsvalid();
+                        int isValidIn = model.getWatcherStatus();
                         //发生改变修改原来model的值
-                        if (isvalid != isValidIn) {
-                            model.setIsvalid(isvalid);
+                        if (isValidIn != watchStatus) {
+                            model.setWatcherStatus(watchStatus);
                             if (mListener != null) {
                                 mListener.onEventWatcherChanged();
                             }
@@ -145,7 +152,7 @@ public class StatusManager implements IStatusControl {
         if (isNeed) {
             eventWatchModel.setPackageName(packageName);
             eventWatchModel.setEventName(eventName);
-            eventWatchModel.setIsvalid(isvalid);
+            eventWatchModel.setWatcherStatus(watchStatus);;
             eventWatchModelList.add(eventWatchModel);
             if (mListener != null) {
                 mListener.onEventWatcherChanged();
@@ -158,11 +165,13 @@ public class StatusManager implements IStatusControl {
         boolean isValid = false;
         if (eventWatchModelList.size() > 0) {
             for (int i = 0; i < eventWatchModelList.size(); i++) {
-                EventWatchModel model = eventWatchModelList.get(i);
+                EventWatcher model = eventWatchModelList.get(i);
                 String packageNameIn = model.getPackageName();
                 String eventNameIn = model.getEventName();
                 if (packageName.equals(packageNameIn) && eventName.equals(eventNameIn)) {
-                    isValid = model.getIsvalid();
+                    if ((model.getWatcherStatus() == 1)){
+                        isValid = true;
+                    }
                     return isValid;
                 }
             }
@@ -175,7 +184,7 @@ public class StatusManager implements IStatusControl {
         List<String> packageNameList = new ArrayList<>();
         if (eventWatchModelList.size() > 0) {
             for (int i = 0; i < eventWatchModelList.size(); i++) {
-                if (eventWatchModelList.get(i).getIsvalid() && packageName.equals(eventWatchModelList.get(i).getPackageName())) {
+                if (eventWatchModelList.get(i).getWatcherStatus() == 1 && packageName.equals(eventWatchModelList.get(i).getPackageName())) {
                     packageNameList.add(eventWatchModelList.get(i).getEventName());
                 }
             }
@@ -189,8 +198,8 @@ public class StatusManager implements IStatusControl {
         Map<String, List<String>> eventMap = new HashMap<>();
         if (eventWatchModelList.size() > 0) {
             for (int i = 0; i < eventWatchModelList.size(); i++) {
-                EventWatchModel model = eventWatchModelList.get(i);
-                if (model.getIsvalid()) {
+                EventWatcher model = eventWatchModelList.get(i);
+                if (model.getWatcherStatus() == 1) {
                     String packageNameIn = model.getPackageName();
                     String eventNameIn = model.getEventName();
                     if (eventMap.get(packageNameIn) != null) {
