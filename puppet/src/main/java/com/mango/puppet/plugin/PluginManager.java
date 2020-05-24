@@ -48,8 +48,10 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     private ArrayList<String> runningPackageNames = new ArrayList<>();
     private ArrayList<String> pluginPackageNames = new ArrayList<>();
     private Context context;
-    final boolean[] callBack = {false};
+    private boolean callBack = false;
     private IPluginControlResult iPluginControlResult;
+    private Timer timer;
+    private Timer checkTimer;
 
     public static PluginManager getInstance() {
         return ourInstance;
@@ -67,7 +69,6 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     @Override
     public void runPuppetPlugin(Context context, String targetPackageName, String dexName, String className, String methodName, IPluginControlResult result) {
         InjectTool.inject(context, targetPackageName, dexName, className, methodName);
-        sendHeart(targetPackageName);
     }
 
     /**
@@ -119,29 +120,35 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                final String packageName = (String) msg.obj;
-                TransmitManager.getInstance().sendMessage(packageName, jsonObject);
-                Timer timer = new Timer();
-                TimerTask timerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        //检测心跳是否回应
-                        runningPackageNames.remove(packageName);
-                        for (PluginModel model : models) {
-                            if (model.getPackageName().equals(packageName) && model.isRun()) {
-                                runningPackageNames.add(packageName);
-                            }
-                        }
-                        if (!runningPackageNames.contains(packageName) && listener != null) {
-                            listener.onPluginRunningStatusChange(packageName, false);
-                        } else if (runningPackageNames.contains(packageName) && listener != null) {
-                            listener.onPluginRunningStatusChange(packageName, true);
-                        }
-                    }
-                };
-                timer.schedule(timerTask, 2000, 5000);
+                for (PluginModel model : models) {
+                    TransmitManager.getInstance().sendMessage(model.getPackageName(), jsonObject);
+                }
+                if (checkTimer == null) {
+                    checkTimer = new Timer();
+                    checkTimer.schedule(timerTask, 2000, 5000);
+                }
             }
             super.handleMessage(msg);
+        }
+    };
+
+    private TimerTask timerTask = new TimerTask() {
+        @Override
+        public void run() {
+            //检测心跳是否回应
+            runningPackageNames.clear();
+            for (PluginModel model : models) {
+                if (model.isRun()) {
+                    runningPackageNames.add(model.getPackageName());
+                    if (listener != null) {
+                        listener.onPluginRunningStatusChange(model.getPackageName(), true);
+                    }
+                } else {
+                    if (listener != null) {
+                        listener.onPluginRunningStatusChange(model.getPackageName(), false);
+                    }
+                }
+            }
         }
     };
 
@@ -153,6 +160,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
      */
     @Override
     public void startPluginSystem(Context context, final List<PluginModel> pluginModels, final IPluginControlResult result) {
+        callBack = false;
         models = pluginModels;
         this.context = context;
         iPluginControlResult = result;
@@ -171,26 +179,25 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                     } else {
                         TransmitManager.getInstance().setTransmitReceiver(this);
                         for (final PluginModel pluginModel : pluginModels) {
-                            if (pluginPackageNames.contains(pluginModel.getPackageName())) {
-                                runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexPath(), CLASS_NAME, METHOD_NAME, result);
-                            } else {
-                                if (!callBack[0]) {
-                                    result.onFinished(false, pluginModel.getPackageName() + "插件不可用");
-                                    callBack[0] = true;
-                                }
+                            if (!pluginPackageNames.contains(pluginModel.getPackageName())) {
+                                result.onFinished(false, pluginModel.getPackageName() + "插件不可用");
+                                callBack = true;
+                                return;
                             }
                         }
-                        if (!callBack[0]) {
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (!callBack[0]) {
-                                        result.onFinished(false, "启动插件超时");
-                                        callBack[0] = true;
-                                    }
-                                }
-                            }, 5000);
+                        sendHeart();
+                        for (final PluginModel pluginModel : pluginModels) {
+                            runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexPath(), CLASS_NAME, METHOD_NAME, result);
                         }
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!callBack) {
+                                    result.onFinished(false, "启动插件超时");
+                                    callBack = true;
+                                }
+                            }
+                        }, 5000);
                     }
                 }
             } catch (Exception e) {
@@ -200,19 +207,19 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         }
     }
 
-    private void sendHeart(final String packageName) {
-        Timer timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                Message message = new Message();
-                message.what = 1;
-                message.obj = packageName;
-                handler.sendMessage(message);
-            }
-        };
-
-        timer.schedule(timerTask, 0, 5000);
+    private void sendHeart() {
+        if (timer == null) {
+            timer = new Timer();
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    Message message = new Message();
+                    message.what = 1;
+                    handler.sendMessage(message);
+                }
+            };
+            timer.schedule(timerTask, 0, 5000);
+        }
     }
 
     /************   IPluginEvent   ************/
@@ -291,17 +298,18 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                     }
                 }
             } else if ("firstStart".equals(type)) {
+                runningPackageNames.add(packageName);
                 if (listener != null) {
                     listener.onPluginRunningStatusChange(packageName, true);
                 }
-                runningPackageNames.add(packageName);
                 for (PluginModel model : models) {
                     if (packageName.equals(model.getPackageName())) {
                         model.setRun(true);
                     }
                 }
-                if (runningPackageNames.size() == models.size()) {
+                if (runningPackageNames.size() == models.size() && !callBack) {
                     iPluginControlResult.onFinished(true, "");
+                    callBack = true;
                 }
             }
         } catch (JSONException e) {
