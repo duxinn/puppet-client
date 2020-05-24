@@ -19,28 +19,4 @@ public class EventWatcher {
     // 1:注册 0:注销
     public int watcher_status;
 
-    public String getPackageName() {
-        return package_name;
-    }
-
-    public void setPackageName(String packageName) {
-        this.package_name = packageName;
-    }
-
-    public String getEventName() {
-        return event_name;
-    }
-
-    public void setEventName(String eventName) {
-        this.event_name = eventName;
-    }
-
-    public int getWatcherStatus() {
-        return watcher_status;
-    }
-
-    public void setWatcherStatus(int watcherStatus) {
-        this.watcher_status = watcherStatus;
-    }
-
 }

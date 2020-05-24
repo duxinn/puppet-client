@@ -3,6 +3,7 @@ package com.mango.puppet.status;
 import com.mango.puppet.status.i.IStatusControl;
 import com.mango.puppet.status.i.IStatusListener;
 import com.mango.puppetmodel.EventWatcher;
+import com.mango.puppetmodel.PluginRunningModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -131,14 +132,14 @@ public class StatusManager implements IStatusControl {
         if (eventWatchModelList.size() > 0) {
             for (int i = 0; i < eventWatchModelList.size(); i++) {
                 EventWatcher model = eventWatchModelList.get(i);
-                String packageNameIn = model.getPackageName();
+                String packageNameIn = model.package_name;
                 if (packageName.equals(packageNameIn)) {
-                    String eventNameIn = model.getEventName();
+                    String eventNameIn = model.event_name;
                     if (eventName.equals(eventNameIn)) {
-                        int isValidIn = model.getWatcherStatus();
+                        int isValidIn = model.watcher_status;
                         //发生改变修改原来model的值
                         if (isValidIn != watchStatus) {
-                            model.setWatcherStatus(watchStatus);
+                            model.watcher_status = watchStatus;
                             if (mListener != null) {
                                 mListener.onEventWatcherChanged();
                             }
@@ -150,9 +151,9 @@ public class StatusManager implements IStatusControl {
         }
         //向list中添加一个新的model
         if (isNeed) {
-            eventWatchModel.setPackageName(packageName);
-            eventWatchModel.setEventName(eventName);
-            eventWatchModel.setWatcherStatus(watchStatus);;
+            eventWatchModel.package_name = packageName;
+            eventWatchModel.event_name = eventName;
+            eventWatchModel.watcher_status = watchStatus;
             eventWatchModelList.add(eventWatchModel);
             if (mListener != null) {
                 mListener.onEventWatcherChanged();
@@ -166,10 +167,10 @@ public class StatusManager implements IStatusControl {
         if (eventWatchModelList.size() > 0) {
             for (int i = 0; i < eventWatchModelList.size(); i++) {
                 EventWatcher model = eventWatchModelList.get(i);
-                String packageNameIn = model.getPackageName();
-                String eventNameIn = model.getEventName();
+                String packageNameIn = model.package_name;
+                String eventNameIn = model.event_name;
                 if (packageName.equals(packageNameIn) && eventName.equals(eventNameIn)) {
-                    if ((model.getWatcherStatus() == 1)){
+                    if ((model.watcher_status == 1)){
                         isValid = true;
                     }
                     return isValid;
@@ -184,8 +185,8 @@ public class StatusManager implements IStatusControl {
         List<String> packageNameList = new ArrayList<>();
         if (eventWatchModelList.size() > 0) {
             for (int i = 0; i < eventWatchModelList.size(); i++) {
-                if (eventWatchModelList.get(i).getWatcherStatus() == 1 && packageName.equals(eventWatchModelList.get(i).getPackageName())) {
-                    packageNameList.add(eventWatchModelList.get(i).getEventName());
+                if (eventWatchModelList.get(i).watcher_status == 1 && packageName.equals(eventWatchModelList.get(i).package_name)) {
+                    packageNameList.add(eventWatchModelList.get(i).event_name);
                 }
             }
         }
@@ -199,9 +200,9 @@ public class StatusManager implements IStatusControl {
         if (eventWatchModelList.size() > 0) {
             for (int i = 0; i < eventWatchModelList.size(); i++) {
                 EventWatcher model = eventWatchModelList.get(i);
-                if (model.getWatcherStatus() == 1) {
-                    String packageNameIn = model.getPackageName();
-                    String eventNameIn = model.getEventName();
+                if (model.watcher_status == 1) {
+                    String packageNameIn = model.package_name;
+                    String eventNameIn = model.event_name;
                     if (eventMap.get(packageNameIn) != null) {
                         eventMap.get(packageNameIn).add(eventNameIn);
                     } else {
@@ -220,8 +221,8 @@ public class StatusManager implements IStatusControl {
         Boolean isRunning = false;
         if (pluginRunningModelList.size() > 0) {
             for (int i = 0; i < pluginRunningModelList.size(); i++) {
-                if (packageName.equals(pluginRunningModelList.get(i).getPackageName())) {
-                    isRunning = pluginRunningModelList.get(i).isRunning();
+                if (packageName.equals(pluginRunningModelList.get(i).packageName)) {
+                    isRunning = pluginRunningModelList.get(i).isRunning;
                 }
             }
         }
@@ -233,8 +234,8 @@ public class StatusManager implements IStatusControl {
         List<String> runningPiuginList = new ArrayList<>();
         for (int i = 0; i < pluginRunningModelList.size(); i++) {
 //            if (pluginRunningList.get(i).get)
-            if (pluginRunningModelList.get(i).isRunning()) {
-                runningPiuginList.add(pluginRunningModelList.get(i).getPackageName());
+            if (pluginRunningModelList.get(i).isRunning) {
+                runningPiuginList.add(pluginRunningModelList.get(i).packageName);
             }
         }
         return runningPiuginList;
@@ -244,9 +245,9 @@ public class StatusManager implements IStatusControl {
     public void setPluginRunning(String packageName, boolean isRunning) {
         Boolean isNeed = true;
         for (int i = 0; i < pluginRunningModelList.size(); i++) {
-            String packageNameIn = pluginRunningModelList.get(i).getPackageName();
+            String packageNameIn = pluginRunningModelList.get(i).packageName;
             if (packageName.equals(packageNameIn)) {
-                pluginRunningModelList.get(i).setRunning(isRunning);
+                pluginRunningModelList.get(i).isRunning = isRunning;
                 if (mListener != null) {
                     mListener.onPluginRunningChanged();
                 }
@@ -255,8 +256,8 @@ public class StatusManager implements IStatusControl {
         }
         if (isNeed) {
             PluginRunningModel pluginRunningModel = new PluginRunningModel();
-            pluginRunningModel.setPackageName(packageName);
-            pluginRunningModel.setRunning(isRunning);
+            pluginRunningModel.packageName = packageName;
+            pluginRunningModel.isRunning = isRunning;
             pluginRunningModelList.add(pluginRunningModel);
             if (mListener != null) {
                 mListener.onPluginRunningChanged();
