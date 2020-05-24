@@ -13,6 +13,7 @@ import com.mango.transmit.TransmitManager;
 import com.mango.transmit.i.ITransmitReceiver;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,8 +63,6 @@ public class Entrance implements ITransmitReceiver {
                 event.event_data.put("content", s);
                 TransmitManager.getInstance().sendEvent(
                         null,
-                        null,
-                        null,
                         event);
             }
         }
@@ -83,16 +82,12 @@ public class Entrance implements ITransmitReceiver {
                 job.job_status = 2;
                 TransmitManager.getInstance().sendJob(
                         null,
-                        null,
-                        null,
                         job);
             } else {
                 job.job_status = 4;
                 job.error_code = -3;
                 job.error_message = "未知任务";
                 TransmitManager.getInstance().sendJob(
-                        null,
-                        null,
                         null,
                         job);
             }
@@ -101,8 +96,6 @@ public class Entrance implements ITransmitReceiver {
             job.error_code = -2;
             job.error_message = "下发错误";
             TransmitManager.getInstance().sendJob(
-                    null,
-                    null,
                     null,
                     job);
         }
@@ -122,5 +115,15 @@ public class Entrance implements ITransmitReceiver {
                 // stop looper
             }
         }
+    }
+
+    @Override
+    public void onReceiveEventData(String packageName, String dataString) {
+
+    }
+
+    @Override
+    public void onReceiveEventData(String packageName, JSONObject jsonObject) {
+
     }
 }
