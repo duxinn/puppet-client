@@ -34,7 +34,7 @@ public class BusinessManager implements IBusiness {
     /************   IBusiness   ************/
     @Override
     public void getUploadResourceWay(final IUploadResourceWayResult mResult) {
-        LogManager.getInstance().init(mContext);
+        LogManager.init(mContext);
         NetworkManager.getInstance().requestUploadResourceWay(new INetwork.IRequestResult() {
             @Override
             public void onSuccess(Object result) {

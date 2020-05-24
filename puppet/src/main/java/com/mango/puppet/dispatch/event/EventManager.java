@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mango.puppet.dispatch.event.i.IEvent;
 import com.mango.puppet.network.NetworkManager;
 import com.mango.puppet.network.i.INetwork;
@@ -14,7 +15,10 @@ import com.mango.puppet.status.StatusManager;
 import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.EventWatcher;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +33,8 @@ public class EventManager implements IEvent {
     private static final EventManager ourInstance = new EventManager();
     Context mContext;
     Map<String, String> eventMap = new HashMap<>();
-    Boolean isNeed;
+    EventWatcher eventWatcherModel = new EventWatcher();
+    List<EventWatcher> eventWatcherList = new ArrayList<>();
     IPluginControl.IPluginControlResult iPluginControlResult = new IPluginControl.IPluginControlResult() {
         @Override
         public void onFinished(boolean isSucceed, String failReason) {
@@ -47,7 +52,7 @@ public class EventManager implements IEvent {
     /************   IEvent   ************/
     @Override
     public void uploadNewEvent(Event event) {
-        if (event != null){
+        if (event != null) {
             NetworkManager.getInstance().reportEvent(event, new INetwork.IEventRequestResult() {
                 @Override
                 public void onSuccess(Event event) {
@@ -73,6 +78,7 @@ public class EventManager implements IEvent {
     @Override
     public void setEventWatcher(String packageName, String eventName, boolean isValid) {
         int watchStatus;
+        Boolean isNeed = true;
         if (packageName != null && eventName != null) {
             if (isValid) {
                 watchStatus = 1;
@@ -81,29 +87,50 @@ public class EventManager implements IEvent {
             }
             StatusManager.getInstance().setEventWatcher(packageName, eventName, isValid);
             EventWatcher model = new EventWatcher();
-            model.setPackageName(packageName);
-            model.setEventName(eventName);
-            model.setWatcherStatus(watchStatus);
+            model.package_name = packageName;
+            model.event_name = eventName;
+            model.watcher_status = watchStatus;
             PluginManager.getInstance().distributeEventWatcher(model, iPluginControlResult);
-            Gson gson = new Gson();
-            String eventJson = gson.toJson(model);
-            SharedPreferences mContextSharedPreferences=  mContext.getSharedPreferences("writeEventJson", Context.MODE_PRIVATE);
+            SharedPreferences mContextSharedPreferences = mContext.getSharedPreferences("writeEventJson", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mContextSharedPreferences.edit();
-            if (eventMap.get(eventName) != null && !isValid) {
-                editor.remove(eventName);
-            } else {
-                editor.putString(eventName, eventJson);
+            for (int i=0;i<eventWatcherList.size();i++){
+                if (packageName.equals(eventWatcherList.get(i).package_name)&&eventName.equals(eventWatcherList.get(i).event_name)){
+                    if (!isValid){
+                        eventWatcherList.remove(i);
+                        i = i-1;
+                    }
+                    isNeed = false;
+                }
             }
+            if (isNeed){
+                eventWatcherList.add(model);
+            }
+            String eventJson = new Gson().toJson(eventWatcherList);
+            editor.putString("eventJson",eventJson);
             editor.commit();
-            StatusManager.getInstance().setEventWatcher(packageName, eventName, isValid);
         }
     }
 
     @Override
     public boolean startEventSystem(Context context) {
         mContext = context;
+        Boolean isValid;
         SharedPreferences read = context.getSharedPreferences("readEventJson", Context.MODE_PRIVATE);
-        eventMap = (Map<String, String>) read.getAll();
+//        eventMap = (Map<String, String>) read.getAll();
+        String readEvent = read.getString("eventJson","");
+        if (!readEvent.equals("")){
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<EventWatcher>>(){}.getType();
+            eventWatcherList = gson.fromJson(readEvent,type);
+        }
+        for (int i=0;i<eventWatcherList.size();i++){
+            if (eventWatcherList.get(i).watcher_status == 1){
+                isValid = true;
+            }else {
+                isValid = false;
+            }
+            StatusManager.getInstance().setEventWatcher(eventWatcherList.get(i).package_name, eventWatcherList.get(i).event_name, isValid);
+        }
         return true;
     }
 }
