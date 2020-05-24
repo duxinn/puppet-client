@@ -2,9 +2,11 @@ package com.mango.puppet.plugin.i;
 
 import android.content.Context;
 
+import com.mango.puppet.plugin.PluginModel;
 import com.mango.puppet.systemplugin.i.ISystemPluginExecute;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * IPluginControl
@@ -19,9 +21,10 @@ public interface IPluginControl {
     /**
      * 启动系统
      * @param context context
+     * @param pluginModels 所有插件的实体类
      * @param result 启动是否成功的回调
      */
-    void startPluginSystem(Context context, IPluginControlResult result);
+    void startPluginSystem(Context context, List<PluginModel> pluginModels, IPluginControlResult result);
 
     /**
      * 运行木马插件
