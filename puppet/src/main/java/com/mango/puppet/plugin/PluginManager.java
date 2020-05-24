@@ -9,6 +9,8 @@ import android.os.Message;
 import androidx.core.app.ActivityCompat;
 
 import com.mango.loadlibtool.InjectTool;
+import com.mango.puppet.dispatch.event.EventManager;
+import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginEvent;
 import com.mango.puppet.plugin.i.IPluginJob;
@@ -43,10 +45,11 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     private static final String CLASS_NAME = "";
     private static final String METHOD_NAME = "";
     private List<PluginModel> models = new ArrayList<>();
-    private Map<String, IPluginControlResult> runListenerMap;
     private ArrayList<String> runningPackageNames = new ArrayList<>();
     private ArrayList<String> pluginPackageNames = new ArrayList<>();
     private Context context;
+    final boolean[] callBack = {false};
+    private IPluginControlResult iPluginControlResult;
 
     public static PluginManager getInstance() {
         return ourInstance;
@@ -64,6 +67,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     @Override
     public void runPuppetPlugin(Context context, String targetPackageName, String dexName, String className, String methodName, IPluginControlResult result) {
         InjectTool.inject(context, targetPackageName, dexName, className, methodName);
+        sendHeart(targetPackageName);
     }
 
     /**
@@ -90,7 +94,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     @Override
     public ArrayList<String> getRunningPuppetPlugin() {
-        return (ArrayList<String>) runningPackageNames;
+        return runningPackageNames;
     }
 
     @Override
@@ -151,7 +155,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     public void startPluginSystem(Context context, final List<PluginModel> pluginModels, final IPluginControlResult result) {
         models = pluginModels;
         this.context = context;
-        final boolean[] callBack = {false};
+        iPluginControlResult = result;
         if (!SystemPluginManager.getInstance().hasRootPermission()) {
             result.onFinished(false, "未开启Root权限");
         } else {
@@ -166,35 +170,26 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                         result.onFinished(false, "无支持插件");
                     } else {
                         TransmitManager.getInstance().setTransmitReceiver(this);
-                        final int[] i = {0};
                         for (final PluginModel pluginModel : pluginModels) {
                             if (pluginPackageNames.contains(pluginModel.getPackageName())) {
-                                runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexPath(), CLASS_NAME, METHOD_NAME, new IPluginControlResult() {
-                                    @Override
-                                    public void onFinished(boolean isSucceed, String failReason) {
-                                        sendHeart(pluginModel.getPackageName());
-                                        if (isSucceed) {
-                                            i[0]++;
-                                            runningPackageNames.add(pluginModel.getPackageName());
-                                        }
-                                        if (listener != null) {
-                                            listener.onPluginRunningStatusChange(pluginModel.getPackageName(), isSucceed);
-                                        }
-                                        if (!callBack[0] && !isSucceed) {
-                                            result.onFinished(false, failReason);
-                                            callBack[0] = true;
-                                        }
-                                        if (i[0] == pluginModels.size() && !callBack[0]) {
-                                            result.onFinished(true, "");
-                                        }
-                                    }
-                                });
+                                runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexPath(), CLASS_NAME, METHOD_NAME, result);
                             } else {
                                 if (!callBack[0]) {
                                     result.onFinished(false, pluginModel.getPackageName() + "插件不可用");
                                     callBack[0] = true;
                                 }
                             }
+                        }
+                        if (!callBack[0]) {
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (!callBack[0]) {
+                                        result.onFinished(false, "启动插件超时");
+                                        callBack[0] = true;
+                                    }
+                                }
+                            }, 5000);
                         }
                     }
                 }
@@ -223,14 +218,22 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     /************   IPluginEvent   ************/
     @Override
     public void distributeEventWatcher(EventWatcher eventWatcher, IPluginControlResult result) {
-        runListenerMap.put(eventWatcher.event_name, result);
-        TransmitManager.getInstance().sendEventWatcher(eventWatcher.package_name, eventWatcher);
+        if (runningPackageNames.contains(eventWatcher.package_name)) {
+            result.onFinished(true, "");
+            TransmitManager.getInstance().sendEventWatcher(eventWatcher.package_name, eventWatcher);
+        } else {
+            result.onFinished(false, "插件未运行");
+        }
     }
 
     @Override
     public void distributeEvent(Event event, IPluginControlResult result) {
-        runListenerMap.put(event.event_name, result);
-        TransmitManager.getInstance().sendEvent(event.package_name, event);
+        if (runningPackageNames.contains(event.package_name)) {
+            result.onFinished(true, "");
+            TransmitManager.getInstance().sendEvent(event.package_name, event);
+        } else {
+            result.onFinished(false, "插件未运行");
+        }
     }
 
     /************   IPluginJob   ************/
@@ -245,8 +248,12 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
             @Override
             public void onFinished(boolean isSucceed, String failReason) {
                 if (isSucceed) {
-                    runListenerMap.put(job.job_id + "", result);
-                    TransmitManager.getInstance().sendJob(job.package_name, job);
+                    if (runningPackageNames.contains(job.package_name)) {
+                        result.onFinished(true, "");
+                        TransmitManager.getInstance().sendJob(job.package_name, job);
+                    } else {
+                        result.onFinished(false, "插件未运行");
+                    }
                 } else {
                     result.onFinished(isSucceed, failReason);
                 }
@@ -256,29 +263,16 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     @Override
     public void onReceiveJob(String packageName, Job job) {
-        IPluginControlResult controlResult = runListenerMap.get(job.job_id + "");
-        if (controlResult != null) {
-            controlResult.onFinished(job.error_code == 0, job.error_message);
-        }
-        runListenerMap.remove(job.job_id + "");
+        JobManager.getInstance().receiveJobResult(job);
     }
 
     @Override
     public void onReceiveEvent(String packageName, Event event) {
-        IPluginControlResult controlResult = runListenerMap.get(event.event_name);
-        if (controlResult != null) {
-            controlResult.onFinished(true, "");
-        }
-        runListenerMap.remove(event.event_name);
+        EventManager.getInstance().uploadNewEvent(event);
     }
 
     @Override
     public void onReceiveEventWatcher(String packageName, EventWatcher eventWatcher) {
-        IPluginControlResult controlResult = runListenerMap.get(eventWatcher.event_name);
-        if (controlResult != null) {
-            controlResult.onFinished(true, "");
-        }
-        runListenerMap.remove(eventWatcher.event_name);
     }
 
     @Override
@@ -289,12 +283,25 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     @Override
     public void onReceiveEventData(String packageName, JSONObject jsonObject) {
         try {
-            String heart = jsonObject.getString("type");
-            if ("heart".equals(heart)) {
+            String type = jsonObject.getString("type");
+            if ("heart".equals(type)) {
                 for (PluginModel model : models) {
                     if (packageName.equals(model.getPackageName())) {
                         model.setRun(true);
                     }
+                }
+            } else if ("firstStart".equals(type)) {
+                if (listener != null) {
+                    listener.onPluginRunningStatusChange(packageName, true);
+                }
+                runningPackageNames.add(packageName);
+                for (PluginModel model : models) {
+                    if (packageName.equals(model.getPackageName())) {
+                        model.setRun(true);
+                    }
+                }
+                if (runningPackageNames.size() == models.size()) {
+                    iPluginControlResult.onFinished(true, "");
                 }
             }
         } catch (JSONException e) {
