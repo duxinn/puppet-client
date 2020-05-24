@@ -35,6 +35,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation project(path: ':puppetmodel')
     implementation project(path: ':transmit')
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //NetWork
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
@@ -43,10 +45,12 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:2.1.16"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    implementation "androidx.core:core-ktx:+"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.yanzhenjie.andserver:api:2.1.1'
+    annotationProcessor 'com.yanzhenjie.andserver:processor:2.1.1'
     //Gson
     implementation 'com.google.code.gson:gson:2.8.5'
+    //Json
+    implementation 'com.alibaba:fastjson:1.1.71.android'
 //    implementation project(path: ':loadlibtool')
 }
 repositories {

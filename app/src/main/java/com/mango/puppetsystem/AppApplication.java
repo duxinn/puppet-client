@@ -14,7 +14,7 @@ public class AppApplication extends Application implements ISystemPluginListener
     public void onCreate() {
         super.onCreate();
         ApiClient.Companion.getInstance().build();
-        SystemPluginManager.getInstance().setSystemPluginListener(this, this);
+//        SystemPluginManager.getInstance().setSystemPluginListener(this, this);
     }
 
     @Override
