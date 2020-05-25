@@ -3,8 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.mango.puppetsystem">
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".AppApplication"
@@ -15,7 +21,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".MainActivity">
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@style/ThemeTranslucent">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,9 +35,13 @@
             </intent-filter>
         </activity>
 
-
         <service android:name="com.mango.puppet.systemplugin.SystemService" />
 
+        <service
+            android:name=".floatball.FloatBallService"
+            android:enabled="true"
+            android:exported="false" />
+        <service android:name=".floatball.FloatWindowService" />
     </application>
 
 </manifest>
