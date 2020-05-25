@@ -52,14 +52,15 @@ public class EventManager implements IEvent {
     /************   IEvent   ************/
     @Override
     public void uploadNewEvent(Event event) {
-        String url;
+        String url = null;
         for (int i = 0; i < eventWatcherList.size(); i++) {
             if (event.package_name.equals(eventWatcherList.get(i).package_name) && event.event_name.equals(eventWatcherList.get(i).event_name)) {
                 url = eventWatcherList.get(i).callback;
             }
         }
-        if (event != null) {
-            NetworkManager.getInstance().reportEvent(url, event, new INetwork.IEventRequestResult() {
+        if (event != null && url != null) {
+            // TODO 志刚 将55行的url加到reportEvent方法中 并全局搜索将回调中的参数 Event Job去掉
+            NetworkManager.getInstance().reportEvent(event, new INetwork.IEventRequestResult() {
                 @Override
                 public void onSuccess(Event event) {
                     event.event_status = 1;
