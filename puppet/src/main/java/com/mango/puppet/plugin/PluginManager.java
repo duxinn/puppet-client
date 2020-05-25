@@ -28,7 +28,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -121,6 +120,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                     e.printStackTrace();
                 }
                 for (PluginModel model : models) {
+                    model.setRun(false);
                     TransmitManager.getInstance().sendMessage(model.getPackageName(), jsonObject);
                 }
                 if (checkTimer == null) {
@@ -136,16 +136,20 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         @Override
         public void run() {
             //检测心跳是否回应
-            runningPackageNames.clear();
             for (PluginModel model : models) {
                 if (model.isRun()) {
-                    runningPackageNames.add(model.getPackageName());
-                    if (listener != null) {
-                        listener.onPluginRunningStatusChange(model.getPackageName(), true);
+                    if (!runningPackageNames.contains(model.getPackageName())){
+                        runningPackageNames.add(model.getPackageName());
+                        if (listener != null) {
+                            listener.onPluginRunningStatusChange(model.getPackageName(), true);
+                        }
                     }
                 } else {
-                    if (listener != null) {
-                        listener.onPluginRunningStatusChange(model.getPackageName(), false);
+                    if (runningPackageNames.contains(model.getPackageName())){
+                        runningPackageNames.remove(model.getPackageName());
+                        if (listener != null) {
+                            listener.onPluginRunningStatusChange(model.getPackageName(), false);
+                        }
                     }
                 }
             }
@@ -163,9 +167,14 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         callBack = false;
         models = pluginModels;
         this.context = context;
+        if (iPluginControlResult!=null){
+            result.onFinished(false,"插件正在启动中,请勿重复调用");
+            return;
+        }
         iPluginControlResult = result;
         if (!SystemPluginManager.getInstance().hasRootPermission()) {
             result.onFinished(false, "未开启Root权限");
+            iPluginControlResult=null;
         } else {
             try {
                 //检测是否有写的权限
@@ -173,19 +182,21 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                         "android.permission.WRITE_EXTERNAL_STORAGE");
                 if (permission != PackageManager.PERMISSION_GRANTED) {
                     result.onFinished(false, "未开启读写权限");
+                    iPluginControlResult=null;
                 } else {
                     if (getSupportPuppetPlugin().size() == 0) {
                         result.onFinished(false, "无支持插件");
+                        iPluginControlResult=null;
                     } else {
                         TransmitManager.getInstance().setTransmitReceiver(this);
                         for (final PluginModel pluginModel : pluginModels) {
                             if (!pluginPackageNames.contains(pluginModel.getPackageName())) {
                                 result.onFinished(false, pluginModel.getPackageName() + "插件不可用");
+                                iPluginControlResult=null;
                                 callBack = true;
                                 return;
                             }
                         }
-                        sendHeart();
                         for (final PluginModel pluginModel : pluginModels) {
                             runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexPath(), CLASS_NAME, METHOD_NAME, result);
                         }
@@ -194,6 +205,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                             public void run() {
                                 if (!callBack) {
                                     result.onFinished(false, "启动插件超时");
+                                    iPluginControlResult=null;
                                     callBack = true;
                                 }
                             }
@@ -203,6 +215,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
             } catch (Exception e) {
                 e.printStackTrace();
                 result.onFinished(false, e.getMessage());
+                iPluginControlResult=null;
             }
         }
     }
@@ -309,6 +322,8 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                 }
                 if (runningPackageNames.size() == models.size() && !callBack) {
                     iPluginControlResult.onFinished(true, "");
+                    iPluginControlResult=null;
+                    sendHeart();
                     callBack = true;
                 }
             }
