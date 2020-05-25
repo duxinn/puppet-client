@@ -3,8 +3,17 @@ package com.mango.puppet.network.api.basemodel
 import com.google.gson.annotations.SerializedName
 
 open class BaseModel<T> {
+
+    @SerializedName("status")
+    var code = 0
+
+    @SerializedName("msg")
+    var msg: String? = null
+
     @SerializedName("data")
     var data: T? = null
-    var code: Int? = null
-    var msg: String? = null
+
+    open fun isSuccess(): Boolean {
+        return code == 0
+    }
 }

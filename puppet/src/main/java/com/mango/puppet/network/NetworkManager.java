@@ -4,15 +4,20 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSON;
 import com.mango.puppet.network.api.api.ApiClient;
+import com.mango.puppet.network.api.basemodel.BaseModel;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
-import com.mango.puppet.network.dto.BaseDTO;
 import com.mango.puppet.network.i.INetwork;
 import com.mango.puppet.network.server.ServerManager;
+import com.mango.puppet.status.StatusManager;
 import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.Job;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import static com.mango.puppet.status.StatusManager.SERVER_ERROR;
+import static com.mango.puppet.status.StatusManager.SERVER_START;
+import static com.mango.puppet.status.StatusManager.SERVER_STOP;
 
 /**
  * NetworkManager
@@ -21,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * @date: 2020/05/18
  */
 @SuppressWarnings("unused")
-public class NetworkManager implements INetwork {
+public class NetworkManager implements INetwork, ServerManager.ServerListener {
     private static final NetworkManager ourInstance = new NetworkManager();
 
     public static NetworkManager getInstance() {
@@ -41,51 +46,43 @@ public class NetworkManager implements INetwork {
     }
 
     @Override
-    public void reportJobResult(Job jobResult) {
+    public void reportJobResult(final Job jobResult, final IJobRequestResult iJobRequestResult) {
         String jobJsonString = JSON.toJSONString(jobResult);
-        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<BaseDTO>() {
+        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<BaseModel<Object>>() {
             @Override
-            public void success(BaseDTO any) {
-                if (any.isSuccess()) {
-                    // todo 上报任务成功后操作
-                } else {
-                    // todo 上报任务失败（非网络原因）
-                }
+            public void onHandleSuccess(@Nullable BaseModel<Object> objectBaseModel) {
+                iJobRequestResult.onSuccess(jobResult);
             }
 
             @Override
-            public void failed(@NotNull Throwable e) {
-
+            public void onHandleError(@Nullable String msg, int code) {
+                iJobRequestResult.onError(jobResult, code, msg);
             }
 
             @Override
-            public void onSubscribe() {
-
+            public void onNetWorkError(@Nullable Throwable e) {
+                iJobRequestResult.onNetworkError(jobResult);
             }
         });
     }
 
     @Override
-    public void reportEvent(String url, Event event, IEventRequestResult requestResult) {
+    public void reportEvent(String url, final Event event, final IEventRequestResult requestResult) {
         String eventJsonString = JSON.toJSONString(event);
-        PuppetVM.Companion.reportEvent(url, eventJsonString, new DesCallBack<BaseDTO>() {
+        PuppetVM.Companion.reportEvent(url, eventJsonString, new DesCallBack<BaseModel<Object>>() {
             @Override
-            public void success(BaseDTO any) {
-                if (any.isSuccess()) {
-                    // todo 上报事件成功后操作
-                } else {
-                    // todo 上报事件失败（非网络原因）
-                }
+            public void onHandleSuccess(@Nullable BaseModel<Object> objectBaseModel) {
+                requestResult.onSuccess(event);
             }
 
             @Override
-            public void failed(@NotNull Throwable e) {
-
+            public void onHandleError(@Nullable String msg, int code) {
+                requestResult.onError(event, code, msg);
             }
 
             @Override
-            public void onSubscribe() {
-
+            public void onNetWorkError(@Nullable Throwable e) {
+                requestResult.onNetworkError(event);
             }
         });
     }
@@ -93,5 +90,21 @@ public class NetworkManager implements INetwork {
     @Override
     public void requestUploadResourceWay(IRequestResult requestResult) {
 
+    }
+
+    // 本地服务监听Listener
+    @Override
+    public void onServerStart(String ip) {
+        StatusManager.getInstance().setNetworkStatus(SERVER_START);
+    }
+
+    @Override
+    public void onServerError(String error) {
+        StatusManager.getInstance().setNetworkStatus(SERVER_ERROR);
+    }
+
+    @Override
+    public void onServerStop() {
+        StatusManager.getInstance().setNetworkStatus(SERVER_STOP);
     }
 }

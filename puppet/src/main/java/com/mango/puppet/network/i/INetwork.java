@@ -23,10 +23,10 @@ public interface INetwork {
 
     /**
      * 上报任务结果
-     *
      * @param jobResult 任务结果
+     * @param iJobRequestResult 请求结果
      */
-    void reportJobResult(Job jobResult);
+    void reportJobResult(Job jobResult, IJobRequestResult iJobRequestResult);
 
     /**
      * 上报新事件
