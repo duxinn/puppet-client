@@ -91,22 +91,6 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
     }
 
     private void initData() {
-        PuppetVM.Companion.getNoParamData(new DesCallBack<List<BaseDTO>>() {
-            @Override
-            public void onSubscribe() {
-
-            }
-
-            @Override
-            public void success(List<BaseDTO> any) {
-                if (any.isEmpty()) return;
-                Log.e("MainActivity", any.toString());
-            }
-
-            @Override
-            public void failed(Throwable e) {
-            }
-        });
     }
 
     @Override

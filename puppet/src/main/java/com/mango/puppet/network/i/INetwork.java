@@ -25,9 +25,8 @@ public interface INetwork {
      * 上报任务结果
      *
      * @param jobResult 任务结果
-     * @param requestResult 请求结果
      */
-    void reportJobResult(Job jobResult, IJobRequestResult requestResult);
+    void reportJobResult(Job jobResult);
 
     /**
      * 上报新事件

@@ -1,8 +1,8 @@
 package com.mango.puppet.network;
 
 import android.content.Context;
-import android.text.TextUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.mango.puppet.network.api.api.ApiClient;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
@@ -41,8 +41,9 @@ public class NetworkManager implements INetwork {
     }
 
     @Override
-    public void reportJobResult(Job jobResult, IJobRequestResult requestResult) {
-        PuppetVM.Companion.reportJobResult(jobResult.callback, jobResult.job_id, jobResult.package_name, jobResult.job_name, jobResult.job_status, jobResult.error_code, jobResult.error_message, jobResult.result_data, new DesCallBack<BaseDTO>() {
+    public void reportJobResult(Job jobResult) {
+        String jobJsonString = JSON.toJSONString(jobResult);
+        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<BaseDTO>() {
             @Override
             public void success(BaseDTO any) {
                 if (any.isSuccess()) {
@@ -66,7 +67,8 @@ public class NetworkManager implements INetwork {
 
     @Override
     public void reportEvent(String url, Event event, IEventRequestResult requestResult) {
-        PuppetVM.Companion.reportEvent(url, event.event_name, event.package_name, event.event_data, new DesCallBack<BaseDTO>() {
+        String eventJsonString = JSON.toJSONString(event);
+        PuppetVM.Companion.reportEvent(url, eventJsonString, new DesCallBack<BaseDTO>() {
             @Override
             public void success(BaseDTO any) {
                 if (any.isSuccess()) {

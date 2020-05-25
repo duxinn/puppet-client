@@ -26,13 +26,13 @@ class PuppetVM {
             }
         }
 
-        fun reportEvent(url: String, name: String, packageName: String, data: Map<Any, Any>, callBack: DesCallBack<BaseDTO>) {
+        fun reportEvent(url: String, eventJsonString: String, callBack: DesCallBack<BaseDTO>) {
             if (TextUtils.isEmpty(url)) {
-                service.reportEvent(name, packageName, data)
+                service.reportEvent(eventJsonString)
                         .compose(RxStreamHelper.io_Main())
                         .subscribe(Destiny(callBack))
             } else {
-                service.reportEvent(url, name, packageName, data)
+                service.reportEvent(url, eventJsonString)
                         .compose(RxStreamHelper.io_Main())
                         .subscribe(Destiny(callBack))
             }

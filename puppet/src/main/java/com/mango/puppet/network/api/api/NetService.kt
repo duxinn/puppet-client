@@ -33,9 +33,7 @@ interface NetService {
     @POST
     fun reportEvent(
             @Url url: String,
-            @Field("name") name: String,
-            @Field("package_name") packageName: String,
-            @Field("data") eventData: Map<Any, Any>
+            @Field("event_json") eventJson: String
     ): Observable<BaseModel<BaseDTO>>
 
     /**
@@ -44,9 +42,7 @@ interface NetService {
     @FormUrlEncoded
     @POST("api/reportEvent")
     fun reportEvent(
-            @Field("name") name: String,
-            @Field("package_name") packageName: String,
-            @Field("data") eventData: Map<Any, Any>
+            @Field("event_json") eventJson: String
     ): Observable<BaseModel<BaseDTO>>
 
     /**
