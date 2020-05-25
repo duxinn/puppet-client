@@ -3,6 +3,7 @@ package com.mango.puppet.plugin.i;
 import android.content.Context;
 
 import com.mango.puppet.systemplugin.i.ISystemPluginExecute;
+import com.mango.puppetmodel.Job;
 
 import java.util.ArrayList;
 
@@ -73,6 +74,6 @@ public interface IPluginControl {
          * @param isSucceed 是否成功
          * @param failReason 失败原因 成功时为空
          */
-        void onFinished(boolean isSucceed, String failReason);
+        void onFinished(Job job ,boolean isSucceed, String failReason);
     }
 }
