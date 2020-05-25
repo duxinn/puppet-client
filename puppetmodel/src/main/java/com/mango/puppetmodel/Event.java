@@ -19,7 +19,7 @@ public class Event {
     public String package_name;
 
     // 1:注册 0:注销
-    public Map event_data;
+    public Map<Object, Object> event_data;
 
     // 事件上报结果(仅本地控制器使用) 0:新事件未上报 1:上报已成功
     public int event_status;

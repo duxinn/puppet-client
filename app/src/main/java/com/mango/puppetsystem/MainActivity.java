@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
-import com.mango.puppet.network.dto.TestDTO;
+import com.mango.puppet.network.dto.BaseDTO;
 import com.mango.puppet.network.server.ServerManager;
 
 import java.io.DataOutputStream;
@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
     private Button mBtnBrowser;
     private TextView mTvMessage;
     private String mRootUrl;
-
-    private ServerManager mServerManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,20 +87,18 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
 
     private void initServer() {
         // 开启本地服务
-        mServerManager = new ServerManager(this);
-        mServerManager.register();
-        mBtnStartServer.performClick();
+        ServerManager.getInstance(this).register();
     }
 
     private void initData() {
-        PuppetVM.Companion.getNoParamData(new DesCallBack<List<TestDTO>>() {
+        PuppetVM.Companion.getNoParamData(new DesCallBack<List<BaseDTO>>() {
             @Override
             public void onSubscribe() {
 
             }
 
             @Override
-            public void success(List<TestDTO> any) {
+            public void success(List<BaseDTO> any) {
                 if (any.isEmpty()) return;
                 Log.e("MainActivity", any.toString());
             }
@@ -122,11 +118,11 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
                 break;
             }
             case R.id.btn_start_server: {
-                mServerManager.startServer();
+                ServerManager.getInstance(this).startServer();
                 break;
             }
             case R.id.btn_stop_server: {
-                mServerManager.stopServer();
+                ServerManager.getInstance(this).stopServer();
                 break;
             }
             case R.id.btn_browse: {
@@ -180,6 +176,6 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mServerManager.unRegister();
+        ServerManager.getInstance(this).unRegister();
     }
 }

@@ -1,6 +1,5 @@
 package com.mango.puppet.network.server;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +15,24 @@ public class ServerManager extends BroadcastReceiver {
     private static final int CMD_VALUE_START = 1;
     private static final int CMD_VALUE_ERROR = 2;
     private static final int CMD_VALUE_STOP = 4;
+
+    private static final ServerManager instance = new ServerManager();
+
+    private static Context mContext;
+    private static Intent mService;
+    private static ServerListener mServerListener;
+
+    public static ServerManager getInstance(Context context) {
+        if (mService == null) {
+            mContext = context;
+            mServerListener = (ServerListener) context;
+            mService = new Intent(context, CoreService.class);
+        }
+        return instance;
+    }
+
+    private ServerManager() {
+    }
 
     public static void onServerStart(Context context, String hostAddress) {
         sendBroadcast(context, CMD_VALUE_START, hostAddress);
@@ -40,31 +57,24 @@ public class ServerManager extends BroadcastReceiver {
         context.sendBroadcast(broadcast);
     }
 
-    private Activity mActivity;
-    private Intent mService;
-    private ServerListener mServerListener;
 
-    public ServerManager(Activity activity) {
-        this.mActivity = activity;
-        this.mServerListener = (ServerListener) activity;
-        mService = new Intent(activity, CoreService.class);
-    }
-
-    public void register() {
+    public ServerManager register() {
         IntentFilter filter = new IntentFilter(ACTION);
-        mActivity.registerReceiver(this, filter);
+        mContext.registerReceiver(this, filter);
+        return instance;
     }
 
     public void unRegister() {
-        mActivity.unregisterReceiver(this);
+        mContext.unregisterReceiver(this);
     }
 
     public void startServer() {
-        mActivity.startService(mService);
+        mContext.startService(mService);
     }
 
     public void stopServer() {
-        mActivity.stopService(mService);
+        // 停止服务
+        mContext.stopService(mService);
     }
 
     @Override
