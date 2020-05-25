@@ -14,14 +14,16 @@ class PuppetVM {
 
         private val service = ApiClient.instance.getApiService(NetService::class.java)
 
-        fun getNoParamData(desCallBack: DesCallBack<MutableList<BaseDTO>>) {
-            service.getNoParamData().compose(RxStreamHelper.io_Main()).subscribe(Destiny(desCallBack))
-        }
-
-        fun getHaveParamData(code: Int, desCallBack: DesCallBack<BaseDTO>) {
-            service.getHaveParamData(code)
-                    .compose(RxStreamHelper.io_Main())
-                    .subscribe(Destiny(desCallBack))
+        fun reportEventWatcherCallBack(url: String, eventWatcherJsonString: String, callBack: DesCallBack<BaseDTO>) {
+            if (TextUtils.isEmpty(url)) {
+                service.reportEventWatcherCallBack(eventWatcherJsonString)
+                        .compose(RxStreamHelper.io_Main())
+                        .subscribe(Destiny(callBack))
+            } else {
+                service.reportEventWatcherCallBack(url, eventWatcherJsonString)
+                        .compose(RxStreamHelper.io_Main())
+                        .subscribe(Destiny(callBack))
+            }
         }
 
         fun reportEvent(url: String, name: String, packageName: String, data: Map<Any, Any>, callBack: DesCallBack<BaseDTO>) {
@@ -36,13 +38,13 @@ class PuppetVM {
             }
         }
 
-        fun reportJobResult(url: String, jobId: Long, packageName: String, jobName: String, jobStatus: Int, errorCode: Int, errorMessage: String, resultData: JSONObject, callBack: DesCallBack<BaseDTO>) {
+        fun reportJobResult(url: String, jobJsonString: String, callBack: DesCallBack<BaseDTO>) {
             if (TextUtils.isEmpty(url)) {
-                service.reportJobResult(jobId, packageName, jobName, jobStatus, errorCode, errorMessage, resultData)
+                service.reportJobResult(jobJsonString)
                         .compose(RxStreamHelper.io_Main())
                         .subscribe(Destiny(callBack))
             } else {
-                service.reportJobResult(url, jobId, packageName, jobName, jobStatus, errorCode, errorMessage, resultData)
+                service.reportJobResult(url, jobJsonString)
                         .compose(RxStreamHelper.io_Main())
                         .subscribe(Destiny(callBack))
             }

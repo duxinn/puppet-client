@@ -2,24 +2,28 @@ package com.mango.puppet.network.api.api
 
 import com.mango.puppet.network.api.basemodel.BaseModel
 import com.mango.puppet.network.dto.BaseDTO
-import com.mango.puppetmodel.Job
 import io.reactivex.Observable
-import org.json.JSONObject
 import retrofit2.http.*
 
 
 interface NetService {
-
-    @GET("api/test/noParam/get")
-    fun getNoParamData(): Observable<BaseModel<MutableList<BaseDTO>>>
-
-    @GET("api/test/haveParam/get")
-    fun getHaveParamData(@Query("param") code: Int): Observable<BaseModel<BaseDTO>>
-
+    /**
+     * 向服务端报告事件监听的注册/注销的结果(EventWatcher本身带有指定callbackUrl)
+     */
     @FormUrlEncoded
-    @POST("api/test/post")
-    fun testPost(
-            @Field("code") code: String
+    @POST
+    fun reportEventWatcherCallBack(
+            @Url url: String,
+            @Field("event_watcher_json") eventWatcherJson: String
+    ): Observable<BaseModel<BaseDTO>>
+
+    /**
+     * 向服务端报告事件监听的注册/注销的结果(EventWatcher本身未带有指定访问url)
+     */
+    @FormUrlEncoded
+    @POST("api/reportEventWatcherCallBack")
+    fun reportEventWatcherCallBack(
+            @Field("event_watcher_json") eventWatcherJson: String
     ): Observable<BaseModel<BaseDTO>>
 
     /**
@@ -52,13 +56,7 @@ interface NetService {
     @POST
     fun reportJobResult(
             @Url url: String,
-            @Field("job_id") jobId: Long,
-            @Field("package_name") packageName: String,
-            @Field("job_name") jobName: String,
-            @Field("job_status") jobStatus: Int,
-            @Field("error_code") errorCode: Int,
-            @Field("error_message") errorMessage: String,
-            @Field("result_data") resultData: JSONObject
+            @Field("job_json") jobJson: String
     ): Observable<BaseModel<BaseDTO>>
 
     /**
@@ -67,12 +65,6 @@ interface NetService {
     @FormUrlEncoded
     @POST("api/reportJobResult")
     fun reportJobResult(
-            @Field("job_id") jobId: Long,
-            @Field("package_name") packageName: String,
-            @Field("job_name") jobName: String,
-            @Field("job_status") jobStatus: Int,
-            @Field("error_code") errorCode: Int,
-            @Field("error_message") errorMessage: String,
-            @Field("result_data") resultData: JSONObject
+            @Field("job_json") jobJson: String
     ): Observable<BaseModel<BaseDTO>>
 }

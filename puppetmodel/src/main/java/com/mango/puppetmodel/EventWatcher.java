@@ -18,4 +18,13 @@ public class EventWatcher {
 
     // 1:注册 0:注销
     public int watcher_status;
+
+    // 注册或注销失败时的错误码 任务成功时为0
+    public int error_code;
+
+    // 注册或注销失败时的原因 任务成功时为null
+    public String error_message;
+
+    // 注册或注销事件后回调url
+    public String call_back;
 }
