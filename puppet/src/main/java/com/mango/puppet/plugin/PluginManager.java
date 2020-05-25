@@ -164,13 +164,13 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
      */
     @Override
     public void startPluginSystem(Context context, final List<PluginModel> pluginModels, final IPluginControlResult result) {
-        callBack = false;
-        models = pluginModels;
-        this.context = context;
         if (iPluginControlResult!=null){
             result.onFinished(false,"插件正在启动中,请勿重复调用");
             return;
         }
+        callBack = false;
+        models = pluginModels;
+        this.context = context;
         iPluginControlResult = result;
         if (!SystemPluginManager.getInstance().hasRootPermission()) {
             result.onFinished(false, "未开启Root权限");
