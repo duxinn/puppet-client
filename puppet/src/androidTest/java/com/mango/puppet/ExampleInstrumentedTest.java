@@ -229,10 +229,11 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void EventUsingTest(){
+        String url = "api";
         EventManager.getInstance().startEventSystem(appContext);
-        EventManager.getInstance().setEventWatcher(packageName,"testEventUsing1",true);
-        EventManager.getInstance().setEventWatcher(packageName,"testEventUsing1",false);
-        EventManager.getInstance().setEventWatcher(packageName,"testEventUsing2",false);
+        EventManager.getInstance().setEventWatcher(packageName,"testEventUsing1",true,url);
+        EventManager.getInstance().setEventWatcher(packageName,"testEventUsing1",false,url);
+        EventManager.getInstance().setEventWatcher(packageName,"testEventUsing2",false,url);
 
         Event event=new Event();
         Map<String,String> map = new HashMap<>();

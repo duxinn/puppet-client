@@ -28,7 +28,8 @@ public interface IEvent {
      */
     void setEventWatcher(String packageName,
                          String eventName,
-                         boolean isValid);
+                         boolean isValid,
+                         String url);
 
     /**
      * 启动系统
