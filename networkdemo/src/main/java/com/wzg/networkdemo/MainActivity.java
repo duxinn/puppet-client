@@ -10,6 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.mango.puppet.network.api.observerCallBack.DesCallBack;
+import com.mango.puppet.network.api.vm.PuppetVM;
+import com.mango.puppet.network.dto.BaseDTO;
 import com.mango.puppet.network.server.ServerManager;
 
 import java.util.LinkedList;
@@ -52,6 +55,22 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
     }
 
     private void initData() {
+        PuppetVM.Companion.reportEvent("http://www.puppet.com", "xxx", new DesCallBack<BaseDTO>() {
+            @Override
+            public void success(BaseDTO any) {
+
+            }
+
+            @Override
+            public void failed(Throwable e) {
+
+            }
+
+            @Override
+            public void onSubscribe() {
+
+            }
+        });
     }
 
     @Override
