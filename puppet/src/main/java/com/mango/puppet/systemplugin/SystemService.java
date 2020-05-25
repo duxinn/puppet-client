@@ -54,19 +54,13 @@ public class SystemService extends Service {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals("android.intent.action.SCREEN_ON")) {
-                if (SystemPluginManager.getInstance().getListener() != null) {
-                    SystemPluginManager.getInstance().getListener().onScreenChange(false);
-                }
+                SystemPluginManager.getInstance().onScreenChange(false);
             } else if (action.equals("android.intent.action.SCREEN_OFF")) {
-                if (SystemPluginManager.getInstance().getListener() != null) {
-                    SystemPluginManager.getInstance().getListener().onScreenChange(true);
-                }
+                SystemPluginManager.getInstance().onScreenChange(true);
             } else if (action.equals("android.intent.action.BATTERY_CHANGED")) {
                 int intLevel = intent.getIntExtra("level", 0);
                 int intScale = intent.getIntExtra("scale", 100);
-                if (SystemPluginManager.getInstance().getListener() != null) {
-                    SystemPluginManager.getInstance().getListener().onBatteryChange(intLevel, intScale);
-                }
+                SystemPluginManager.getInstance().onBatteryChange(intLevel, intScale);
             }
         }
     };

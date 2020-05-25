@@ -23,23 +23,20 @@ import java.util.List;
  * @date: 2020/05/18
  */
 @SuppressWarnings("unused")
-public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQuery {
+public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQuery, ISystemPluginListener{
     private static final SystemPluginManager ourInstance = new SystemPluginManager();
 
     public static SystemPluginManager getInstance() {
         return ourInstance;
     }
 
-    private ISystemPluginListener mListener;
-
     private SystemPluginManager() {
     }
 
     /************   public   ************/
-    public void setSystemPluginListener(Application application, ISystemPluginListener listener) {
-        mListener = listener;
-        Intent intent = new Intent(application, SystemService.class);
-        application.startService(intent);
+    public void setSystemPluginListener(Context context) {
+        Intent intent = new Intent(context, SystemService.class);
+        context.startService(intent);
     }
 
     /************   ISystemPluginExecute   ************/
@@ -262,11 +259,6 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
         return version;
     }
 
-    /************   public   ************/
-    protected ISystemPluginListener getListener() {
-        return mListener;
-    }
-
     /************   private   ************/
     private void startActivity(String packageName, String activityName) {
         String s = "am start -n '" + packageName + "/" + packageName + "." + activityName + "' -a android.intent.action.MAIN -c android.intent.category.LAUNCHER";
@@ -281,5 +273,15 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
             }
         }
         return flag;
+    }
+
+    @Override
+    public void onBatteryChange(int intLevel, int intScale) {
+
+    }
+
+    @Override
+    public void onScreenChange(boolean isOff) {
+
     }
 }

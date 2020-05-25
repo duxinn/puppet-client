@@ -13,6 +13,7 @@ import com.mango.puppet.plugin.PluginModel;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginRunListener;
 import com.mango.puppet.status.StatusManager;
+import com.mango.puppet.systemplugin.SystemPluginManager;
 
 import java.util.ArrayList;
 
@@ -36,6 +37,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
     /************   ISystem   ************/
     @Override
     public void startSystem(final Context context) {
+        SystemPluginManager.getInstance().setSystemPluginListener(context);
         // 1 插件管理模块
         //TODO pluginmodels列表暂时没有
         PluginManager.getInstance().startPluginSystem(context, new ArrayList<PluginModel>() ,new IPluginControl.IPluginControlResult() {

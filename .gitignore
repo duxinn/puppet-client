@@ -13,3 +13,4 @@
 .externalNativeBuild
 .cxx
 .idea/
+src/main/java/com/mango/puppet/dispatch/job/db/

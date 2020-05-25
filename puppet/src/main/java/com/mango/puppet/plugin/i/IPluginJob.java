@@ -18,5 +18,16 @@ public interface IPluginJob {
      * @param job 任务
      * @param result 是否下发成功
      */
-    void distributeJob(Job job, IPluginControl.IPluginControlResult result);
+    void distributeJob(Job job, IPluginJobCallBack result);
+
+    interface IPluginJobCallBack {
+
+        /**
+         * IPluginJobCallBack
+         *
+         * @param isSucceed 是否成功
+         * @param failReason 失败原因 成功时为空
+         */
+        void onFinished(Job job, boolean isSucceed, String failReason);
+    }
 }

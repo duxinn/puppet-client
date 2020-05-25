@@ -258,7 +258,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     /************   IPluginJob   ************/
     @Override
-    public void distributeJob(final Job job, final IPluginControlResult result) {
+    public void distributeJob(final Job job, final IPluginJobCallBack result) {
         String activityName = "";
         for (PluginModel model : models) {
             if (model.getPackageName().equals(job.package_name))
@@ -269,13 +269,13 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
             public void onFinished(boolean isSucceed, String failReason) {
                 if (isSucceed) {
                     if (runningPackageNames.contains(job.package_name)) {
-                        result.onFinished(true, "");
+                        result.onFinished(job,true, "");
                         TransmitManager.getInstance().sendJob(job.package_name, job);
                     } else {
-                        result.onFinished(false, "插件未运行");
+                        result.onFinished(job,false, "插件未运行");
                     }
                 } else {
-                    result.onFinished(isSucceed, failReason);
+                    result.onFinished(job, isSucceed, failReason);
                 }
             }
         });
