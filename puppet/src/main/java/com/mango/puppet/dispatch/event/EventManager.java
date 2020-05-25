@@ -52,8 +52,14 @@ public class EventManager implements IEvent {
     /************   IEvent   ************/
     @Override
     public void uploadNewEvent(Event event) {
+        String url;
+        for (int i = 0; i < eventWatcherList.size(); i++) {
+            if (event.package_name.equals(eventWatcherList.get(i).package_name) && event.event_name.equals(eventWatcherList.get(i).event_name)) {
+                url = eventWatcherList.get(i).callback;
+            }
+        }
         if (event != null) {
-            NetworkManager.getInstance().reportEvent(event, new INetwork.IEventRequestResult() {
+            NetworkManager.getInstance().reportEvent(url, event, new INetwork.IEventRequestResult() {
                 @Override
                 public void onSuccess(Event event) {
                     event.event_status = 1;
@@ -76,7 +82,7 @@ public class EventManager implements IEvent {
     }
 
     @Override
-    public void setEventWatcher(String packageName, String eventName, boolean isValid) {
+    public void setEventWatcher(String packageName, String eventName, boolean isValid, String url) {
         int watchStatus;
         Boolean isNeed = true;
         if (packageName != null && eventName != null) {
@@ -90,23 +96,24 @@ public class EventManager implements IEvent {
             model.package_name = packageName;
             model.event_name = eventName;
             model.watcher_status = watchStatus;
+            model.callback = url;
             PluginManager.getInstance().distributeEventWatcher(model, iPluginControlResult);
-            SharedPreferences mContextSharedPreferences = mContext.getSharedPreferences("writeEventJson", Context.MODE_PRIVATE);
+            SharedPreferences mContextSharedPreferences = mContext.getSharedPreferences("saveEventJson", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mContextSharedPreferences.edit();
-            for (int i=0;i<eventWatcherList.size();i++){
-                if (packageName.equals(eventWatcherList.get(i).package_name)&&eventName.equals(eventWatcherList.get(i).event_name)){
-                    if (!isValid){
+            for (int i = 0; i < eventWatcherList.size(); i++) {
+                if (packageName.equals(eventWatcherList.get(i).package_name) && eventName.equals(eventWatcherList.get(i).event_name)) {
+                    if (!isValid) {
                         eventWatcherList.remove(i);
-                        i = i-1;
+                        i = i - 1;
                     }
                     isNeed = false;
                 }
             }
-            if (isNeed){
+            if (isNeed) {
                 eventWatcherList.add(model);
             }
             String eventJson = new Gson().toJson(eventWatcherList);
-            editor.putString("eventJson",eventJson);
+            editor.putString("eventJson", eventJson);
             editor.commit();
         }
     }
@@ -115,18 +122,18 @@ public class EventManager implements IEvent {
     public boolean startEventSystem(Context context) {
         mContext = context;
         Boolean isValid;
-        SharedPreferences read = context.getSharedPreferences("readEventJson", Context.MODE_PRIVATE);
-//        eventMap = (Map<String, String>) read.getAll();
-        String readEvent = read.getString("eventJson","");
-        if (!readEvent.equals("")){
+        SharedPreferences read = context.getSharedPreferences("saveEventJson", Context.MODE_PRIVATE);
+        String readEvent = read.getString("eventJson", "");
+        if (!readEvent.equals("")) {
             Gson gson = new Gson();
-            Type type = new TypeToken<List<EventWatcher>>(){}.getType();
-            eventWatcherList = gson.fromJson(readEvent,type);
+            Type type = new TypeToken<List<EventWatcher>>() {
+            }.getType();
+            eventWatcherList = gson.fromJson(readEvent, type);
         }
-        for (int i=0;i<eventWatcherList.size();i++){
-            if (eventWatcherList.get(i).watcher_status == 1){
+        for (int i = 0; i < eventWatcherList.size(); i++) {
+            if (eventWatcherList.get(i).watcher_status == 1) {
                 isValid = true;
-            }else {
+            } else {
                 isValid = false;
             }
             StatusManager.getInstance().setEventWatcher(eventWatcherList.get(i).package_name, eventWatcherList.get(i).event_name, isValid);

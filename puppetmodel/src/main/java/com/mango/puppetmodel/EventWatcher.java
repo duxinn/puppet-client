@@ -19,4 +19,6 @@ public class EventWatcher {
     // 1:注册 0:注销
     public int watcher_status;
 
+    //传递的url
+    public String callback;
 }
