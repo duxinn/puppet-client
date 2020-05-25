@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
                 break;
             }
             case R.id.btn_browse: {
+                // 模拟远程后台发送过来请求
                 if (!TextUtils.isEmpty(mRootUrl)) {
                     Intent intent = new Intent();
                     intent.setAction("android.intent.action.VIEW");
@@ -101,6 +102,9 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
         }
     }
 
+    /**
+     * 这部分接口回调根据用户需求  看是否需要服务状态的回调
+     */
     @Override
     public void onServerStart(String ip) {
         mBtnStartServer.setVisibility(View.GONE);
