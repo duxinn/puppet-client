@@ -24,6 +24,7 @@ import com.mango.puppet.log.i.ILog;
 import com.mango.puppet.plugin.PluginManager;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.status.i.IStatusListener;
+import com.mango.puppetsystem.AppApplication;
 import com.mango.puppetsystem.NormalConst;
 import com.mango.puppetsystem.R;
 
@@ -107,7 +108,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.llRetry) {
-            SystemManager.getInstance().startSystem();
+            SystemManager.getInstance().startSystem(AppApplication.instance);
         }
     }
 

@@ -8,10 +8,12 @@ import com.mango.puppet.systemplugin.i.ISystemPluginListener;
 
 public class AppApplication extends Application implements ISystemPluginListener {
 
+    public static AppApplication instance;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         SystemPluginManager.getInstance().setSystemPluginListener(this, this);
     }
 

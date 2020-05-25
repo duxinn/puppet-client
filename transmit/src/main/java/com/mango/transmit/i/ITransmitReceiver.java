@@ -49,8 +49,8 @@ public interface ITransmitReceiver {
      * @param packageName 发送消息的应用的包名
      * @param dataString 收到的内容
      */
-    void onReceiveEventData(String packageName,
-                            String dataString);
+    void onReceiveDataString(String packageName,
+                             String dataString);
 
     /**
      * 收到JSONObject内容
@@ -58,6 +58,6 @@ public interface ITransmitReceiver {
      * @param packageName 发送消息的应用的包名
      * @param jsonObject 收到的内容
      */
-    void onReceiveEventData(String packageName,
-                            JSONObject jsonObject);
+    void onReceiveData(String packageName,
+                       JSONObject jsonObject);
 }

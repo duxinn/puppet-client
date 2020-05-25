@@ -296,12 +296,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     }
 
     @Override
-    public void onReceiveEventData(String packageName, String dataString) {
-
-    }
-
-    @Override
-    public void onReceiveEventData(String packageName, JSONObject jsonObject) {
+    public void onReceiveData(String packageName, JSONObject jsonObject) {
         try {
             String type = jsonObject.getString("type");
             if ("heart".equals(type)) {
@@ -330,5 +325,10 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onReceiveDataString(String packageName, String dataString) {
+
     }
 }
