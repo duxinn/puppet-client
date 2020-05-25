@@ -1,17 +1,35 @@
 package com.mango.puppet.plugin;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.Message;
+
+import androidx.core.app.ActivityCompat;
 
 import com.mango.loadlibtool.InjectTool;
+import com.mango.puppet.dispatch.event.EventManager;
+import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginEvent;
 import com.mango.puppet.plugin.i.IPluginJob;
 import com.mango.puppet.plugin.i.IPluginRunListener;
+import com.mango.puppet.systemplugin.SystemPluginManager;
+import com.mango.puppet.systemplugin.i.ISystemPluginExecute;
 import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.EventWatcher;
 import com.mango.puppetmodel.Job;
+import com.mango.transmit.TransmitManager;
+import com.mango.transmit.i.ITransmitReceiver;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * PluginManager
@@ -20,8 +38,19 @@ import java.util.ArrayList;
  * @date: 2020/05/18
  */
 @SuppressWarnings("unused")
-public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent {
+public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, ITransmitReceiver {
     private static final PluginManager ourInstance = new PluginManager();
+    private IPluginRunListener listener = null;
+    private static final String CLASS_NAME = "";
+    private static final String METHOD_NAME = "";
+    private List<PluginModel> models = new ArrayList<>();
+    private ArrayList<String> runningPackageNames = new ArrayList<>();
+    private ArrayList<String> pluginPackageNames = new ArrayList<>();
+    private Context context;
+    private boolean callBack = false;
+    private IPluginControlResult iPluginControlResult;
+    private Timer timer;
+    private Timer checkTimer;
 
     public static PluginManager getInstance() {
         return ourInstance;
@@ -32,7 +61,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent {
 
     /************   public   ************/
     public void setPluginControlListener(IPluginRunListener listener) {
-
+        this.listener = listener;
     }
 
     /************   IPluginControl   ************/
@@ -41,20 +70,91 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent {
         InjectTool.inject(context, targetPackageName, dexName, className, methodName);
     }
 
+    /**
+     * 获取可使用的插件 注:需已经安装目标app且版本正确
+     */
     @Override
     public ArrayList<String> getSupportPuppetPlugin() {
-        return null;
+        if (pluginPackageNames.size() > 0) {
+            return pluginPackageNames;
+        }
+        if (models == null || models.size() == 0) {
+            return new ArrayList<>();
+        }
+
+        for (PluginModel model : models) {
+            String version = SystemPluginManager.getInstance().getApplicationVersion(context, model.getPackageName());
+            if (version != null && version.equals(model.getDexVersion())) {
+                pluginPackageNames.add(model.getPackageName());
+            }
+
+        }
+        return pluginPackageNames;
     }
 
     @Override
     public ArrayList<String> getRunningPuppetPlugin() {
-        return null;
+        return runningPackageNames;
     }
 
     @Override
     public void isPluginRunning(String packageName, IPluginControlResult result) {
-
+        for (String runningPackageName : runningPackageNames) {
+            if (packageName.equals(runningPackageName)) {
+                result.onFinished(true, "");
+                return;
+            }
+        }
+        result.onFinished(false, "");
     }
+
+    @SuppressLint("HandlerLeak")
+    private final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(final Message msg) {
+            if (msg.what == 1) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("type", "heart");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                for (PluginModel model : models) {
+                    model.setRun(false);
+                    TransmitManager.getInstance().sendMessage(model.getPackageName(), jsonObject);
+                }
+                if (checkTimer == null) {
+                    checkTimer = new Timer();
+                    checkTimer.schedule(timerTask, 2000, 5000);
+                }
+            }
+            super.handleMessage(msg);
+        }
+    };
+
+    private TimerTask timerTask = new TimerTask() {
+        @Override
+        public void run() {
+            //检测心跳是否回应
+            for (PluginModel model : models) {
+                if (model.isRun()) {
+                    if (!runningPackageNames.contains(model.getPackageName())){
+                        runningPackageNames.add(model.getPackageName());
+                        if (listener != null) {
+                            listener.onPluginRunningStatusChange(model.getPackageName(), true);
+                        }
+                    }
+                } else {
+                    if (runningPackageNames.contains(model.getPackageName())){
+                        runningPackageNames.remove(model.getPackageName());
+                        if (listener != null) {
+                            listener.onPluginRunningStatusChange(model.getPackageName(), false);
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     /**
      * 1 检查是否root及是否有读写权限
@@ -63,24 +163,172 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent {
      * 4 运行木马程序
      */
     @Override
-    public void startPluginSystem(Context context, IPluginControlResult result) {
+    public void startPluginSystem(Context context, final List<PluginModel> pluginModels, final IPluginControlResult result) {
+        if (iPluginControlResult!=null){
+            result.onFinished(false,"插件正在启动中,请勿重复调用");
+            return;
+        }
+        callBack = false;
+        models = pluginModels;
+        this.context = context;
+        iPluginControlResult = result;
+        if (!SystemPluginManager.getInstance().hasRootPermission()) {
+            result.onFinished(false, "未开启Root权限");
+            iPluginControlResult=null;
+        } else {
+            try {
+                //检测是否有写的权限
+                int permission = ActivityCompat.checkSelfPermission(context,
+                        "android.permission.WRITE_EXTERNAL_STORAGE");
+                if (permission != PackageManager.PERMISSION_GRANTED) {
+                    result.onFinished(false, "未开启读写权限");
+                    iPluginControlResult=null;
+                } else {
+                    if (getSupportPuppetPlugin().size() == 0) {
+                        result.onFinished(false, "无支持插件");
+                        iPluginControlResult=null;
+                    } else {
+                        TransmitManager.getInstance().setTransmitReceiver(this);
+                        for (final PluginModel pluginModel : pluginModels) {
+                            if (!pluginPackageNames.contains(pluginModel.getPackageName())) {
+                                result.onFinished(false, pluginModel.getPackageName() + "插件不可用");
+                                iPluginControlResult=null;
+                                callBack = true;
+                                return;
+                            }
+                        }
+                        for (final PluginModel pluginModel : pluginModels) {
+                            runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexPath(), CLASS_NAME, METHOD_NAME, result);
+                        }
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!callBack) {
+                                    result.onFinished(false, "启动插件超时");
+                                    iPluginControlResult=null;
+                                    callBack = true;
+                                }
+                            }
+                        }, 5000);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                result.onFinished(false, e.getMessage());
+                iPluginControlResult=null;
+            }
+        }
+    }
 
+    private void sendHeart() {
+        if (timer == null) {
+            timer = new Timer();
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    Message message = new Message();
+                    message.what = 1;
+                    handler.sendMessage(message);
+                }
+            };
+            timer.schedule(timerTask, 0, 5000);
+        }
     }
 
     /************   IPluginEvent   ************/
     @Override
     public void distributeEventWatcher(EventWatcher eventWatcher, IPluginControlResult result) {
-
+        if (runningPackageNames.contains(eventWatcher.package_name)) {
+            result.onFinished(true, "");
+            TransmitManager.getInstance().sendEventWatcher(eventWatcher.package_name, eventWatcher);
+        } else {
+            result.onFinished(false, "插件未运行");
+        }
     }
 
     @Override
     public void distributeEvent(Event event, IPluginControlResult result) {
-
+        if (runningPackageNames.contains(event.package_name)) {
+            result.onFinished(true, "");
+            TransmitManager.getInstance().sendEvent(event.package_name, event);
+        } else {
+            result.onFinished(false, "插件未运行");
+        }
     }
 
     /************   IPluginJob   ************/
     @Override
-    public void distributeJob(Job job, IPluginControlResult result) {
+    public void distributeJob(final Job job, final IPluginControlResult result) {
+        String activityName = "";
+        for (PluginModel model : models) {
+            if (model.getPackageName().equals(job.package_name))
+                activityName = model.getActivityName();
+        }
+        SystemPluginManager.getInstance().changeForegroundApplication(job.package_name, activityName, new ISystemPluginExecute.ISystemPluginResult() {
+            @Override
+            public void onFinished(boolean isSucceed, String failReason) {
+                if (isSucceed) {
+                    if (runningPackageNames.contains(job.package_name)) {
+                        result.onFinished(true, "");
+                        TransmitManager.getInstance().sendJob(job.package_name, job);
+                    } else {
+                        result.onFinished(false, "插件未运行");
+                    }
+                } else {
+                    result.onFinished(isSucceed, failReason);
+                }
+            }
+        });
+    }
 
+    @Override
+    public void onReceiveJob(String packageName, Job job) {
+        JobManager.getInstance().receiveJobResult(job);
+    }
+
+    @Override
+    public void onReceiveEvent(String packageName, Event event) {
+        EventManager.getInstance().uploadNewEvent(event);
+    }
+
+    @Override
+    public void onReceiveEventWatcher(String packageName, EventWatcher eventWatcher) {
+    }
+
+    @Override
+    public void onReceiveEventData(String packageName, String dataString) {
+
+    }
+
+    @Override
+    public void onReceiveEventData(String packageName, JSONObject jsonObject) {
+        try {
+            String type = jsonObject.getString("type");
+            if ("heart".equals(type)) {
+                for (PluginModel model : models) {
+                    if (packageName.equals(model.getPackageName())) {
+                        model.setRun(true);
+                    }
+                }
+            } else if ("firstStart".equals(type)) {
+                runningPackageNames.add(packageName);
+                if (listener != null) {
+                    listener.onPluginRunningStatusChange(packageName, true);
+                }
+                for (PluginModel model : models) {
+                    if (packageName.equals(model.getPackageName())) {
+                        model.setRun(true);
+                    }
+                }
+                if (runningPackageNames.size() == models.size() && !callBack) {
+                    iPluginControlResult.onFinished(true, "");
+                    iPluginControlResult=null;
+                    sendHeart();
+                    callBack = true;
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

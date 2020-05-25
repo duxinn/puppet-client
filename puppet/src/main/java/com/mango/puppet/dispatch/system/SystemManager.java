@@ -9,9 +9,12 @@ import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.NetworkManager;
 import com.mango.puppet.network.i.INetwork;
 import com.mango.puppet.plugin.PluginManager;
+import com.mango.puppet.plugin.PluginModel;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginRunListener;
 import com.mango.puppet.status.StatusManager;
+
+import java.util.ArrayList;
 
 /**
  * SystemManager
@@ -34,7 +37,8 @@ public class SystemManager implements ISystem, IPluginRunListener {
     @Override
     public void startSystem(final Context context) {
         // 1 插件管理模块
-        PluginManager.getInstance().startPluginSystem(context, new IPluginControl.IPluginControlResult() {
+        //TODO pluginmodels列表暂时没有
+        PluginManager.getInstance().startPluginSystem(context, new ArrayList<PluginModel>() ,new IPluginControl.IPluginControlResult() {
             @Override
             public void onFinished(boolean isSucceed, String failReason) {
                 if (!isSucceed) {
