@@ -25,7 +25,6 @@ class Destiny<T>(callBack: DesCallBack<T>) : Observer<T> {
     }
 
     override fun onError(e: Throwable) {
-        // 网络错误
         e.printStackTrace()
         if (e.message != null) {
             Log.e("Destiny", e.message!!)

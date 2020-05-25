@@ -3,6 +3,7 @@ package com.mango.puppet.network.api.commen
 import android.net.ParseException
 import android.nfc.FormatException
 import android.text.TextUtils
+import com.mango.puppet.log.LogManager
 import com.mango.puppet.network.api.errorcode.Error.Companion.ACCESS_DENIED
 import com.mango.puppet.network.api.errorcode.Error.Companion.BAD_GATEWAY
 import com.mango.puppet.network.api.errorcode.Error.Companion.ERROR_REQUEST
@@ -67,57 +68,69 @@ open  class CustomException {
                         }
                     }
                 }
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is JSONException || e is ParseException) {
                 var ex = ApiException(PARSE_ERROR, e.message, e)
                 ex.msg("解析错误")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is ConnectException) {
                 var ex = ApiException(NETWORK_ERROR, e.message, e)
                 ex.msg("连接失败")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is javax.net.ssl.SSLHandshakeException) {
                 var ex = ApiException(SSL_ERROR, e.message, e)
                 ex.msg("证书验证失败")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is java.security.cert.CertPathValidatorException) {
                 var ex = ApiException(SSL_NOT_FOUND, e.message, e)
                 ex.msg("证书路径没找到")
-
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is SSLPeerUnverifiedException) {
                 var ex = ApiException(SSL_NOT_FOUND, e.message, e)
                 ex.msg("无有效的SSL证书")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
 
             } else if (e is ConnectTimeoutException) {
                 var ex = ApiException(TIMEOUT_ERROR, e.message, e)
                 ex.msg("连接超时")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is java.net.SocketTimeoutException) {
                 var ex = ApiException(TIMEOUT_ERROR, e.message, e)
                 ex.msg("连接超时")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is java.lang.ClassCastException) {
                 var ex = ApiException(FORMAT_ERROR, e.message, e)
                 ex.msg("类型转换出错")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is NullPointerException) {
                 var ex = ApiException(NULL, e.message, e)
                 ex.msg("数据有空")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is FormatException) {
 
                 var ex = ApiException(-200, e.message, e)
                 ex.msg("服务端返回数据格式异常")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else if (e is UnknownHostException) {
                 var ex = ApiException(NOT_FOUND, e.message, e)
                 ex.msg("服务器地址未找到,请检查网络或Url")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             } else {
                 var ex = ApiException(UNKNOWN, e.message, e)
                 ex.msg("未知异常")
+                LogManager.getInstance().recordLog(ex.msg)
                 return ex
             }
 
