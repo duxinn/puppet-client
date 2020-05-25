@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import com.mango.puppet.status.StatusManager;
+
 public class ServerManager extends BroadcastReceiver {
 
     private static final String ACTION = "com.mango.puppetsystem.receiver";
@@ -87,6 +89,7 @@ public class ServerManager extends BroadcastReceiver {
                     String ip = intent.getStringExtra(MESSAGE_KEY);
                     if (mServerListener != null) {
                         mServerListener.onServerStart(ip);
+                        StatusManager.getInstance().setNetworkStatus(0);
                     }
                     break;
                 }
@@ -94,12 +97,14 @@ public class ServerManager extends BroadcastReceiver {
                     String error = intent.getStringExtra(MESSAGE_KEY);
                     if (mServerListener != null) {
                         mServerListener.onServerError(error);
+                        StatusManager.getInstance().setNetworkStatus(2);
                     }
                     break;
                 }
                 case CMD_VALUE_STOP: {
                     if (mServerListener != null) {
                         mServerListener.onServerStop();
+                        StatusManager.getInstance().setNetworkStatus(1);
                     }
                     break;
                 }
