@@ -42,55 +42,50 @@ public class NetworkManager implements INetwork {
 
     @Override
     public void reportJobResult(Job jobResult, IJobRequestResult requestResult) {
+        PuppetVM.Companion.reportJobResult(jobResult.callback, jobResult.job_id, jobResult.package_name, jobResult.job_name, jobResult.job_status, jobResult.error_code, jobResult.error_message, jobResult.result_data, new DesCallBack<BaseDTO>() {
+            @Override
+            public void success(BaseDTO any) {
+                if (any.isSuccess()) {
+                    // todo 上报任务成功后操作
+                } else {
+                    // todo 上报任务失败（非网络原因）
+                }
+            }
 
+            @Override
+            public void failed(@NotNull Throwable e) {
+
+            }
+
+            @Override
+            public void onSubscribe() {
+
+            }
+        });
     }
 
     @Override
     public void reportEvent(String url, Event event, IEventRequestResult requestResult) {
-        // 无url，和远程后台约定好接口
-        if(TextUtils.isEmpty(url)) {
-            PuppetVM.Companion.reportEvent(event.event_name, event.package_name, event.event_data, new DesCallBack<BaseDTO>() {
-                @Override
-                public void success(BaseDTO any) {
-                    if (any.isSuccess()) {
-                        // todo 上报事件成功后操作
-                    } else {
-                        // todo 上报事件失败（非网络原因）
-                    }
+        PuppetVM.Companion.reportEvent(url, event.event_name, event.package_name, event.event_data, new DesCallBack<BaseDTO>() {
+            @Override
+            public void success(BaseDTO any) {
+                if (any.isSuccess()) {
+                    // todo 上报事件成功后操作
+                } else {
+                    // todo 上报事件失败（非网络原因）
                 }
+            }
 
-                @Override
-                public void failed(@NotNull Throwable e) {
+            @Override
+            public void failed(@NotNull Throwable e) {
 
-                }
+            }
 
-                @Override
-                public void onSubscribe() {
+            @Override
+            public void onSubscribe() {
 
-                }
-            });
-        } else { // 指定url访问服务端
-            PuppetVM.Companion.reportEvent(url, event.event_name, event.package_name, event.event_data, new DesCallBack<BaseDTO>() {
-                @Override
-                public void success(BaseDTO any) {
-                    if (any.isSuccess()) {
-                        // todo 上报事件成功后操作
-                    } else {
-                        // todo 上报事件失败（非网络原因）
-                    }
-                }
-
-                @Override
-                public void failed(@NotNull Throwable e) {
-
-                }
-
-                @Override
-                public void onSubscribe() {
-
-                }
-            });
-        }
+            }
+        });
     }
 
     @Override
