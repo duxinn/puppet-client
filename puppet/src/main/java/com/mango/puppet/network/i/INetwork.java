@@ -23,19 +23,19 @@ public interface INetwork {
 
     /**
      * 上报任务结果
-     *
      * @param jobResult 任务结果
-     * @param requestResult 请求结果
+     * @param iJobRequestResult 请求结果
      */
-    void reportJobResult(Job jobResult, IJobRequestResult requestResult);
+    void reportJobResult(Job jobResult, IJobRequestResult iJobRequestResult);
 
     /**
      * 上报新事件
      *
+     * @param url   上报新事件的远程服务器url
      * @param event 新事件
      * @param requestResult 请求结果
      */
-    void reportEvent(Event event, IEventRequestResult requestResult);
+    void reportEvent(String url, Event event, IEventRequestResult requestResult);
 
     /**
      * 获取上传资源文件的方式及参数

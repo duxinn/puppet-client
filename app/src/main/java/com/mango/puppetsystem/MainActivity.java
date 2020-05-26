@@ -1,8 +1,5 @@
 package com.mango.puppetsystem;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,10 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mango.puppet.log.LogManager;
-import com.mango.puppet.log.i.ILog;
-import com.mango.puppet.status.StatusManager;
-import com.mango.puppet.status.i.IStatusListener;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.mango.puppetsystem.floatball.FloatBallService;
 
 import java.io.DataOutputStream;

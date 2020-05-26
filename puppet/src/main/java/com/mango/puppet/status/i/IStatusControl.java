@@ -15,7 +15,7 @@ public interface IStatusControl {
 
     /**
      * 设置网络连接状态
-     * @param status 负责网络模块的同学补充
+     * @param status 0: 开启服务状态  1: 服务停止状态  2: 服务错误状态
      */
     void setNetworkStatus(int status);
 

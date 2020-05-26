@@ -1,2 +1,3 @@
 include ':app', ':puppet', ':transmit', ':puppetmodel', ':hookdemo', ':hookdemoplugin', ':loadlibtool'
 rootProject.name='puppetsystem'
+include ':networkdemo'

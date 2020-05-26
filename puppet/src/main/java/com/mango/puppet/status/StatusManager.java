@@ -18,6 +18,9 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public class StatusManager implements IStatusControl {
+    public static final int SERVER_START = 0;
+    public static final int SERVER_STOP = 1;
+    public static final int SERVER_ERROR = 2;
 
     private static IStatusListener mListener;
     int networkStatus = -99;

@@ -59,8 +59,7 @@ public class EventManager implements IEvent {
             }
         }
         if (event != null && url != null) {
-            // TODO 志刚 将55行的url加到reportEvent方法中 并全局搜索将回调中的参数 Event Job去掉
-            NetworkManager.getInstance().reportEvent(event, new INetwork.IEventRequestResult() {
+            NetworkManager.getInstance().reportEvent(url, event, new INetwork.IEventRequestResult() {
                 @Override
                 public void onSuccess(Event event) {
                     event.event_status = 1;

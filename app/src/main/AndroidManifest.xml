@@ -36,6 +36,9 @@
         </activity>
 
         <service android:name="com.mango.puppet.systemplugin.SystemService" />
+        <service
+            android:name="com.mango.puppet.network.server.CoreService"
+            android:exported="false" />
 
         <service
             android:name=".floatball.FloatBallService"
