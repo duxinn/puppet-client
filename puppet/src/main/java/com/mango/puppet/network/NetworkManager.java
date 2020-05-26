@@ -37,20 +37,29 @@ public class NetworkManager implements INetwork{
 
     /************   INetwork   ************/
     @Override
-    public void setupNetwork(Context context, final ISetupResult result) {
+    public void setupNetwork(Context context, ISetupResult result) {
+
+        final ISetupResult[] iSetupResult = {result};
+
         // 初始化网络
         ApiClient.Companion.getInstance().build();
         // 开启服务
         ServerManager.getInstance(context).register().startServer(new ServerManager.ServerListener() {
             @Override
             public void onServerStart(String ip) {
-                result.onSuccess();
+                if (iSetupResult[0] != null) {
+                    iSetupResult[0].onSuccess();
+                    iSetupResult[0] = null;
+                }
                 StatusManager.getInstance().setNetworkStatus(SERVER_START);
             }
 
             @Override
             public void onServerError(String error) {
-                result.onFailure();
+                if (iSetupResult[0] != null) {
+                    iSetupResult[0].onFailure();
+                    iSetupResult[0] = null;
+                }
                 StatusManager.getInstance().setNetworkStatus(SERVER_ERROR);
             }
 
