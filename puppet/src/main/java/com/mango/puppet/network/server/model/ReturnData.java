@@ -7,9 +7,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 public class ReturnData implements Parcelable {
 
-    @JSONField(name = "isSuccess")
-    private boolean isSuccess;
-
     @JSONField(name = "errorCode")
     private int errorCode;
 
@@ -19,20 +16,23 @@ public class ReturnData implements Parcelable {
     @JSONField(name = "data")
     private Object data;
 
+    @JSONField(name = "status")
+    private int status;
+
     public ReturnData() {
     }
 
     protected ReturnData(Parcel in) {
-        isSuccess = in.readByte() != 0;
         errorCode = in.readInt();
         errorMsg = in.readString();
+        status = in.readInt();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte((byte) (isSuccess ? 1 : 0));
         dest.writeInt(errorCode);
         dest.writeString(errorMsg);
+        dest.writeInt(status);
     }
 
     @Override
@@ -51,14 +51,6 @@ public class ReturnData implements Parcelable {
             return new ReturnData[size];
         }
     };
-
-    public boolean isSuccess() {
-        return isSuccess;
-    }
-
-    public void setSuccess(boolean success) {
-        isSuccess = success;
-    }
 
     public int getErrorCode() {
         return errorCode;
@@ -82,5 +74,13 @@ public class ReturnData implements Parcelable {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }
