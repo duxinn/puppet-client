@@ -6,10 +6,6 @@ import com.mango.puppet.network.api.observerCallBack.DesCallBack
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 
-
-/**
- * subscribe的时候使用这个接口
- */
 class Destiny<T>(callBack: DesCallBack<T>) : Observer<BaseModel<T>> {
 
     private var callBack: DesCallBack<T>? = callBack
