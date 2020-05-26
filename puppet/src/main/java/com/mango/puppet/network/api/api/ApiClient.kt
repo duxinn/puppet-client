@@ -6,7 +6,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class ApiClient {
-    private var BASE_URL_MAIN = "https://www.baidu.com"
+    private var BASE_URL_MAIN = "http://10.154.41.171:8080/"
     private var retrofit: Retrofit? = null
     private var interceptor: Interceptor? = null
 

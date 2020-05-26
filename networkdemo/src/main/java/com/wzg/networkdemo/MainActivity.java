@@ -9,7 +9,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.mango.puppet.network.api.api.ApiClient;
 import com.mango.puppet.network.api.basemodel.BaseModel;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
@@ -31,7 +33,8 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        // 初始化网络
+        ApiClient.Companion.getInstance().build();
         initView();
         initServer();
     }
@@ -55,20 +58,20 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
     }
 
     private void initData() {
-        PuppetVM.Companion.reportEvent("http://www.puppet.com", "xxx", new DesCallBack<Object>() {
+        PuppetVM.Companion.testNetwork("", "testJson", new DesCallBack<Object>() {
             @Override
             public void onHandleSuccess(Object objectBaseModel) {
-
+                Toast.makeText(MainActivity.this, "请求成功", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onHandleError(String msg, int code) {
-
+                Toast.makeText(MainActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onNetWorkError(Throwable e) {
-
+                Toast.makeText(MainActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -70,7 +70,8 @@ public class ServerManager extends BroadcastReceiver {
         mContext.unregisterReceiver(this);
     }
 
-    public void startServer() {
+    public void startServer(ServerListener serverListener) {
+        mServerListener = serverListener;
         mContext.startService(mService);
     }
 

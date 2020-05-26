@@ -48,5 +48,17 @@ class PuppetVM {
                         .subscribe(Destiny(callBack))
             }
         }
+
+        fun testNetwork(url: String, eventJsonString: String, callBack: DesCallBack<Any>) {
+            if (TextUtils.isEmpty(url)) {
+                service.reportEvent(eventJsonString)
+                        .compose(RxStreamHelper.io_Main())
+                        .subscribe(Destiny(callBack))
+            } else {
+                service.reportEvent(url,eventJsonString)
+                        .compose(RxStreamHelper.io_Main())
+                        .subscribe(Destiny(callBack))
+            }
+        }
     }
 }

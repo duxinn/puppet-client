@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSON;
 import com.mango.puppet.network.api.api.ApiClient;
-import com.mango.puppet.network.api.basemodel.BaseModel;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
 import com.mango.puppet.network.i.INetwork;
@@ -26,7 +25,7 @@ import static com.mango.puppet.status.StatusManager.SERVER_STOP;
  * @date: 2020/05/18
  */
 @SuppressWarnings("unused")
-public class NetworkManager implements INetwork, ServerManager.ServerListener {
+public class NetworkManager implements INetwork{
     private static final NetworkManager ourInstance = new NetworkManager();
 
     public static NetworkManager getInstance() {
@@ -38,11 +37,28 @@ public class NetworkManager implements INetwork, ServerManager.ServerListener {
 
     /************   INetwork   ************/
     @Override
-    public void setupNetwork(Context context, ISetupResult result) {
+    public void setupNetwork(Context context, final ISetupResult result) {
         // 初始化网络
         ApiClient.Companion.getInstance().build();
         // 开启服务
-        ServerManager.getInstance(context).register().startServer();
+        ServerManager.getInstance(context).register().startServer(new ServerManager.ServerListener() {
+            @Override
+            public void onServerStart(String ip) {
+                result.onSuccess();
+                StatusManager.getInstance().setNetworkStatus(SERVER_START);
+            }
+
+            @Override
+            public void onServerError(String error) {
+                result.onFailure();
+                StatusManager.getInstance().setNetworkStatus(SERVER_ERROR);
+            }
+
+            @Override
+            public void onServerStop() {
+                StatusManager.getInstance().setNetworkStatus(SERVER_STOP);
+            }
+        });
     }
 
     @Override
@@ -90,21 +106,5 @@ public class NetworkManager implements INetwork, ServerManager.ServerListener {
     @Override
     public void requestUploadResourceWay(IRequestResult requestResult) {
 
-    }
-
-    // 本地服务监听Listener
-    @Override
-    public void onServerStart(String ip) {
-        StatusManager.getInstance().setNetworkStatus(SERVER_START);
-    }
-
-    @Override
-    public void onServerError(String error) {
-        StatusManager.getInstance().setNetworkStatus(SERVER_ERROR);
-    }
-
-    @Override
-    public void onServerStop() {
-        StatusManager.getInstance().setNetworkStatus(SERVER_STOP);
     }
 }
