@@ -55,9 +55,9 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
     }
 
     private void initData() {
-        PuppetVM.Companion.reportEvent("http://www.puppet.com", "xxx", new DesCallBack<BaseModel<Object>>() {
+        PuppetVM.Companion.reportEvent("http://www.puppet.com", "xxx", new DesCallBack<Object>() {
             @Override
-            public void onHandleSuccess(BaseModel<Object> objectBaseModel) {
+            public void onHandleSuccess(Object objectBaseModel) {
 
             }
 

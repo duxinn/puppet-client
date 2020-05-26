@@ -13,7 +13,7 @@ class PuppetVM {
 
         private val service = ApiClient.instance.getApiService(NetService::class.java)
 
-        fun reportEventWatcherCallBack(url: String, eventWatcherJsonString: String, callBack: DesCallBack<BaseModel<Any>>) {
+        fun reportEventWatcherCallBack(url: String, eventWatcherJsonString: String, callBack: DesCallBack<Any>) {
             if (TextUtils.isEmpty(url)) {
                 service.reportEventWatcherCallBack(eventWatcherJsonString)
                         .compose(RxStreamHelper.io_Main())
@@ -25,7 +25,7 @@ class PuppetVM {
             }
         }
 
-        fun reportEvent(url: String, eventJsonString: String, callBack: DesCallBack<BaseModel<Any>>) {
+        fun reportEvent(url: String, eventJsonString: String, callBack: DesCallBack<Any>) {
             if (TextUtils.isEmpty(url)) {
                 service.reportEvent(eventJsonString)
                         .compose(RxStreamHelper.io_Main())

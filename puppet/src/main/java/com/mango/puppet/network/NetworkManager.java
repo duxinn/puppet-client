@@ -69,9 +69,9 @@ public class NetworkManager implements INetwork, ServerManager.ServerListener {
     @Override
     public void reportEvent(String url, final Event event, final IEventRequestResult requestResult) {
         String eventJsonString = JSON.toJSONString(event);
-        PuppetVM.Companion.reportEvent(url, eventJsonString, new DesCallBack<BaseModel<Object>>() {
+        PuppetVM.Companion.reportEvent(url, eventJsonString, new DesCallBack<Object>() {
             @Override
-            public void onHandleSuccess(@Nullable BaseModel<Object> objectBaseModel) {
+            public void onHandleSuccess(@Nullable Object objectBaseModel) {
                 requestResult.onSuccess(event);
             }
 
