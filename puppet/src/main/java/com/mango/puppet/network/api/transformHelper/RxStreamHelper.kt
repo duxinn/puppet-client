@@ -1,7 +1,5 @@
 package com.mango.puppet.network.api.transformHelper
 
-import com.mango.puppet.network.api.basemodel.BaseModel
-import com.mango.puppet.network.api.commen.ApiException
 import com.mango.puppet.network.api.commen.CustomException
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
@@ -14,7 +12,7 @@ import io.reactivex.schedulers.Schedulers
  */
 class RxStreamHelper {
     companion object {
-        fun <T> io_Main(): ObservableTransformer<BaseModel<T>, T> {
+        fun <T> io_Main(): ObservableTransformer<T, T> {
             return ObservableTransformer { upstream ->
                 upstream.subscribeOn(Schedulers.io())
                     //出错统一处理
@@ -25,20 +23,6 @@ class RxStreamHelper {
                             )
                         )
                     })
-                    //解析data层，剔除 code /msg
-                    .flatMap { tBaseModel ->
-                        if (tBaseModel.code == 200) {
-                            val data = tBaseModel.data!!
-                            Observable.just(data)
-                        } else {
-                            Observable.error(
-                                ApiException(
-                                    tBaseModel.code!!,
-                                    tBaseModel.msg!!
-                                )
-                            )
-                        }
-                    }
                     .observeOn(AndroidSchedulers.mainThread())
             }
 
