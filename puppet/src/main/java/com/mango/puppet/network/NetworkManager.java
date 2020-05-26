@@ -48,9 +48,9 @@ public class NetworkManager implements INetwork, ServerManager.ServerListener {
     @Override
     public void reportJobResult(final Job jobResult, final IJobRequestResult iJobRequestResult) {
         String jobJsonString = JSON.toJSONString(jobResult);
-        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<BaseModel<Object>>() {
+        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<Object>() {
             @Override
-            public void onHandleSuccess(@Nullable BaseModel<Object> objectBaseModel) {
+            public void onHandleSuccess(@Nullable Object objectBaseModel) {
                 iJobRequestResult.onSuccess(jobResult);
             }
 

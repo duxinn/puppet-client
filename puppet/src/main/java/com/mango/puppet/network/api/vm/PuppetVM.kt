@@ -37,7 +37,7 @@ class PuppetVM {
             }
         }
 
-        fun reportJobResult(url: String, jobJsonString: String, callBack: DesCallBack<BaseModel<Any>>) {
+        fun reportJobResult(url: String, jobJsonString: String, callBack: DesCallBack<Any>) {
             if (TextUtils.isEmpty(url)) {
                 service.reportJobResult(jobJsonString)
                         .compose(RxStreamHelper.io_Main())
