@@ -10,8 +10,8 @@ import io.reactivex.disposables.Disposable
 /**
  * subscribe的时候使用这个接口
  */
-class Destiny<T>(callBack: DesCallBack<T>) : Observer<BaseModel<T>> {
-    private var callBack: DesCallBack<T>? = callBack
+class Destiny<T>(callBack: DesCallBack<BaseModel<T>>) : Observer<BaseModel<T>> {
+    private var callBack: DesCallBack<BaseModel<T>>? = callBack
 
     override fun onComplete() {
 
@@ -27,7 +27,7 @@ class Destiny<T>(callBack: DesCallBack<T>) : Observer<BaseModel<T>> {
 
     override fun onNext(t: BaseModel<T>) {
         if (t.isSuccess()) {
-            callBack?.onHandleSuccess(t.data)
+            callBack?.onHandleSuccess(t)
         } else {
             callBack?.onHandleError(t.msg, t.code)
         }
