@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mango.puppet.network.api.api.ApiClient;
-import com.mango.puppet.network.api.basemodel.BaseModel;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
 import com.mango.puppet.network.server.ServerManager;
@@ -20,7 +19,7 @@ import com.mango.puppet.network.server.ServerManager;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ServerManager.ServerListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     // 用于测试网络部分
     private Button mBtnTestNetwork;
     private Button mBtnStartServer;
@@ -85,7 +84,43 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
                 break;
             }
             case R.id.btn_start_server: {
-                ServerManager.getInstance(this).startServer();
+                ServerManager.getInstance(this).startServer(new ServerManager.ServerListener() {
+                    @Override
+                    public void onServerStart(String ip) {
+                        mBtnStartServer.setVisibility(View.GONE);
+                        mBtnStopServer.setVisibility(View.VISIBLE);
+                        mBtnBrowser.setVisibility(View.VISIBLE);
+
+                        if (!TextUtils.isEmpty(ip)) {
+                            List<String> addressList = new LinkedList<>();
+                            mRootUrl = "http://" + ip + ":8080/";
+                            addressList.add(mRootUrl);
+                            addressList.add("http://" + ip + ":8080/login.html");
+                            mTvMessage.setText(TextUtils.join("\n", addressList));
+                        } else {
+                            mRootUrl = null;
+                            mTvMessage.setText("Did not get the server IP address");
+                        }
+                    }
+
+                    @Override
+                    public void onServerError(String error) {
+                        mRootUrl = null;
+                        mBtnStartServer.setVisibility(View.VISIBLE);
+                        mBtnStopServer.setVisibility(View.GONE);
+                        mBtnBrowser.setVisibility(View.GONE);
+                        mTvMessage.setText(error);
+                    }
+
+                    @Override
+                    public void onServerStop() {
+                        mRootUrl = null;
+                        mBtnStartServer.setVisibility(View.VISIBLE);
+                        mBtnStopServer.setVisibility(View.GONE);
+                        mBtnBrowser.setVisibility(View.GONE);
+                        mTvMessage.setText("Server Stop Succeed");
+                    }
+                });
                 break;
             }
             case R.id.btn_stop_server: {
@@ -103,45 +138,6 @@ public class MainActivity extends AppCompatActivity implements ServerManager.Ser
                 break;
             }
         }
-    }
-
-    /**
-     * 这部分接口回调根据用户需求  看是否需要服务状态的回调
-     */
-    @Override
-    public void onServerStart(String ip) {
-        mBtnStartServer.setVisibility(View.GONE);
-        mBtnStopServer.setVisibility(View.VISIBLE);
-        mBtnBrowser.setVisibility(View.VISIBLE);
-
-        if (!TextUtils.isEmpty(ip)) {
-            List<String> addressList = new LinkedList<>();
-            mRootUrl = "http://" + ip + ":8080/";
-            addressList.add(mRootUrl);
-            addressList.add("http://" + ip + ":8080/login.html");
-            mTvMessage.setText(TextUtils.join("\n", addressList));
-        } else {
-            mRootUrl = null;
-            mTvMessage.setText("Did not get the server IP address");
-        }
-    }
-
-    @Override
-    public void onServerError(String error) {
-        mRootUrl = null;
-        mBtnStartServer.setVisibility(View.VISIBLE);
-        mBtnStopServer.setVisibility(View.GONE);
-        mBtnBrowser.setVisibility(View.GONE);
-        mTvMessage.setText(error);
-    }
-
-    @Override
-    public void onServerStop() {
-        mRootUrl = null;
-        mBtnStartServer.setVisibility(View.VISIBLE);
-        mBtnStopServer.setVisibility(View.GONE);
-        mBtnBrowser.setVisibility(View.GONE);
-        mTvMessage.setText("Server Stop Succeed");
     }
 
     @Override

@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import com.mango.puppet.status.StatusManager;
-
 public class ServerManager extends BroadcastReceiver {
 
     private static final String ACTION = "com.mango.puppetsystem.receiver";
@@ -27,7 +25,6 @@ public class ServerManager extends BroadcastReceiver {
     public static ServerManager getInstance(Context context) {
         if (mService == null) {
             mContext = context;
-            mServerListener = (ServerListener) context;
             mService = new Intent(context, CoreService.class);
         }
         return instance;
