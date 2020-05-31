@@ -23,6 +23,7 @@ import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.log.i.ILog;
+import com.mango.puppet.network.CallBackListener;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.status.i.IStatusListener;
 import com.mango.puppetmodel.Event;
@@ -126,11 +127,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
                 break;
 
             case R.id.ll_send_job:
-                Job job = new Job();
-                job.package_name = "com.wzg.trojandemo";
-                job.job_name = "起飞";
-                job.job_id = 1;
-                JobManager.getInstance().addJob(job);
+                CallBackListener.getInstance().sendSuccessJob();
                 break;
 
             case R.id.ll_event_watcher:
