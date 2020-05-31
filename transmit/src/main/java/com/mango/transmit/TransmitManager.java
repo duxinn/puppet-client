@@ -106,7 +106,6 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("TransmitManager", "onReceive:" + intent.getAction());
                 if (appendedFilters.contains(intent.getAction())) {
                     String content = intent.getStringExtra(CONTENT_KEY);
                     String packageName = intent.getStringExtra(PACKAGE_KEY);
@@ -131,7 +130,7 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
     @Override
     public void sendJob(String targetPackageName, Job job) {
         if (job != null) {
-            String data = new Gson().toJson(job);
+            String data = job.toString();
             try {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put(TYPE_KEY, JOB_KEY);
@@ -161,7 +160,7 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
     @Override
     public void sendEvent(String targetPackageName, Event event) {
         if (event != null) {
-            String data = new Gson().toJson(event);
+            String data = event.toString();
             try {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put(TYPE_KEY, EVENT_KEY);
@@ -184,6 +183,7 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
             sendData(targetPackageName, data.toString());
         }
     }
+
 
     /*   private   */
 
@@ -253,7 +253,9 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
      */
     private void dealData(String packageName, String content) {
         if (mListener == null) return;
-        Log.d("TransmitManager", "onReceiveDataString:" + packageName + " " + content);
+        if (!content.contains(HEART_KEY)) {
+            Log.d("TransmitManager", "onReceiveDataString:" + packageName + " " + content);
+        }
         mListener.onReceiveDataString(packageName, content);
         try {
             JSONObject jsonObject = new JSONObject(content);
@@ -261,10 +263,10 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
 
             String type = jsonObject.getString(TYPE_KEY);
             if (JOB_KEY.equals(type)) {
-                Job job = new Gson().fromJson(jsonObject.getString(DATA_KEY), Job.class);
+                Job job = Job.fromString(jsonObject.getString(DATA_KEY));
                 mListener.onReceiveJob(packageName, job);
             } else if (EVENT_KEY.equals(type)) {
-                Event event = new Gson().fromJson(jsonObject.getString(DATA_KEY), Event.class);
+                Event event = Event.fromString(jsonObject.getString(DATA_KEY));
                 mListener.onReceiveEvent(packageName, event);
             } else if (EVENT_WATCHER_KEY.equals(type)) {
                 EventWatcher eventWatcher = new Gson().fromJson(jsonObject.getString(DATA_KEY), EventWatcher.class);
@@ -281,8 +283,10 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
      * @param string 内容
      */
     private void sendString(String targetPackageName, String string) {
-        Log.d("TransmitManager", "sendString:" + targetPackageName + " " + string);
         if (string != null && getContext() != null) {
+            if (!string.contains(HEART_KEY)) {
+                Log.d("TransmitManager", "sendString:" + targetPackageName + " " + string);
+            }
             String sendString = string + HookTypeEndString;
             double divideLength = 10000.0;
             int divideInt = 10000;
