@@ -6,8 +6,9 @@ import com.mango.puppet.dispatch.business.i.IBusiness;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.NetworkManager;
 import com.mango.puppet.network.i.INetwork;
-import com.mango.puppetmodel.UploadResourceModel;
+import com.mango.puppet.plugin.UploadChannelInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,16 +34,17 @@ public class BusinessManager implements IBusiness {
     }
     /************   IBusiness   ************/
     @Override
-    public void getUploadResourceWay(final IUploadResourceWayResult mResult) {
-        NetworkManager.getInstance().requestUploadResourceWay(new INetwork.IRequestResult() {
+    public void getUploadResourceWay(ArrayList<String> supportChannels, final IUploadResourceWayResult mResult) {
+        NetworkManager.getInstance().requestUploadResourceWay(supportChannels, new INetwork.IRequestResult() {
             @Override
             public void onSuccess(Object result) {
                 if (result instanceof List) {
-                    if (((List) result).size() > 0 && ((List) result).get(0) instanceof UploadResourceModel) {
+                    if (((List) result).size() > 0 && ((List) result).get(0) instanceof UploadChannelInfo) {
                         mResult.onSuccess((List) result);
                     }
                 } else {
                     mResult.onError();
+                    LogManager.getInstance().recordLog("请求资源时路径时，返回格式错误");
                 }
             }
 

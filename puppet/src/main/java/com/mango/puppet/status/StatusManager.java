@@ -1,5 +1,8 @@
 package com.mango.puppet.status;
 
+import android.util.Log;
+
+import com.mango.puppet.log.LogManager;
 import com.mango.puppet.status.i.IStatusControl;
 import com.mango.puppet.status.i.IStatusListener;
 import com.mango.puppetmodel.EventWatcher;
@@ -52,7 +55,7 @@ public class StatusManager implements IStatusControl {
         boolean isNetOk;
         if (networkStatus != status) {
             networkStatus = status;
-            if (networkStatus == 1) {
+            if (networkStatus == 0) {
                 isNetOk = true;
             } else {
                 isNetOk = false;
@@ -73,7 +76,7 @@ public class StatusManager implements IStatusControl {
         if (jobEngineStatus != status) {
             jobEngineStatus = status;
             if (mListener != null) {
-                mListener.onJobEngineStatusChanged(networkStatus);
+                mListener.onJobEngineStatusChanged(jobEngineStatus);
             }
         }
     }
@@ -246,6 +249,7 @@ public class StatusManager implements IStatusControl {
 
     @Override
     public void setPluginRunning(String packageName, boolean isRunning) {
+        LogManager.getInstance().recordLog("插件运行状态" + packageName + " " + isRunning);
         Boolean isNeed = true;
         for (int i = 0; i < pluginRunningModelList.size(); i++) {
             String packageNameIn = pluginRunningModelList.get(i).packageName;

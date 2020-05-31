@@ -1,13 +1,10 @@
 package com.mango.puppet.dispatch.job;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.mango.puppet.dispatch.job.db.DBManager;
-import com.mango.puppet.dispatch.job.i.IJob;
 import com.mango.puppet.network.NetworkManager;
 import com.mango.puppet.network.i.INetwork;
-import com.mango.puppet.status.StatusManager;
 import com.mango.puppetmodel.Job;
 
 import java.util.ArrayList;
@@ -36,6 +33,7 @@ public class ReportManager implements
     private ScheduledThreadPoolExecutor scheduled
             = null;
 
+    /* DBManager.OnJobDBChangeListener */
     @Override
     public void onJobInsert(Job job) {
 
@@ -53,21 +51,41 @@ public class ReportManager implements
         }
     }
 
+    /* INetwork.IJobRequestResult */
     @Override
     public void onSuccess(Job jobResult) {
-        removeFromDb(jobResult);
-    }
-
-    private void removeFromDb(Job jobResult) {
-        boolean b = DBManager.deleteJob(jobResult.job_id);
-        if (b) {
-            Log.e("ReportManager", "DBManager.deleteJob error ");
+        if (jobResult.job_status == 2) {
+            jobResult.job_status = 1;
+            DBManager.updateJobStatus(jobResult);
+        } else if (jobResult.job_status == 3
+                || jobResult.job_status == 4) {
+            removeFromDb(jobResult);
+        } else if (jobResult.job_status == 5) {
+            jobResult.job_status = 6;
+            DBManager.updateJobStatus(jobResult);
+        } else if (jobResult.job_status == 1) {
+            // 两步任务第一步上报成功前 第二步执行完成了
+        } else {
+            throw new RuntimeException("status:" + jobResult.job_status);
         }
     }
 
     @Override
     public void onError(Job jobResult, int errorCode, String errorMessage) {
-        removeFromDb(jobResult);
+        if (jobResult.job_status == 2) {
+            jobResult.job_status = 1;
+            DBManager.updateJobStatus(jobResult);
+        } else if (jobResult.job_status == 3
+                || jobResult.job_status == 4) {
+            removeFromDb(jobResult);
+        } else if (jobResult.job_status == 5) {
+            jobResult.job_status = 6;
+            DBManager.updateJobStatus(jobResult);
+        } else if (jobResult.job_status == 1) {
+            // 两步任务第一步上报成功前 第二步执行完成了
+        } else {
+            throw new RuntimeException("status:" + jobResult.job_status);
+        }
     }
 
     @Override
@@ -75,14 +93,17 @@ public class ReportManager implements
         onErrorReport();
     }
 
-    public void reportToService(Job job) {
+    private void reportToService(Job job) {
         NetworkManager.getInstance().reportJobResult(job, this);
     }
 
+    public void reportToServiceNoCallback(Job job) {
+        NetworkManager.getInstance().reportJobResult(job, null);
+    }
 
-    public void startJobSystem() {
+    public void start() {
         DBManager.addJobDbListener(ReportManager.this);
-        startJobSystem();
+        reportAllJob();
     }
 
 
@@ -104,6 +125,13 @@ public class ReportManager implements
                     reportAllJob();
                 }
             }, 5, 5, TimeUnit.SECONDS);
+        }
+    }
+
+    private void removeFromDb(Job jobResult) {
+        boolean b = DBManager.deleteJob(jobResult.job_id);
+        if (b) {
+            Log.e("ReportManager", "DBManager.deleteJob error ");
         }
     }
 

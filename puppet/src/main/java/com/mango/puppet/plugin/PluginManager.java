@@ -26,6 +26,7 @@ import com.mango.transmit.i.ITransmitReceiver;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -50,7 +51,6 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     private boolean callBack = false;
     private IPluginControlResult iPluginControlResult;
     private Timer timer;
-    private Timer checkTimer;
 
     public static PluginManager getInstance() {
         return ourInstance;
@@ -115,7 +115,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
             if (msg.what == 1) {
                 JSONObject jsonObject = new JSONObject();
                 try {
-                    jsonObject.put("type", "heart");
+                    jsonObject.put(TransmitManager.TYPE_KEY, TransmitManager.HEART_KEY);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -123,36 +123,30 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                     model.setRun(false);
                     TransmitManager.getInstance().sendMessage(model.getPackageName(), jsonObject);
                 }
-                if (checkTimer == null) {
-                    checkTimer = new Timer();
-                    checkTimer.schedule(timerTask, 2000, 5000);
-                }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (PluginModel model : models) {
+                            if (model.isRun()) {
+                                if (!runningPackageNames.contains(model.getPackageName())){
+                                    runningPackageNames.add(model.getPackageName());
+                                    if (listener != null) {
+                                        listener.onPluginRunningStatusChange(model.getPackageName(), true);
+                                    }
+                                }
+                            } else {
+                                if (runningPackageNames.contains(model.getPackageName())){
+                                    runningPackageNames.remove(model.getPackageName());
+                                    if (listener != null) {
+                                        listener.onPluginRunningStatusChange(model.getPackageName(), false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }, 3000);
             }
             super.handleMessage(msg);
-        }
-    };
-
-    private TimerTask timerTask = new TimerTask() {
-        @Override
-        public void run() {
-            //检测心跳是否回应
-            for (PluginModel model : models) {
-                if (model.isRun()) {
-                    if (!runningPackageNames.contains(model.getPackageName())){
-                        runningPackageNames.add(model.getPackageName());
-                        if (listener != null) {
-                            listener.onPluginRunningStatusChange(model.getPackageName(), true);
-                        }
-                    }
-                } else {
-                    if (runningPackageNames.contains(model.getPackageName())){
-                        runningPackageNames.remove(model.getPackageName());
-                        if (listener != null) {
-                            listener.onPluginRunningStatusChange(model.getPackageName(), false);
-                        }
-                    }
-                }
-            }
         }
     };
 
@@ -189,6 +183,9 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                         iPluginControlResult=null;
                     } else {
                         TransmitManager.getInstance().setTransmitReceiver(this);
+                        ArrayList<String> actions = new ArrayList<>();
+                        actions.add(TransmitManager.MANAGER_PACKAGE_NAME);
+                        TransmitManager.getInstance().setRegister(context, actions);
                         for (final PluginModel pluginModel : pluginModels) {
                             if (!pluginPackageNames.contains(pluginModel.getPackageName())) {
                                 result.onFinished(false, pluginModel.getPackageName() + "插件不可用");
@@ -198,7 +195,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                             }
                         }
                         for (final PluginModel pluginModel : pluginModels) {
-                            runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexPath(), CLASS_NAME, METHOD_NAME, result);
+                            runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexName(), pluginModel.getClassName(), pluginModel.getMethodName(), result);
                         }
                         new Handler().postDelayed(new Runnable() {
                             @Override
@@ -296,16 +293,16 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     }
 
     @Override
-    public void onReceiveData(String packageName, JSONObject jsonObject) {
+    public void onReceiveData(final String packageName, JSONObject jsonObject) {
         try {
-            String type = jsonObject.getString("type");
-            if ("heart".equals(type)) {
+            String type = jsonObject.getString(TransmitManager.TYPE_KEY);
+            if (TransmitManager.HEART_KEY.equals(type)) {
                 for (PluginModel model : models) {
                     if (packageName.equals(model.getPackageName())) {
                         model.setRun(true);
                     }
                 }
-            } else if ("firstStart".equals(type)) {
+            } else if (TransmitManager.FIRST_START_KEY.equals(type)) {
                 runningPackageNames.add(packageName);
                 if (listener != null) {
                     listener.onPluginRunningStatusChange(packageName, true);
@@ -320,6 +317,47 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                     iPluginControlResult=null;
                     sendHeart();
                     callBack = true;
+                }
+            } else if (TransmitManager.UPLOAD_KEY.equals(type)) {
+                final String filePath = jsonObject.getString(TransmitManager.LOCAL_URL_KEY);
+                final String fileName = jsonObject.getString(TransmitManager.FILE_NAME);
+                if (new File(fileName).exists()) {
+                    UploadImageUtils.uploadImage(0x00, fileName, filePath, new UploadImageUtils.UploadImageCallBack() {
+                        @Override
+                        public void uploadImageSuccess(int requestCode, String identifier, String urlPath) {
+                            try {
+                                JSONObject receiptObject = new JSONObject();
+                                receiptObject.put(TransmitManager.LOCAL_URL_KEY, filePath);
+                                receiptObject.put(TransmitManager.FILE_NAME, fileName);
+                                receiptObject.put(TransmitManager.REMOTE_URL_KEY, urlPath);
+                                TransmitManager.getInstance().sendMessage(packageName, receiptObject);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void uploadImageFailed(int requestCode, String identifier) {
+                            try {
+                                JSONObject receiptObject = new JSONObject();
+                                receiptObject.put(TransmitManager.LOCAL_URL_KEY, filePath);
+                                receiptObject.put(TransmitManager.FILE_NAME, fileName);
+                                TransmitManager.getInstance().sendMessage(packageName, receiptObject);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void uploadImageProgress(int requestCode, String identifier, double percent) {
+
+                        }
+                    });
+                } else {
+                    JSONObject receiptObject = new JSONObject();
+                    receiptObject.put(TransmitManager.LOCAL_URL_KEY, filePath);
+                    receiptObject.put(TransmitManager.FILE_NAME, fileName);
+                    TransmitManager.getInstance().sendMessage(packageName, receiptObject);
                 }
             }
         } catch (JSONException e) {

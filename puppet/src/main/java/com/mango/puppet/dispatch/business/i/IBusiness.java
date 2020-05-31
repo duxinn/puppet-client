@@ -1,7 +1,8 @@
 package com.mango.puppet.dispatch.business.i;
 
-import com.mango.puppetmodel.UploadResourceModel;
+import com.mango.puppet.plugin.UploadChannelInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,11 +19,11 @@ public interface IBusiness {
      * 获取资源文件上传方式
      * @param result 结果
      */
-    void getUploadResourceWay(IUploadResourceWayResult result);
+    void getUploadResourceWay(ArrayList<String> supportChannels, IUploadResourceWayResult result);
 
     interface IUploadResourceWayResult {
 
-        void onSuccess(List<UploadResourceModel> modelList);
+        void onSuccess(List<UploadChannelInfo> modelList);
 
         void onError();
     }

@@ -3,8 +3,10 @@ package com.mango.puppet.plugin;
 public class PluginModel {
     private String packageName;
     private String activityName;
-    private String dexPath;
+    private String dexName;
     private String dexVersion;
+    private String className;
+    private String methodName;
     private boolean isRun = false;
 
     public String getActivityName() {
@@ -31,12 +33,12 @@ public class PluginModel {
         this.packageName = packageName;
     }
 
-    public String getDexPath() {
-        return dexPath;
+    public String getDexName() {
+        return dexName;
     }
 
-    public void setDexPath(String dexPath) {
-        this.dexPath = dexPath;
+    public void setDexName(String dexName) {
+        this.dexName = dexName;
     }
 
     public boolean isRun() {
@@ -45,5 +47,21 @@ public class PluginModel {
 
     public void setRun(boolean run) {
         isRun = run;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 }

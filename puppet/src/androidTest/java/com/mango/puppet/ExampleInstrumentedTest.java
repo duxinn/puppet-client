@@ -17,7 +17,6 @@ import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.status.i.IStatusListener;
 import com.mango.puppetmodel.Event;
-import com.mango.puppetmodel.UploadResourceModel;
 
 import org.junit.Before;
 import org.junit.Test;

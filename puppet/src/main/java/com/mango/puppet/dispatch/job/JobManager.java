@@ -5,15 +5,10 @@ import android.util.Log;
 
 import com.mango.puppet.dispatch.job.db.DBManager;
 import com.mango.puppet.dispatch.job.i.IJob;
-import com.mango.puppet.network.NetworkManager;
-import com.mango.puppet.network.i.INetwork;
-import com.mango.puppet.plugin.PluginManager;
-import com.mango.puppet.plugin.i.IPluginControl;
-import com.mango.puppet.plugin.i.IPluginJob;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppetmodel.Job;
 
-import java.util.ArrayList;
+import org.json.JSONObject;
 
 /**
  * JobManager
@@ -22,21 +17,24 @@ import java.util.ArrayList;
  * @date: 2020/05/18
  */
 @SuppressWarnings("unused")
-public class JobManager implements IJob,
-        IPluginJob.IPluginJobCallBack {
+public class JobManager implements IJob {
     private static final JobManager ourInstance = new JobManager();
 
     enum STATUS {
         /**
-         * status stop 执行完成任务休息中
+         * status rest 等待新任务 如果有新任务则立刻执行
          */
-        STOP(0),
+        REST(0),
         /**
-         * status error 上报任务失败过多终止执行
+         * status stop 失败任务而停止执行
          */
-        ERROE(-1),
+        STOP(-1),
         /**
-         * status stop 执行中
+         * status wait 上报失败过多而停止执行
+         */
+        WAIT(-2),
+        /**
+         * status running 执行中
          */
         RUNNING(1);
         private int code;
@@ -63,7 +61,54 @@ public class JobManager implements IJob,
 
     /************   IJob   ************/
     @Override
+    public boolean startJobSystem(Context context) {
+        DBManager.init(context);
+        ReportManager.getInstance().start();
+        ExecutorManager.getInstance().start();
+        return true;
+    }
+
+    @Override
     public void addJob(Job job) {
+        if (Job.RETRY_JOB.equals(job.job_name)
+                || Job.CANCEL_JOB.equals(job.job_name)) {
+            if (status == STATUS.STOP) {
+                long job_id;
+                if (Job.RETRY_JOB.equals(job.job_name)) {
+                    job_id = job.job_data.optLong("retry_job_id");
+                } else {
+                    job_id = job.job_data.optLong("cancel_job_id");
+                }
+
+                Job targetJob = DBManager.getJobsById(job_id);
+                if (targetJob != null && targetJob.job_status == 6) {
+                    job.job_status = 3;
+                    ReportManager.getInstance().reportToServiceNoCallback(job);
+
+                    if (Job.RETRY_JOB.equals(job.job_name)) {
+                        targetJob.job_status = 0;
+                        targetJob.result_data = (new JSONObject()).toString();
+                        targetJob.error_code = 0;
+                        targetJob.error_message = "";
+                        DBManager.updateJobStatus(targetJob);
+                    } else {
+                        DBManager.deleteJob(job_id);
+                    }
+                } else {
+                    job.job_status = 4;
+                    job.error_message = "任务引擎异常";
+                    job.error_code = 2;
+                    ReportManager.getInstance().reportToServiceNoCallback(job);
+                }
+            } else {
+                job.job_status = 4;
+                job.error_message = "当前没有失败任务";
+                job.error_code = 1;
+                ReportManager.getInstance().reportToServiceNoCallback(job);
+            }
+            return;
+        }
+
         boolean b = DBManager.insertJobIntoDb(job);
         if (!b) {
             Log.e("JobManager", "DBManager.insertJobIntoDb error ");
@@ -72,49 +117,15 @@ public class JobManager implements IJob,
 
     @Override
     public void receiveJobResult(Job jobResult) {
-        status = STATUS.STOP;
+        ExecutorManager.getInstance().receiveJobResult();
         boolean b = DBManager.updateJobStatus(jobResult);
         if (!b) {
             Log.e("JobManager", "DBManager.updateJobStatus error ");
-        } else {
-            executeJob();
-        }
-        log();
-    }
-
-    @Override
-    public boolean startJobSystem(Context context) {
-        DBManager.init(context);
-        executeJob();
-        ReportManager.getInstance().startJobSystem();
-        return true;
-    }
-
-    @Override
-    public void onFinished(Job job, boolean isSucceed, String failReason) {
-        if (!isSucceed) {
-            job.job_status = 4;
-            boolean b = DBManager.updateJobStatus(job);
-            status = STATUS.ERROE;
-            log();
         }
     }
 
-    private void log() {
+    protected void setStatus(STATUS s) {
+        status = s;
         StatusManager.getInstance().setJobEngineStatus(status.getCode());
-    }
-
-    public void executeJob() {
-        Job currentJob = DBManager.getSingleNotDoneJobsFromDb();
-        if (currentJob != null && status != STATUS.RUNNING) {
-            if (DBManager.getAllErrorJob().size() > 5 ||
-                    DBManager.getJobsDependOnStatus(4).size() > 0) {
-                status = STATUS.ERROE;
-            } else {
-                status = STATUS.RUNNING;
-                PluginManager.getInstance().distributeJob(currentJob, this);
-            }
-        }
-        log();
     }
 }

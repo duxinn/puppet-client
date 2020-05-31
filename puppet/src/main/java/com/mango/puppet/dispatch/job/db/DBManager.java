@@ -44,7 +44,10 @@ public class DBManager {
 
 
     public static boolean addJobDbListener(OnJobDBChangeListener listener) {
-        return jbListenerDatas.add(listener);
+        if (!jbListenerDatas.contains(listener)) {
+            return jbListenerDatas.add(listener);
+        }
+        return true;
     }
 
     public static boolean removeJobDbListener(OnJobDBChangeListener listener) {
@@ -92,10 +95,11 @@ public class DBManager {
     }
 
     public static ArrayList<Job> getReportJobs() {
-        ArrayList<JobBean> jobBeans = (ArrayList<JobBean>) SQLite.
-                select().
-                from(JobBean.class).where(JobBean_Table.job_status.notEq(0)).
-                queryList();
+        ArrayList<JobBean> jobBeans = (ArrayList<JobBean>) SQLite
+                .select()
+                .from(JobBean.class)
+                .where(JobBean_Table.job_status.in(2, 3, 4, 5))
+                .queryList();
         return handleJobBeanListToJobs(jobBeans);
     }
 
@@ -108,6 +112,14 @@ public class DBManager {
         return handleJobBeanListToJobs(jobBeans);
     }
 
+    public static Job getJobsById(long job_id) {
+        JobBean jobBeans = SQLite
+                .select()
+                .from(JobBean.class)
+                .where(JobBean_Table.job_id.eq(job_id))
+                .querySingle();
+        return handleJobBeanToJob(jobBeans, new Gson());
+    }
 
     @Nullable
     public static Job getSingleNotDoneJobsFromDb() {
@@ -115,7 +127,7 @@ public class DBManager {
 
         List<JobBean> beans = SQLite.
                 select().
-                from(JobBean.class).where(JobBean_Table.job_status.eq(0)).
+                from(JobBean.class).where(JobBean_Table.job_status.in(0, 1)).
                 queryList();
         if (beans != null && beans.size() > 0) {
             jobBean = handleJobBeanToJob(beans.get(0), new Gson());
@@ -171,15 +183,6 @@ public class DBManager {
             }
         }
         return ret;
-    }
-
-    public static ArrayList<Job> getAllErrorJob() {
-        ArrayList<JobBean> jobBeans = (ArrayList<JobBean>) SQLite.
-                select().
-                from(JobBean.class).
-                where(JobBean_Table.job_status.eq(4)).
-                queryList();
-        return handleJobBeanListToJobs(jobBeans);
     }
 
     public static void notify(int type, Job job) {

@@ -14,6 +14,8 @@ import com.mango.puppetmodel.Job;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 import static com.mango.puppet.status.StatusManager.SERVER_ERROR;
 import static com.mango.puppet.status.StatusManager.SERVER_START;
 import static com.mango.puppet.status.StatusManager.SERVER_STOP;
@@ -113,7 +115,7 @@ public class NetworkManager implements INetwork{
     }
 
     @Override
-    public void requestUploadResourceWay(IRequestResult requestResult) {
-
+    public void requestUploadResourceWay(ArrayList<String> supportChannels, IRequestResult requestResult) {
+        // TODO 提供供本地客户端调用的接口
     }
 }

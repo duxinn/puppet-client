@@ -1,6 +1,7 @@
 package com.mango.puppet.dispatch.system;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
@@ -41,7 +42,17 @@ public class SystemManager implements ISystem, IPluginRunListener {
         SystemPluginManager.getInstance().setSystemPluginListener(context);
         // 1 插件管理模块
         //TODO pluginmodels列表暂时没有
-        PluginManager.getInstance().startPluginSystem(context, new ArrayList<PluginModel>() ,new IPluginControl.IPluginControlResult() {
+        PluginModel wechatModel = new PluginModel();
+        wechatModel.setPackageName("com.tencent.mm");
+        wechatModel.setActivityName("ui.LauncherUI");
+        wechatModel.setDexName("wechat704.apk");
+        wechatModel.setClassName("com.mango.wechattool.business.WechatEntrance");
+        wechatModel.setMethodName("entrance");
+        wechatModel.setDexVersion("7.0.4");
+        ArrayList<PluginModel> models = new ArrayList<>();
+        models.add(wechatModel);
+        PluginManager.getInstance().setPluginControlListener(SystemManager.this);
+        PluginManager.getInstance().startPluginSystem(context, models,new IPluginControl.IPluginControlResult() {
             @Override
             public void onFinished(boolean isSucceed, String failReason) {
                 if (!isSucceed) {
@@ -49,7 +60,6 @@ public class SystemManager implements ISystem, IPluginRunListener {
                     LogManager.getInstance().recordLog(failReason);
                 } else  {
                     LogManager.getInstance().recordLog("Plugin启动成功");
-                    PluginManager.getInstance().setPluginControlListener(SystemManager.this);
                     // 2 任务模块
                     boolean result = JobManager.getInstance().startJobSystem(context);
                     if (!result) {
@@ -85,6 +95,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
     /************   IPluginRunListener   ************/
     @Override
     public void onPluginRunningStatusChange(String packageName, boolean isRunning) {
+        Log.d(getClass().toString(), "onPluginRunningStatusChange:" + packageName + isRunning);
         StatusManager.getInstance().setPluginRunning(packageName, isRunning);
     }
 }

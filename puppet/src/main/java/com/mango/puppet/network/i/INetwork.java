@@ -5,6 +5,8 @@ import android.content.Context;
 import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.Job;
 
+import java.util.ArrayList;
+
 /**
  * INetwork
  * 网络层与本期其他模块交互时提供的接口
@@ -41,7 +43,7 @@ public interface INetwork {
      * 获取上传资源文件的方式及参数
      * @param requestResult 请求结果
      */
-    void requestUploadResourceWay(IRequestResult requestResult);
+    void requestUploadResourceWay(ArrayList<String> supportChannels, IRequestResult requestResult);
 
     interface ISetupResult {
 

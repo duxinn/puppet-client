@@ -3,7 +3,6 @@ package com.mango.puppetsystem;
 import android.app.Application;
 import android.util.Log;
 
-import com.mango.puppet.network.api.api.ApiClient;
 import com.mango.puppet.systemplugin.SystemPluginManager;
 import com.mango.puppet.systemplugin.i.ISystemPluginListener;
 

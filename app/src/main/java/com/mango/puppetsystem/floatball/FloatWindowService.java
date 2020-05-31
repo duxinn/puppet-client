@@ -159,13 +159,25 @@ public class FloatWindowService extends Service implements View.OnClickListener,
 
     @Override
     public void onNetworkStatusChanged(boolean isNetOk) {
-        tvNet.setText(isNetOk ? "网络状态良好" : "请检查网络状态");
+        tvNet.setText(isNetOk ? "服务器运行中" : "服务器已停止");
         sendBroadCastToActivity(tvNet.getText().toString(), NormalConst.TYPE_NET);
     }
 
     @Override
     public void onJobEngineStatusChanged(int status) {
-        tvJobEngineStatus.setText(status == 0 ? "任务引擎停止" : "任务引擎正常");
+        String text;
+        if (status == 1) {
+            text = "执行中";
+        } else if (status == 0) {
+            text = "等待新任务";
+        } else if (status == -1) {
+            text = "有失败任务";
+        } else if (status == -2) {
+            text = "等待任务结果上报完成";
+        } else {
+            text = "未知状态";
+        }
+        tvJobEngineStatus.setText(text);
         sendBroadCastToActivity(tvJobEngineStatus.getText().toString(), NormalConst.TYPE_JOB_ENGINE_STATUS);
     }
 

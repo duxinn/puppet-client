@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.mango.puppetmodel.Event;
@@ -32,6 +33,21 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class TransmitManager implements ITransmitSender, IEventTransform {
 
+    public static final String MANAGER_PACKAGE_NAME = "com.mango.puppetsystem";
+    public static final String TYPE_KEY = "TYPE_KEY";
+    public static final String DATA_KEY = "DATA_KEY";
+    public static final String JOB_KEY = "JOB_KEY";
+    public static final String EVENT_KEY = "EVENT_KEY";
+    public static final String EVENT_WATCHER_KEY = "EVENT_WATCHER_KEY";
+    public static final String FIRST_START_KEY = "FIRST_START_KEY";
+    public static final String HEART_KEY = "HEART_KEY";
+    // 上传文件
+    public static final String UPLOAD_KEY = "UPLOAD_KEY";
+    public static final String LOCAL_URL_KEY = "LOCAL_URL_KEY";
+    public static final String FILE_NAME = "FILE_NAME";
+    public static final String REMOTE_URL_KEY = "REMOTE_URL_KEY";
+
+
     private static final String CONTENT_KEY = "CONTENT_KEY";
     private static final String PACKAGE_KEY = "PACKAGE_KEY";
     private static final TransmitManager ourInstance = new TransmitManager();
@@ -51,6 +67,14 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
     private TransmitManager() {
     }
 
+    public void destroy() {
+        if (getContext() != null && mReceiver != null) {
+            getContext().unregisterReceiver(mReceiver);
+            mContextReference = null;
+            mReceiver = null;
+        }
+    }
+
     /*   public   */
 
     /**
@@ -59,6 +83,9 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
      * @param filters 木马插件所在应用的包名
      */
     public void setRegister(Context context, ArrayList<String> filters) {
+        for (int i = 0; i < filters.size(); i++) {
+            Log.d("TransmitManager", "setRegister:" + filters.get(i));
+        }
         if (context == null || filters == null) {
             return;
         }
@@ -67,19 +94,24 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
             mContextReference = null;
             mReceiver = null;
         }
-
+        final ArrayList<String> appendedFilters = new ArrayList<>();
         mContextReference = new WeakReference<>(context);
         IntentFilter intentFilter = new IntentFilter();
         for (int i = 0; i < filters.size(); i++) {
-            intentFilter.addAction(RECEIVE_FORE_STRING + filters.get(i));
+            String s = RECEIVE_FORE_STRING + filters.get(i);
+            intentFilter.addAction(s);
+            appendedFilters.add(s);
         }
         mTmpDataMap = new HashMap<>();
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String content = intent.getStringExtra(CONTENT_KEY);
-                String packageName = intent.getStringExtra(PACKAGE_KEY);
-                dealReceiveContent(packageName, content);
+                Log.d("TransmitManager", "onReceive:" + intent.getAction());
+                if (appendedFilters.contains(intent.getAction())) {
+                    String content = intent.getStringExtra(CONTENT_KEY);
+                    String packageName = intent.getStringExtra(PACKAGE_KEY);
+                    dealReceiveContent(packageName, content);
+                }
             }
         };
         getContext().registerReceiver(mReceiver, intentFilter);
@@ -102,8 +134,8 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
             String data = new Gson().toJson(job);
             try {
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("type", "job");
-                jsonObject.put("data", data);
+                jsonObject.put(TYPE_KEY, JOB_KEY);
+                jsonObject.put(DATA_KEY, data);
                 sendData(targetPackageName, jsonObject.toString());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -117,8 +149,8 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
             String data = new Gson().toJson(eventWatcher);
             try {
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("type", "eventWatcher");
-                jsonObject.put("data", data);
+                jsonObject.put(TYPE_KEY, EVENT_WATCHER_KEY);
+                jsonObject.put(DATA_KEY, data);
                 sendData(targetPackageName, jsonObject.toString());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -132,8 +164,8 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
             String data = new Gson().toJson(event);
             try {
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("type", "event");
-                jsonObject.put("data", data);
+                jsonObject.put(TYPE_KEY, EVENT_KEY);
+                jsonObject.put(DATA_KEY, data);
                 sendData(targetPackageName, jsonObject.toString());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -152,7 +184,6 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
             sendData(targetPackageName, data.toString());
         }
     }
-
 
     /*   private   */
 
@@ -222,20 +253,21 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
      */
     private void dealData(String packageName, String content) {
         if (mListener == null) return;
+        Log.d("TransmitManager", "onReceiveDataString:" + packageName + " " + content);
         mListener.onReceiveDataString(packageName, content);
         try {
             JSONObject jsonObject = new JSONObject(content);
             mListener.onReceiveData(packageName, jsonObject);
 
-            String type = jsonObject.getString("type");
-            if ("job".equals(type)) {
-                Job job = new Gson().fromJson(jsonObject.getString("data"), Job.class);
+            String type = jsonObject.getString(TYPE_KEY);
+            if (JOB_KEY.equals(type)) {
+                Job job = new Gson().fromJson(jsonObject.getString(DATA_KEY), Job.class);
                 mListener.onReceiveJob(packageName, job);
-            } else if ("event".equals(type)) {
-                Event event = new Gson().fromJson(jsonObject.getString("data"), Event.class);
+            } else if (EVENT_KEY.equals(type)) {
+                Event event = new Gson().fromJson(jsonObject.getString(DATA_KEY), Event.class);
                 mListener.onReceiveEvent(packageName, event);
-            } else if ("eventWatcher".equals(type)) {
-                EventWatcher eventWatcher = new Gson().fromJson(jsonObject.getString("data"), EventWatcher.class);
+            } else if (EVENT_WATCHER_KEY.equals(type)) {
+                EventWatcher eventWatcher = new Gson().fromJson(jsonObject.getString(DATA_KEY), EventWatcher.class);
                 mListener.onReceiveEventWatcher(packageName, eventWatcher);
             }
         } catch (Exception e) {
@@ -249,6 +281,7 @@ public class TransmitManager implements ITransmitSender, IEventTransform {
      * @param string 内容
      */
     private void sendString(String targetPackageName, String string) {
+        Log.d("TransmitManager", "sendString:" + targetPackageName + " " + string);
         if (string != null && getContext() != null) {
             String sendString = string + HookTypeEndString;
             double divideLength = 10000.0;

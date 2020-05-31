@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     //Json
     implementation 'com.alibaba:fastjson:1.1.71.android'
+    implementation 'com.qiniu:qiniu-android-sdk:7.3.10'
 }
 repositories {
     mavenCentral()

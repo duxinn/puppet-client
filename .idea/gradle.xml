@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/puppet" />
             <option value="$PROJECT_DIR$/puppetmodel" />
             <option value="$PROJECT_DIR$/transmit" />
+            <option value="$PROJECT_DIR$/wechattool" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
