@@ -18,12 +18,15 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.mango.puppet.dispatch.event.EventManager;
+import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.log.i.ILog;
-import com.mango.puppet.plugin.PluginManager;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.status.i.IStatusListener;
+import com.mango.puppetmodel.Event;
+import com.mango.puppetmodel.Job;
 import com.mango.puppetsystem.AppApplication;
 import com.mango.puppetsystem.NormalConst;
 import com.mango.puppetsystem.R;
@@ -42,6 +45,8 @@ public class FloatWindowService extends Service implements View.OnClickListener,
     private TextView tvLog, tvNet, tvJobCount, tvJobResultCount, tvJobEngineStatus, tvLocalStatus, tvEventWatcher;
 
     private int injectStatus = 0;
+    private int hasRegisterEventWatcher = 0;
+    private TextView mTvEventWatcher;
 
     @Override
     public void onCreate() {
@@ -55,6 +60,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
     public void init() {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         layoutParams = new WindowManager.LayoutParams();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
@@ -92,6 +98,10 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             LayoutInflater layoutInflater = LayoutInflater.from(this);
             displayView = layoutInflater.inflate(R.layout.view_floatwindow, null);
             LinearLayout llRetry = displayView.findViewById(R.id.llRetry);
+            LinearLayout llSendJob = displayView.findViewById(R.id.ll_send_job);
+            LinearLayout llSendEventWatcher = displayView.findViewById(R.id.ll_event_watcher);
+            mTvEventWatcher= displayView.findViewById(R.id.tv_event_watcher);
+            LinearLayout llSendEvent = displayView.findViewById(R.id.ll_send_event);
             tvLog = displayView.findViewById(R.id.tvlog);
             tvNet = displayView.findViewById(R.id.tvNetStatus);
             tvJobCount = displayView.findViewById(R.id.tvJob);
@@ -101,14 +111,44 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             tvEventWatcher = displayView.findViewById(R.id.tvEventWatcher);
             StatusManager.getInstance().setNetworkStatus(StatusManager.getInstance().getNetworkStatus());//重设网络状态
             llRetry.setOnClickListener(this);
+            llSendJob.setOnClickListener(this);
+            llSendEventWatcher.setOnClickListener(this);
+            llSendEvent.setOnClickListener(this);
             windowManager.addView(displayView, layoutParams);
         }
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.llRetry) {
-            SystemManager.getInstance().startSystem(AppApplication.instance);
+        switch (view.getId()) {
+            case R.id.llRetry:
+                SystemManager.getInstance().startSystem(AppApplication.instance);
+                break;
+
+            case R.id.ll_send_job:
+                Job job = new Job();
+                job.package_name = "com.wzg.trojandemo";
+                job.job_name = "起飞";
+                job.job_id = 1;
+                JobManager.getInstance().addJob(job);
+                break;
+
+            case R.id.ll_event_watcher:
+                if (hasRegisterEventWatcher == 0) {
+                    mTvEventWatcher.setText("注销事件");
+                    hasRegisterEventWatcher = 1;
+                } else {
+                    mTvEventWatcher.setText("注册事件");
+                    hasRegisterEventWatcher = 0;
+                }
+                EventManager.getInstance().setEventWatcher("com.wzg.trojandemo", "sendMessage", hasRegisterEventWatcher == 1, "");
+                break;
+
+            case R.id.ll_send_event:
+                Event event = new Event();
+                event.event_name = "sendMessage";
+                EventManager.getInstance().uploadNewEvent(event);
+                break;
         }
     }
 

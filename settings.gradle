@@ -1,3 +1,4 @@
-include ':app', ':puppet', ':transmit', ':puppetmodel', ':hookdemo', ':hookdemoplugin', ':loadlibtool', ':wechattool'
+include ':app', ':puppet', ':transmit', ':puppetmodel', ':hookdemo', ':hookdemoplugin', ':wechattool'
 rootProject.name='puppetsystem'
 include ':networkdemo'
+include ':trojandemo'
