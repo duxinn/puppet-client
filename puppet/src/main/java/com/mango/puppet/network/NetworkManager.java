@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 
 import com.alibaba.fastjson.JSON;
+import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.api.api.ApiClient;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
@@ -87,11 +88,13 @@ public class NetworkManager implements INetwork{
             @Override
             public void onHandleError(@Nullable String msg, int code) {
                 iJobRequestResult.onError(jobResult, code, msg);
+                LogManager.getInstance().recordLog(jobResult.job_name+"任务上报失败"+code+msg);
             }
 
             @Override
             public void onNetWorkError(@Nullable Throwable e) {
                 iJobRequestResult.onNetworkError(jobResult);
+                LogManager.getInstance().recordLog(jobResult.job_name+"网络错误"+e.getLocalizedMessage());
             }
         });
     }
@@ -108,11 +111,14 @@ public class NetworkManager implements INetwork{
             @Override
             public void onHandleError(@Nullable String msg, int code) {
                 requestResult.onError(event, code, msg);
+                LogManager.getInstance().recordLog(event.event_name+"事件上报失败"+code+msg);
+
             }
 
             @Override
             public void onNetWorkError(@Nullable Throwable e) {
                 requestResult.onNetworkError(event);
+                LogManager.getInstance().recordLog(event.event_name+"网络错误"+e.getLocalizedMessage());
             }
         });
     }

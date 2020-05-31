@@ -83,7 +83,8 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         }
 
         for (PluginModel model : models) {
-            String version = SystemPluginManager.getInstance().getApplicationVersion(context, model.getPackageName());
+//            String version = SystemPluginManager.getInstance().getApplicationVersion(context, model.getPackageName());
+            String version = "7.0.4";
             if (version != null && version.equals(model.getDexVersion())) {
                 pluginPackageNames.add(model.getPackageName());
             }
@@ -120,7 +121,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                     e.printStackTrace();
                 }
                 for (PluginModel model : models) {
-                    model.setRun(false);
+                    model.setRun(true);
                     TransmitManager.getInstance().sendMessage(model.getPackageName(), jsonObject);
                 }
                 new Handler().postDelayed(new Runnable() {
@@ -166,10 +167,15 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         models = pluginModels;
         this.context = context;
         iPluginControlResult = result;
-        if (!SystemPluginManager.getInstance().hasRootPermission()) {
+//        if (!SystemPluginManager.getInstance().hasRootPermission()) {
+//            result.onFinished(false, "未开启Root权限");
+//            iPluginControlResult=null;
+//        }
+        if (false) {
             result.onFinished(false, "未开启Root权限");
             iPluginControlResult=null;
-        } else {
+        }
+        else {
             try {
                 //检测是否有写的权限
                 int permission = ActivityCompat.checkSelfPermission(context,
@@ -195,18 +201,33 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                             }
                         }
                         for (final PluginModel pluginModel : pluginModels) {
-                            runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexName(), pluginModel.getClassName(), pluginModel.getMethodName(), result);
-                        }
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!callBack) {
-                                    result.onFinished(false, "启动插件超时");
-                                    iPluginControlResult=null;
-                                    callBack = true;
+                            runningPackageNames.add(pluginModel.getPackageName());
+                            if (listener != null) {
+                                listener.onPluginRunningStatusChange(pluginModel.getPackageName(), true);
+                            }
+                            for (PluginModel model : models) {
+                                if (pluginModel.getPackageName().equals(model.getPackageName())) {
+                                    model.setRun(true);
                                 }
                             }
-                        }, 5000);
+                            if (runningPackageNames.size() == models.size() && !callBack) {
+                                iPluginControlResult.onFinished(true, "");
+                                iPluginControlResult=null;
+                                sendHeart();
+                                callBack = true;
+                            }
+//                            runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexName(), pluginModel.getClassName(), pluginModel.getMethodName(), result);
+                        }
+//                        new Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                if (!callBack) {
+//                                    result.onFinished(false, "启动插件超时");
+//                                    iPluginControlResult=null;
+//                                    callBack = true;
+//                                }
+//                            }
+//                        }, 5000);
                     }
                 }
             } catch (Exception e) {

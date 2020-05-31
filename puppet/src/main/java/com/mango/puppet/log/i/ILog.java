@@ -27,6 +27,13 @@ public interface ILog {
     void recordLog(String log);
 
     /**
+     * 记录debug日志
+     *
+     * @param log 日志内容
+     */
+    void recordDebugLog(String log);
+
+    /**
      * 新日志监听者
      */
     interface ILogListener {
