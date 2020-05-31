@@ -46,7 +46,7 @@ public class ReportManager implements
 
     @Override
     public void onJobStatusChange(Job job) {
-        if (job.job_status != 0 && job.job_status != 1) {
+        if (job.job_status != 0 && job.job_status != 1 && job.job_status != 6) {
             reportToService(job);
         }
     }
