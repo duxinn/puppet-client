@@ -1,5 +1,8 @@
 package com.mango.puppetmodel;
 
+import com.google.gson.Gson;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -86,5 +89,27 @@ public class Job {
     // 任务回执url
     public String callback;
 
+    public String toString() {
+        String str = new Gson().toJson(this);
+        try  {
+            JSONObject jsonObject = new JSONObject(str);
+            jsonObject.put("job_data", this.job_data);
+            str = jsonObject.toString();
+            return str;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return super.toString();
+    }
 
+    public static Job fromString(String string) {
+        Job job = new Gson().fromJson(string, Job.class);
+        try {
+            JSONObject jsonObject = new JSONObject(string);
+            job.job_data = jsonObject.optJSONObject("job_data");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return job;
+    }
 }

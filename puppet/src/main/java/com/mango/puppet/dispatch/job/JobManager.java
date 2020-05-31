@@ -5,10 +5,18 @@ import android.util.Log;
 
 import com.mango.puppet.dispatch.job.db.DBManager;
 import com.mango.puppet.dispatch.job.i.IJob;
+import com.mango.puppet.log.LogManager;
+import com.mango.puppet.network.NetworkManager;
+import com.mango.puppet.network.i.INetwork;
+import com.mango.puppet.plugin.PluginManager;
+import com.mango.puppet.plugin.i.IPluginControl;
+import com.mango.puppet.plugin.i.IPluginJob;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppetmodel.Job;
 
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * JobManager
@@ -70,6 +78,12 @@ public class JobManager implements IJob {
 
     @Override
     public void addJob(Job job) {
+        Job storeJob = DBManager.getJobsById(job.job_id);
+        if (storeJob != null) {
+            LogManager.getInstance().recordLog("任务已存在 " + job.job_id);
+            return;
+        }
+
         if (Job.RETRY_JOB.equals(job.job_name)
                 || Job.CANCEL_JOB.equals(job.job_name)) {
             if (status == STATUS.STOP) {
