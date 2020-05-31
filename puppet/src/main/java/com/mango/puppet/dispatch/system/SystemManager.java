@@ -41,9 +41,9 @@ public class SystemManager implements ISystem, IPluginRunListener {
         LogManager.init(context);
         SystemPluginManager.getInstance().setSystemPluginListener(context);
         // 1 插件管理模块
-        //TODO pluginmodels列表暂时没有
+        //TODO pluginmodels列表暂时没有 王宇琦 包名需要王志刚那边的
         PluginModel wechatModel = new PluginModel();
-        wechatModel.setPackageName("com.tencent.mm");
+        wechatModel.setPackageName("com.wzg.trojandemo");
         wechatModel.setActivityName("ui.LauncherUI");
         wechatModel.setDexName("wechat704.apk");
         wechatModel.setClassName("com.mango.wechattool.business.WechatEntrance");
