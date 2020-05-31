@@ -2,6 +2,7 @@ package com.mango.puppet.network;
 
 import android.content.Context;
 
+import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.api.api.ApiClient;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
@@ -105,12 +106,14 @@ public class NetworkManager implements INetwork {
                 if (iJobRequestResult != null) {
                     iJobRequestResult.onError(jobResult, code, msg);
                 }
+                LogManager.getInstance().recordLog(jobResult.job_name+"任务上报失败"+code+msg);
             }
 
             @Override
             public void onNetWorkError(@Nullable Throwable e) {
                 if (iJobRequestResult != null) {
                     iJobRequestResult.onNetworkError(jobResult);
+                    LogManager.getInstance().recordLog(jobResult.job_name+"网络错误"+e.getLocalizedMessage());
                 }
             }
         });
@@ -130,6 +133,7 @@ public class NetworkManager implements INetwork {
             public void onHandleError(@Nullable String msg, int code) {
                 if (requestResult != null) {
                     requestResult.onError(event, code, msg);
+                    LogManager.getInstance().recordLog(event.event_name+"事件上报失败"+code+msg);
                 }
             }
 
@@ -137,6 +141,7 @@ public class NetworkManager implements INetwork {
             public void onNetWorkError(@Nullable Throwable e) {
                 if (requestResult != null) {
                     requestResult.onNetworkError(event);
+                    LogManager.getInstance().recordLog(event.event_name+"网络错误"+e.getLocalizedMessage());
                 }
             }
         });

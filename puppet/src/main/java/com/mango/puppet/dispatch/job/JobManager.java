@@ -79,6 +79,7 @@ public class JobManager implements IJob {
 
     @Override
     public boolean addJob(final Job job) {
+        LogManager.getInstance().recordLog("接收一个新的待执行任务" + job.job_id);
         Job storeJob = DBManager.getJobsById(job.job_id);
         if (storeJob != null) {
             LogManager.getInstance().recordLog("任务已存在 " + job.job_id);
@@ -137,6 +138,7 @@ public class JobManager implements IJob {
 
     @Override
     public void receiveJobResult(Job jobResult) {
+        LogManager.getInstance().recordLog("接收到一个执行完毕的任务" + jobResult.job_id);
         ExecutorManager.getInstance().receiveJobResult();
         boolean b = DBManager.updateJobStatus(jobResult);
         if (!b) {

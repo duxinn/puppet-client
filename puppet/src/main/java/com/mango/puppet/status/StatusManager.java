@@ -61,6 +61,7 @@ public class StatusManager implements IStatusControl {
                 isNetOk = false;
             }
             if (mListener != null) {
+                LogManager.getInstance().recordLog("网络状态改变"+isNetOk);
                 mListener.onNetworkStatusChanged(isNetOk);
             }
         }
@@ -75,6 +76,7 @@ public class StatusManager implements IStatusControl {
     public void setJobEngineStatus(int status) {
         jobEngineStatus = status;
         if (mListener != null) {
+            LogManager.getInstance().recordLog("任务引擎状态改变"+status);
             mListener.onJobEngineStatusChanged(jobEngineStatus);
         }
     }
@@ -86,12 +88,9 @@ public class StatusManager implements IStatusControl {
 
     @Override
     public void setJobCount(int count) {
-//        jobCount = count;
-//        if (mListener != null) {
-//            mListener.onJobCountChanged(count);
-//        }
         jobCount = count;
         if (mListener != null) {
+            LogManager.getInstance().recordLog("待执行任务数发生改变"+jobCount);
             mListener.onJobCountChanged(jobCount);
         }
     }
@@ -103,15 +102,10 @@ public class StatusManager implements IStatusControl {
 
     @Override
     public void setJobResultCount(int count) {
-//        jobResultCount = count;
-//        if (mListener != null){
-//            mListener.onJobResultCountChanged(count);
-//        }
-        if (jobResultCount != count) {
-            jobResultCount = count;
-            if (mListener != null) {
-                mListener.onJobResultCountChanged(jobResultCount);
-            }
+        jobResultCount = count;
+        if (mListener != null) {
+            LogManager.getInstance().recordLog("待上报任务数发生改变"+jobResultCount);
+            mListener.onJobResultCountChanged(jobResultCount);
         }
     }
 
@@ -143,6 +137,7 @@ public class StatusManager implements IStatusControl {
                         if (isValidIn != watchStatus) {
                             model.watcher_status = watchStatus;
                             if (mListener != null) {
+                                LogManager.getInstance().recordLog(eventNameIn+"事件注册/注销状态发生改变"+watchStatus);
                                 mListener.onEventWatcherChanged();
                             }
                         }
@@ -158,6 +153,7 @@ public class StatusManager implements IStatusControl {
             eventWatchModel.watcher_status = watchStatus;
             eventWatchModelList.add(eventWatchModel);
             if (mListener != null) {
+                LogManager.getInstance().recordLog(eventName+"事件注册/注销状态发生改变"+watchStatus);
                 mListener.onEventWatcherChanged();
             }
         }
