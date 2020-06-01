@@ -27,7 +27,7 @@ import static com.mango.puppet.status.StatusManager.SERVER_STOP;
  * @date: 2020/05/18
  */
 @SuppressWarnings("unused")
-public class NetworkManager implements INetwork{
+public class NetworkManager implements INetwork {
     private static final NetworkManager ourInstance = new NetworkManager();
 
     public static NetworkManager getInstance() {
@@ -74,8 +74,7 @@ public class NetworkManager implements INetwork{
 
     @Override
     public void reportJobResult(final Job jobResult, final IJobRequestResult iJobRequestResult) {
-        String jobJsonString = JSON.toJSONString(jobResult);
-        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<Object>() {
+        PuppetVM.Companion.reportJobResult(jobResult.callback, jobResult, new DesCallBack<Object>() {
             @Override
             public void onHandleSuccess(@Nullable Object objectBaseModel) {
                 iJobRequestResult.onSuccess(jobResult);
@@ -95,8 +94,7 @@ public class NetworkManager implements INetwork{
 
     @Override
     public void reportEvent(String url, final Event event, final IEventRequestResult requestResult) {
-        String eventJsonString = JSON.toJSONString(event);
-        PuppetVM.Companion.reportEvent(url, eventJsonString, new DesCallBack<Object>() {
+        PuppetVM.Companion.reportEvent(url, event, new DesCallBack<Object>() {
             @Override
             public void onHandleSuccess(@Nullable Object objectBaseModel) {
                 requestResult.onSuccess(event);
