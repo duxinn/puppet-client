@@ -248,6 +248,7 @@ public class CallBackListener {
         }, 3000);
     }
 
+    /*****测试该用例时先调用sendFailedAndReportJob*****/
     public void sendCancelJob() {
         final Job cancelJob = new Job();
         cancelJob.package_name = "com.wzg.trojandemo";
@@ -265,15 +266,16 @@ public class CallBackListener {
             @Override
             public void run() {
                 if (DBManager.getJobsById(mFailedJob.job_id) == null) {
-                    LogManager.getInstance().recordLog("测取消任务测试通过");
+                    LogManager.getInstance().recordLog("取消任务测试通过");
                 } else {
-                    LogManager.getInstance().recordLog("测取消任务测试未通过");
+                    LogManager.getInstance().recordLog("取消任务测试未通过");
                 }
             }
         }, 3000);
 
     }
 
+    /*****测试该用例时先调用sendFailedAndReportJob*****/
     public void sendRetryJob() {
         final Job retryJob = new Job();
         retryJob.package_name = "com.wzg.trojandemo";
@@ -290,22 +292,32 @@ public class CallBackListener {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (mSuccessJob != null && mSuccessResult != null) {
+                    if (mSuccessJob.job_status == 3) {
+                        mSuccessResult.onSuccess(mSuccessJob);
+                        LogManager.getInstance().recordLog("重试任务上报完成");
+                        mSuccessJob = null;
+                        mSuccessResult = null;
+                        mSuccessCallCount = 0;
+                    }
+                }
                 if (mFailedJob != null
                         && mFailedResult != null
                 ) {
                     if (mFailedJob.job_status == 5) {
-                        LogManager.getInstance().recordLog("测重试任务测试通过");
+                        LogManager.getInstance().recordLog("重试任务测试通过");
                     } else {
-                        LogManager.getInstance().recordLog("测重试任务测试未通过");
+                        LogManager.getInstance().recordLog("重试任务测试未通过");
                     }
                 }
             }
         }, 3000);
-
     }
 
+    /*****注册事件成功回调*****/
+    public void sendEventWatcher() {
 
-
+    }
 
     void reportJobResult(final Job jobResult, final INetwork.IJobRequestResult iJobRequestResult) {
         // 任务执行成功未上报
