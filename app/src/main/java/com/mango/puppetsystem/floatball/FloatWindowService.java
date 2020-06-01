@@ -176,17 +176,18 @@ public class FloatWindowService extends Service implements View.OnClickListener,
                 if (hasRegisterEventWatcher == 0) {
                     mTvEventWatcher.setText("注销事件");
                     hasRegisterEventWatcher = 1;
-                    CallBackListener.getInstance().sendEventWatcher();
+                    CallBackListener.getInstance().sendEventWatcher(true);
                 } else {
                     mTvEventWatcher.setText("注册事件");
                     hasRegisterEventWatcher = 0;
+                    CallBackListener.getInstance().sendEventWatcher(false);
                 }
                 break;
 
             case R.id.ll_send_event:
                 Event event = new Event();
                 event.event_name = "sendMessage";
-                EventManager.getInstance().uploadNewEvent(event);
+//                EventManager.getInstance().uploadNewEvent(event);
                 break;
 
             case R.id.ll_clear_db:

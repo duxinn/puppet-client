@@ -194,6 +194,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dimens_40_dp"
                 android:layout_marginTop="@dimen/dimens_10_dp"
+                android:visibility="gone"
                 >
                 <View
                     android:layout_width="10dp"

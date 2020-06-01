@@ -324,13 +324,13 @@ public class CallBackListener {
         }, 3000);
     }
 
-    /*****注册事件，连续发5个同类型事件，测是否注册成功*****/
-    public void sendEventWatcher() {
+    /*****注册/注销事件，连续发5个同类型事件，测是否注册/注销成功*****/
+    public void sendEventWatcher(final boolean isValid) {
         mSuccessEvent = null;
         mSuccessEventResult = null;
         mSuccessEventCallCount = 0;
 
-        EventManager.getInstance().setEventWatcher("com.wzg.trojandemo","testEvent1",true, "");
+        EventManager.getInstance().setEventWatcher("com.wzg.trojandemo","testEvent1", isValid, "");
 
         Event event1=new Event();
         event1.event_status = 0;
@@ -361,11 +361,20 @@ public class CallBackListener {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mSuccessEventCallCount > 4) {
-                    LogManager.getInstance().recordLog("事件注册测试通过");
+                if (isValid) {
+                    if (mSuccessEventCallCount > 4) {
+                        LogManager.getInstance().recordLog("事件注册测试通过");
+                    } else {
+                        LogManager.getInstance().recordLog("事件注册测试未通过");
+                    }
                 } else {
-                    LogManager.getInstance().recordLog("事件注册测试未通过");
+                    if (mSuccessEventCallCount < 2) {
+                        LogManager.getInstance().recordLog("事件注销测试通过");
+                    } else {
+                        LogManager.getInstance().recordLog("事件注销测试未通过");
+                    }
                 }
+
             }
         }, 3000);
     }
