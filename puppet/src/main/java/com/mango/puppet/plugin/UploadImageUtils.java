@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import com.mango.puppet.dispatch.business.BusinessManager;
 import com.mango.puppet.dispatch.business.i.IBusiness;
 import com.mango.puppet.network.NetworkManager;
+import com.mango.puppet.network.api.observerCallBack.DesCallBack;
+import com.mango.puppet.network.api.vm.PuppetVM;
 import com.mango.puppet.network.i.INetwork;
 import com.qiniu.android.common.AutoZone;
 import com.qiniu.android.http.ResponseInfo;
@@ -14,11 +16,14 @@ import com.qiniu.android.storage.UpProgressHandler;
 import com.qiniu.android.storage.UploadManager;
 import com.qiniu.android.storage.UploadOptions;
 
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Observable;
 
 /**
  * Created by hehongzhen on 2018/8/1.
@@ -53,23 +58,42 @@ public class UploadImageUtils {
     }
 
     public static void getQinNiuToken(final GetQinNiuCallBack callBack) {
-        ArrayList<String> channels = new ArrayList<>();
-        channels.add("qiniu");
-        BusinessManager.getInstance().getUploadResourceWay(channels, new IBusiness.IUploadResourceWayResult() {
+//        ArrayList<String> channels = new ArrayList<>();
+//        channels.add("qiniu");
+//        BusinessManager.getInstance().getUploadResourceWay(channels, new IBusiness.IUploadResourceWayResult() {
+//            @Override
+//            public void onSuccess(List<UploadChannelInfo> modelList) {
+//                for (int i = 0; i < modelList.size(); i++) {
+//                    if ("qiniu".equals(modelList.get(i).getChannel())) {
+//                        mQinNiuInfo = modelList.get(i).getParameter();
+//                        callBack.onSuccess(mQinNiuInfo);
+//                        return;
+//                    }
+//                }
+//                callBack.onError(2, "未获取到上传参数");
+//            }
+//
+//            @Override
+//            public void onError() {
+//                callBack.onError(1, "网络不给力，请稍后再试");
+//            }
+//        });
+        // TODO TMP
+        PuppetVM.Companion.getQiNiuToken("https://api.gbzc168.com/api/utils/gettoken", new DesCallBack<QinNiuInfo>() {
             @Override
-            public void onSuccess(List<UploadChannelInfo> modelList) {
-                for (int i = 0; i < modelList.size(); i++) {
-                    if ("qiniu".equals(modelList.get(i).getChannel())) {
-                        mQinNiuInfo = modelList.get(i).getParameter();
-                        callBack.onSuccess(mQinNiuInfo);
-                        return;
-                    }
-                }
-                callBack.onError(2, "未获取到上传参数");
+            public void onHandleSuccess(@Nullable QinNiuInfo qinNiuInfo) {
+                mQinNiuInfo = qinNiuInfo;
+                mQinNiuInfo.setDomain("http://p.wcssq.cn/");
+                callBack.onSuccess(mQinNiuInfo);
             }
 
             @Override
-            public void onError() {
+            public void onHandleError(@Nullable String msg, int code) {
+                callBack.onError(code, msg);
+            }
+
+            @Override
+            public void onNetWorkError(@Nullable Throwable e) {
                 callBack.onError(1, "网络不给力，请稍后再试");
             }
         });

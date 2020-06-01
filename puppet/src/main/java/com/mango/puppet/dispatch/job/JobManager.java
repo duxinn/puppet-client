@@ -108,6 +108,7 @@ public class JobManager implements IJob {
                                 targetJob.error_code = 0;
                                 targetJob.error_message = "";
                                 DBManager.updateJobStatus(targetJob);
+
                             } else {
                                 DBManager.deleteJob(job_id);
                             }

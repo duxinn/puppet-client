@@ -9,6 +9,7 @@ import com.mango.puppet.network.api.basemodel.BaseModel
 import com.mango.puppet.network.api.commen.Destiny
 import com.mango.puppet.network.api.observerCallBack.DesCallBack
 import com.mango.puppet.network.api.transformHelper.RxStreamHelper
+import com.mango.puppet.plugin.QinNiuInfo
 import com.mango.puppetmodel.Event
 import com.mango.puppetmodel.EventWatcher
 import com.mango.puppetmodel.Job
@@ -42,6 +43,12 @@ class PuppetVM {
                         .compose(RxStreamHelper.io_Main())
                         .subscribe(Destiny(callBack))
             }
+        }
+
+        fun getQiNiuToken(url: String, callBack: DesCallBack<QinNiuInfo>) {
+            service.getQiNiuInfo(url)
+                    .compose(RxStreamHelper.io_Main())
+                    .subscribe(Destiny(callBack))
         }
 
         fun testNetwork(url: String, eventJsonString: String, callBack: DesCallBack<Any>) {

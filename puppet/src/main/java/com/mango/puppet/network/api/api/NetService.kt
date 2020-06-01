@@ -2,6 +2,7 @@ package com.mango.puppet.network.api.api
 
 import com.google.gson.JsonObject
 import com.mango.puppet.network.api.basemodel.BaseModel
+import com.mango.puppet.plugin.QinNiuInfo
 import com.mango.puppetmodel.EventWatcher
 import com.mango.puppetmodel.Job
 import io.reactivex.Observable
@@ -36,6 +37,16 @@ interface NetService {
             @Url url: String,
             @Body info: JsonObject
     ): Observable<BaseModel<Any>>
+
+    /**
+     * 获取七牛token
+     */
+    @GET
+    fun getQiNiuInfo(
+            @Url url: String
+    ): Observable<BaseModel<QinNiuInfo>>
+
+
 
     /**
      * 向远端服务器报告任务结果(和远程服务器定义好接口)

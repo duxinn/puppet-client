@@ -137,6 +137,7 @@ public class EventManager implements IEvent {
                 isValid = false;
             }
             StatusManager.getInstance().setEventWatcher(eventWatcherList.get(i).package_name, eventWatcherList.get(i).event_name, isValid);
+            PluginManager.getInstance().distributeEventWatcher(eventWatcherList.get(i), iPluginControlResult);
         }
         return true;
     }
