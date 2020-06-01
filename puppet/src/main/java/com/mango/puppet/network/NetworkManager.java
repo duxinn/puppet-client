@@ -78,33 +78,27 @@ public class NetworkManager implements INetwork{
     @Override
     public void reportJobResult(final Job jobResult, final IJobRequestResult iJobRequestResult) {
         LogManager.getInstance().recordDebugLog("上报任务结果"+jobResult.job_id);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (jobResult == null) throw new AssertionError("任务分发未成功");
-            }
-        }, 10000);
         CallBackListener.getInstance().reportJobResult(jobResult, iJobRequestResult);
 
         String jobJsonString = JSON.toJSONString(jobResult);
-        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<Object>() {
-            @Override
-            public void onHandleSuccess(@Nullable Object objectBaseModel) {
-                iJobRequestResult.onSuccess(jobResult);
-            }
-
-            @Override
-            public void onHandleError(@Nullable String msg, int code) {
-                iJobRequestResult.onError(jobResult, code, msg);
-                LogManager.getInstance().recordLog(jobResult.job_name+"任务上报失败"+code+msg);
-            }
-
-            @Override
-            public void onNetWorkError(@Nullable Throwable e) {
-                iJobRequestResult.onNetworkError(jobResult);
-                LogManager.getInstance().recordLog(jobResult.job_name+"网络错误"+e.getLocalizedMessage());
-            }
-        });
+//        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<Object>() {
+//            @Override
+//            public void onHandleSuccess(@Nullable Object objectBaseModel) {
+//                iJobRequestResult.onSuccess(jobResult);
+//            }
+//
+//            @Override
+//            public void onHandleError(@Nullable String msg, int code) {
+//                iJobRequestResult.onError(jobResult, code, msg);
+//                LogManager.getInstance().recordLog(jobResult.job_name+"任务上报失败"+code+msg);
+//            }
+//
+//            @Override
+//            public void onNetWorkError(@Nullable Throwable e) {
+//                iJobRequestResult.onNetworkError(jobResult);
+//                LogManager.getInstance().recordLog(jobResult.job_name+"网络错误"+e.getLocalizedMessage());
+//            }
+//        });
     }
 
     @Override

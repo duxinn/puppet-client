@@ -56,6 +56,8 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         LogManager.getInstance().setNewLogListener(this);
         StatusManager.getInstance().setStatusListener(this);
         init();
+        // todo 测试代码，临时解决方案
+        LogManager.init(this);
         showFloatingWindow();
     }
 
@@ -101,6 +103,10 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             displayView = layoutInflater.inflate(R.layout.view_floatwindow, null);
             LinearLayout llRetry = displayView.findViewById(R.id.llRetry);
             LinearLayout llSendJob = displayView.findViewById(R.id.ll_send_job);
+            LinearLayout llSendDelayJob = displayView.findViewById(R.id.ll_send_delay_job);
+            LinearLayout llSendContinueJob = displayView.findViewById(R.id.ll_send_continuous_job);
+            LinearLayout llSendErrorJob = displayView.findViewById(R.id.ll_error_job);
+            LinearLayout llSendDelayContinueJob = displayView.findViewById(R.id.ll_delay_continue_job);
             LinearLayout llSendEventWatcher = displayView.findViewById(R.id.ll_event_watcher);
             mTvEventWatcher= displayView.findViewById(R.id.tv_event_watcher);
             LinearLayout llSendEvent = displayView.findViewById(R.id.ll_send_event);
@@ -115,6 +121,12 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             StatusManager.getInstance().setNetworkStatus(StatusManager.getInstance().getNetworkStatus());//重设网络状态
             llRetry.setOnClickListener(this);
             llSendJob.setOnClickListener(this);
+            llSendDelayJob.setOnClickListener(this);
+            llSendContinueJob.setOnClickListener(this);
+            llSendErrorJob.setOnClickListener(this);
+            llSendDelayContinueJob.setOnClickListener(this);
+
+
             llSendEventWatcher.setOnClickListener(this);
             llSendEvent.setOnClickListener(this);
             llClearDB.setOnClickListener(this);
@@ -131,6 +143,22 @@ public class FloatWindowService extends Service implements View.OnClickListener,
 
             case R.id.ll_send_job:
                 CallBackListener.getInstance().sendSuccessJob();
+                break;
+
+            case R.id.ll_send_delay_job:
+                CallBackListener.getInstance().sendDelayJob();
+                break;
+
+            case R.id.ll_send_continuous_job:
+                CallBackListener.getInstance().sendContinuousJob();
+                break;
+
+            case R.id.ll_error_job:
+                CallBackListener.getInstance().sendFailedJob();
+                break;
+
+            case R.id.ll_delay_continue_job:
+//                CallBackListener.getInstance().sendDelayJob();
                 break;
 
             case R.id.ll_event_watcher:
