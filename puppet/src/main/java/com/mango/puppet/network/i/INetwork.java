@@ -17,6 +17,7 @@ import java.util.ArrayList;
 @SuppressWarnings("unused")
 public interface INetwork {
 
+    void setupApi();
     /**
      * 启动本地server/长连接
      * @param result 启动结果

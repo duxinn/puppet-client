@@ -39,6 +39,15 @@ public class NetworkManager implements INetwork {
     }
 
     /************   INetwork   ************/
+
+
+    @Override
+    public void setupApi() {
+        // 初始化网络
+        ApiClient.Companion.getInstance().build();
+    }
+
+
     @Override
     public void setupNetwork(Context context, ISetupResult result) {
 
@@ -51,8 +60,6 @@ public class NetworkManager implements INetwork {
 
         final ISetupResult[] iSetupResult = {result};
 
-        // 初始化网络
-        ApiClient.Companion.getInstance().build();
         // 开启服务
         ServerManager.getInstance(context).register().startServer(new ServerManager.ServerListener() {
             @Override

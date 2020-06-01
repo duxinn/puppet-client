@@ -60,6 +60,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
                     LogManager.getInstance().recordLog(failReason);
                 } else  {
                     LogManager.getInstance().recordLog("Plugin启动成功");
+                    NetworkManager.getInstance().setupApi();
                     // 2 任务模块
                     boolean result = JobManager.getInstance().startJobSystem(context);
                     if (!result) {
