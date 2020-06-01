@@ -47,7 +47,6 @@ public class DataReceiver implements ITransmitReceiver {
     public void onReceiveEvent(String packageName, com.mango.puppetmodel.Event event) {
         if (MyApplication.instance.getPackageName().equals(event.package_name)) {
             // 假设事件做完，上报事件结果
-            event.event_status = 0;
             TransmitManager.getInstance().sendEvent(TransmitManager.MANAGER_PACKAGE_NAME, event);
             Log.e("onReceiveEvent", "收到事件");
         }

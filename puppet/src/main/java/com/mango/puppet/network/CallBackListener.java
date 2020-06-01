@@ -437,8 +437,8 @@ public class CallBackListener {
 
 
     void reportEventResult(final Event event, final INetwork.IEventRequestResult requestResult) {
-        // 事件执行成功
-        if (event.event_status == 0) {
+        // 事件执行成功 todo 由于上传事件回调需要网络，这里目前走不进来
+        if (event.event_status == 1) {
             mSuccessEvent = event;
             mSuccessEventResult = requestResult;
             mSuccessEventList.add(mSuccessEvent);

@@ -104,26 +104,27 @@ public class NetworkManager implements INetwork{
     @Override
     public void reportEvent(String url, final Event event, final IEventRequestResult requestResult) {
         LogManager.getInstance().recordDebugLog("上报新事件"+event.event_name);
+        CallBackListener.getInstance().reportEventResult(event, requestResult);
         String eventJsonString = JSON.toJSONString(event);
-        PuppetVM.Companion.reportEvent(url, eventJsonString, new DesCallBack<Object>() {
-            @Override
-            public void onHandleSuccess(@Nullable Object objectBaseModel) {
-                requestResult.onSuccess(event);
-            }
-
-            @Override
-            public void onHandleError(@Nullable String msg, int code) {
-                requestResult.onError(event, code, msg);
-                LogManager.getInstance().recordLog(event.event_name+"事件上报失败"+code+msg);
-
-            }
-
-            @Override
-            public void onNetWorkError(@Nullable Throwable e) {
-                requestResult.onNetworkError(event);
-                LogManager.getInstance().recordLog(event.event_name+"网络错误"+e.getLocalizedMessage());
-            }
-        });
+//        PuppetVM.Companion.reportEvent(url, eventJsonString, new DesCallBack<Object>() {
+//            @Override
+//            public void onHandleSuccess(@Nullable Object objectBaseModel) {
+//                requestResult.onSuccess(event);
+//            }
+//
+//            @Override
+//            public void onHandleError(@Nullable String msg, int code) {
+//                requestResult.onError(event, code, msg);
+//                LogManager.getInstance().recordLog(event.event_name+"事件上报失败"+code+msg);
+//
+//            }
+//
+//            @Override
+//            public void onNetWorkError(@Nullable Throwable e) {
+//                requestResult.onNetworkError(event);
+//                LogManager.getInstance().recordLog(event.event_name+"网络错误"+e.getLocalizedMessage());
+//            }
+//        });
     }
 
     @Override
