@@ -71,6 +71,7 @@ public class JobManager implements IJob {
     /************   IJob   ************/
     @Override
     public boolean startJobSystem(Context context) {
+        LogManager.getInstance().recordDebugLog("启动任务系统");
         DBManager.init(context);
         ReportManager.getInstance().start();
         ExecutorManager.getInstance().start();

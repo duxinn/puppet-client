@@ -38,6 +38,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
     /************   ISystem   ************/
     @Override
     public void startSystem(final Context context) {
+        LogManager.getInstance().recordDebugLog("开始启动程序");
         LogManager.init(context);
         SystemPluginManager.getInstance().setSystemPluginListener(context);
         // 1 插件管理模块
@@ -96,6 +97,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
     /************   IPluginRunListener   ************/
     @Override
     public void onPluginRunningStatusChange(String packageName, boolean isRunning) {
+        LogManager.getInstance().recordLog(packageName + "木马插件运行状态变化为" + isRunning);
         Log.d(getClass().toString(), "onPluginRunningStatusChange:" + packageName + isRunning);
         StatusManager.getInstance().setPluginRunning(packageName, isRunning);
     }

@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mango.puppet.dispatch.event.i.IEvent;
+import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.NetworkManager;
 import com.mango.puppet.network.i.INetwork;
 import com.mango.puppet.plugin.PluginManager;
@@ -52,6 +53,8 @@ public class EventManager implements IEvent {
     /************   IEvent   ************/
     @Override
     public void uploadNewEvent(Event event) {
+        LogManager.getInstance().recordDebugLog("上报新事件"+event.event_name);
+
         String url = null;
         for (int i = 0; i < eventWatcherList.size(); i++) {
             if (event.package_name.equals(eventWatcherList.get(i).package_name) && event.event_name.equals(eventWatcherList.get(i).event_name)) {
@@ -83,6 +86,7 @@ public class EventManager implements IEvent {
 
     @Override
     public void setEventWatcher(String packageName, String eventName, boolean isValid, String url) {
+        LogManager.getInstance().recordDebugLog(isValid?"注册新事件":"注销新事件"+packageName+" "+eventName+" ");
         int watchStatus;
         Boolean isNeed = true;
         if (packageName != null && eventName != null) {
@@ -120,6 +124,7 @@ public class EventManager implements IEvent {
 
     @Override
     public boolean startEventSystem(Context context) {
+        LogManager.getInstance().recordDebugLog("启动事件系统");
         mContext = context;
         Boolean isValid;
         SharedPreferences read = context.getSharedPreferences("saveEventJson", Context.MODE_PRIVATE);

@@ -35,6 +35,7 @@ public class BusinessManager implements IBusiness {
     /************   IBusiness   ************/
     @Override
     public void getUploadResourceWay(ArrayList<String> supportChannels, final IUploadResourceWayResult mResult) {
+        LogManager.getInstance().recordDebugLog("获取资源文件上传方式");
         NetworkManager.getInstance().requestUploadResourceWay(supportChannels, new INetwork.IRequestResult() {
             @Override
             public void onSuccess(Object result) {
