@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.text.TextUtils;
 
+import com.mango.puppet.log.LogManager;
 import com.mango.puppet.systemplugin.i.ISystemPluginExecute;
 import com.mango.puppet.systemplugin.i.ISystemPluginListener;
 import com.mango.puppet.systemplugin.i.ISystemPluginQuery;
@@ -42,6 +43,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
     /************   ISystemPluginExecute   ************/
     @Override
     public int execRootCmd(String commandString) {
+        LogManager.getInstance().recordDebugLog("root权限执行命令行"+commandString);
         int result = -1;
         DataOutputStream dos = null;
 
@@ -71,6 +73,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public String execRootCmdWithResult(String commandString) {
+        LogManager.getInstance().recordDebugLog("root权限执行命令行并输出结果"+commandString);
         StringBuilder result = new StringBuilder();
         DataOutputStream dos = null;
         DataInputStream dis = null;
@@ -116,6 +119,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public void changeForegroundApplication(String packageName, String activityName, ISystemPluginResult result) {
+        LogManager.getInstance().recordDebugLog("更改前台应用"+packageName+activityName);
         if (!judgeRoot(result)) {
             return;
         }
@@ -137,6 +141,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public void installApplication(String apkPath, ISystemPluginResult result) {
+        LogManager.getInstance().recordDebugLog("安装应用"+apkPath);
         if (!judgeRoot(result)) {
             return;
         }
@@ -155,6 +160,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public void uninstallApplication(final String packageName, ISystemPluginResult result) {
+        LogManager.getInstance().recordDebugLog("卸载应用"+packageName);
         if (!judgeRoot(result)) {
             return;
         }
@@ -167,6 +173,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public void exitApplication(final String packageName, final ISystemPluginResult result) {
+        LogManager.getInstance().recordDebugLog("退出应用"+packageName);
         if (!judgeRoot(result)) {
             return;
         }
@@ -179,6 +186,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public void restartApplication(String packageName, String activityName, ISystemPluginResult result) {
+        LogManager.getInstance().recordDebugLog("重启应用"+packageName);
         if (!judgeRoot(result)) {
             return;
         }
@@ -195,6 +203,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
     /************   ISystemPluginQuery   ************/
     @Override
     public String getCurrentForegroundApplication() {
+        LogManager.getInstance().recordDebugLog("获取当前前台应用");
         if (!judgeRoot(null)) {
             return null;
         }
@@ -211,6 +220,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public boolean hasRootPermission() {
+        LogManager.getInstance().recordDebugLog("检测手机是否root");
         Boolean flag;
         Process process = null;
         DataOutputStream os = null;
@@ -244,6 +254,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public String getApplicationVersion(Context context, String packageName) {
+        LogManager.getInstance().recordDebugLog("获取目标应用版本号");
         if (context == null || TextUtils.isEmpty(packageName)) {
             return null;
         }

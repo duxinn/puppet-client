@@ -42,6 +42,7 @@ public class NetworkManager implements INetwork{
     /************   INetwork   ************/
     @Override
     public void setupNetwork(Context context, ISetupResult result) {
+        LogManager.getInstance().recordDebugLog("启动本地server/长连接");
 
         final ISetupResult[] iSetupResult = {result};
 
@@ -76,6 +77,7 @@ public class NetworkManager implements INetwork{
 
     @Override
     public void reportJobResult(final Job jobResult, final IJobRequestResult iJobRequestResult) {
+        LogManager.getInstance().recordDebugLog("上报任务结果"+jobResult.job_id);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -106,6 +108,7 @@ public class NetworkManager implements INetwork{
 
     @Override
     public void reportEvent(String url, final Event event, final IEventRequestResult requestResult) {
+        LogManager.getInstance().recordDebugLog("上报新事件"+event.event_name);
         String eventJsonString = JSON.toJSONString(event);
         PuppetVM.Companion.reportEvent(url, eventJsonString, new DesCallBack<Object>() {
             @Override

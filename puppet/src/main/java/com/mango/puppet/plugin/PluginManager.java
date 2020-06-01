@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat;
 import com.mango.loadlibtool.InjectTool;
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
+import com.mango.puppet.log.LogManager;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginEvent;
 import com.mango.puppet.plugin.i.IPluginJob;
@@ -67,6 +68,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     /************   IPluginControl   ************/
     @Override
     public void runPuppetPlugin(Context context, String targetPackageName, String dexName, String className, String methodName, IPluginControlResult result) {
+        LogManager.getInstance().recordDebugLog("启动插件"+targetPackageName+dexName);
         InjectTool.inject(context, targetPackageName, dexName, className, methodName);
     }
 
@@ -159,6 +161,8 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
      */
     @Override
     public void startPluginSystem(Context context, final List<PluginModel> pluginModels, final IPluginControlResult result) {
+        LogManager.getInstance().recordDebugLog("启动插件系统");
+
         if (iPluginControlResult!=null){
             result.onFinished(false,"插件正在启动中,请勿重复调用");
             return;
@@ -256,6 +260,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     /************   IPluginEvent   ************/
     @Override
     public void distributeEventWatcher(EventWatcher eventWatcher, IPluginControlResult result) {
+        LogManager.getInstance().recordDebugLog("注册/注销事件的监听"+eventWatcher.event_name);
         if (runningPackageNames.contains(eventWatcher.package_name)) {
             result.onFinished(true, "");
             TransmitManager.getInstance().sendEventWatcher(eventWatcher.package_name, eventWatcher);
@@ -266,6 +271,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     @Override
     public void distributeEvent(Event event, IPluginControlResult result) {
+        LogManager.getInstance().recordDebugLog("开始向插件传递已经上传完毕的事件 用于记录事件进度"+event.event_name);
         if (runningPackageNames.contains(event.package_name)) {
             result.onFinished(true, "");
             TransmitManager.getInstance().sendEvent(event.package_name, event);
@@ -277,6 +283,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     /************   IPluginJob   ************/
     @Override
     public void distributeJob(final Job job, final IPluginJobCallBack result) {
+        LogManager.getInstance().recordDebugLog("开始将任务下发给插件"+job.job_id);
         String activityName = "";
         for (PluginModel model : models) {
             if (model.getPackageName().equals(job.package_name))
@@ -301,20 +308,26 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     @Override
     public void onReceiveJob(String packageName, Job job) {
+        LogManager.getInstance().recordDebugLog("开始将任务下发给插件"+job.job_id);
+
         JobManager.getInstance().receiveJobResult(job);
     }
 
     @Override
     public void onReceiveEvent(String packageName, Event event) {
+        LogManager.getInstance().recordDebugLog("插件层收到事件"+packageName+event.event_name);
         EventManager.getInstance().uploadNewEvent(event);
     }
 
     @Override
     public void onReceiveEventWatcher(String packageName, EventWatcher eventWatcher) {
+        LogManager.getInstance().recordDebugLog("插件层收到注册/注销事件"+packageName+eventWatcher.event_name);
+
     }
 
     @Override
     public void onReceiveData(final String packageName, JSONObject jsonObject) {
+        LogManager.getInstance().recordDebugLog("插件层收到JSONObject内容"+packageName);
         try {
             String type = jsonObject.getString(TransmitManager.TYPE_KEY);
             if (TransmitManager.HEART_KEY.equals(type)) {
@@ -388,6 +401,6 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     @Override
     public void onReceiveDataString(String packageName, String dataString) {
-
+        LogManager.getInstance().recordDebugLog("插件层收到String内容"+packageName);
     }
 }
