@@ -1,9 +1,9 @@
 package com.wzg.trojandemo;
 
-import com.mango.puppetmodel.Event;
+import android.util.Log;
+
 import com.mango.puppetmodel.EventWatcher;
 
-import com.mango.puppetmodel.Job;
 import com.mango.transmit.TransmitManager;
 import com.mango.transmit.i.ITransmitReceiver;
 
@@ -33,6 +33,7 @@ public class DataReceiver implements ITransmitReceiver {
             job.result_data = "任务已完成";
             job.job_status = 3; // 3成功 5失败
             TransmitManager.getInstance().sendJob(TransmitManager.MANAGER_PACKAGE_NAME, job);
+            Log.e("DataReceiver", "收到任务");
         }
     }
 
@@ -42,6 +43,7 @@ public class DataReceiver implements ITransmitReceiver {
             // 假设事件做完，上报事件结果
             event.event_status = 0;
             TransmitManager.getInstance().sendEvent(TransmitManager.MANAGER_PACKAGE_NAME, event);
+            Log.e("onReceiveEvent", "收到事件");
         }
     }
 
@@ -51,6 +53,7 @@ public class DataReceiver implements ITransmitReceiver {
             // 假设注册完成，上报注册结果
             eventWatcher.error_code = 0; // 注册/注销成功
             TransmitManager.getInstance().sendEventWatcher(TransmitManager.MANAGER_PACKAGE_NAME, eventWatcher);
+            Log.e("onReceiveEvent", "收到事件注册/监听");
         }
     }
 

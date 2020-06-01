@@ -20,9 +20,11 @@ import androidx.annotation.Nullable;
 
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
+import com.mango.puppet.dispatch.job.db.DBManager;
 import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.log.i.ILog;
+import com.mango.puppet.network.CallBackListener;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.status.i.IStatusListener;
 import com.mango.puppetmodel.Event;
@@ -102,6 +104,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             LinearLayout llSendEventWatcher = displayView.findViewById(R.id.ll_event_watcher);
             mTvEventWatcher= displayView.findViewById(R.id.tv_event_watcher);
             LinearLayout llSendEvent = displayView.findViewById(R.id.ll_send_event);
+            LinearLayout llClearDB = displayView.findViewById(R.id.ll_clear_db);
             tvLog = displayView.findViewById(R.id.tvlog);
             tvNet = displayView.findViewById(R.id.tvNetStatus);
             tvJobCount = displayView.findViewById(R.id.tvJob);
@@ -114,6 +117,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             llSendJob.setOnClickListener(this);
             llSendEventWatcher.setOnClickListener(this);
             llSendEvent.setOnClickListener(this);
+            llClearDB.setOnClickListener(this);
             windowManager.addView(displayView, layoutParams);
         }
     }
@@ -126,11 +130,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
                 break;
 
             case R.id.ll_send_job:
-                Job job = new Job();
-                job.package_name = "com.wzg.trojandemo";
-                job.job_name = "起飞";
-                job.job_id = 1;
-                JobManager.getInstance().addJob(job);
+                CallBackListener.getInstance().sendSuccessJob();
                 break;
 
             case R.id.ll_event_watcher:
@@ -148,6 +148,10 @@ public class FloatWindowService extends Service implements View.OnClickListener,
                 Event event = new Event();
                 event.event_name = "sendMessage";
                 EventManager.getInstance().uploadNewEvent(event);
+                break;
+
+            case R.id.ll_clear_db:
+                DBManager.clearDB();
                 break;
         }
     }

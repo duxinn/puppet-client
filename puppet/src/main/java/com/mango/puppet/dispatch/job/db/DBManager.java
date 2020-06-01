@@ -121,6 +121,12 @@ public class DBManager {
         return handleJobBeanToJob(jobBeans, new Gson());
     }
 
+    public static void clearDB() {
+        for (Job cdJob : DBManager.getAllJobsFromDb()) {
+            DBManager.deleteJob(cdJob.job_id);
+        }
+    }
+
     @Nullable
     public static Job getSingleNotDoneJobsFromDb() {
         Job jobBean = null;
