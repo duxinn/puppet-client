@@ -38,8 +38,8 @@ public class SystemManager implements ISystem, IPluginRunListener {
     /************   ISystem   ************/
     @Override
     public void startSystem(final Context context) {
-        LogManager.getInstance().recordDebugLog("开始启动程序");
         LogManager.init(context);
+        LogManager.getInstance().recordDebugLog("开始启动程序");
         SystemPluginManager.getInstance().setSystemPluginListener(context);
         // 1 插件管理模块
         //TODO pluginmodels列表暂时没有
