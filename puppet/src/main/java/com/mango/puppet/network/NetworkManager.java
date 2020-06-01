@@ -95,17 +95,23 @@ public class NetworkManager implements INetwork {
         PuppetVM.Companion.reportJobResult(jobResult.callback, jobResult, new DesCallBack<Object>() {
             @Override
             public void onHandleSuccess(@Nullable Object objectBaseModel) {
-                iJobRequestResult.onSuccess(jobResult);
+                if (iJobRequestResult != null) {
+                    iJobRequestResult.onSuccess(jobResult);
+                }
             }
 
             @Override
             public void onHandleError(@Nullable String msg, int code) {
-                iJobRequestResult.onError(jobResult, code, msg);
+                if (iJobRequestResult != null) {
+                    iJobRequestResult.onError(jobResult, code, msg);
+                }
             }
 
             @Override
             public void onNetWorkError(@Nullable Throwable e) {
-                iJobRequestResult.onNetworkError(jobResult);
+                if (iJobRequestResult != null) {
+                    iJobRequestResult.onNetworkError(jobResult);
+                }
             }
         });
     }
@@ -115,17 +121,23 @@ public class NetworkManager implements INetwork {
         PuppetVM.Companion.reportEvent(url, event, new DesCallBack<Object>() {
             @Override
             public void onHandleSuccess(@Nullable Object objectBaseModel) {
-                requestResult.onSuccess(event);
+                if (requestResult != null) {
+                    requestResult.onSuccess(event);
+                }
             }
 
             @Override
             public void onHandleError(@Nullable String msg, int code) {
-                requestResult.onError(event, code, msg);
+                if (requestResult != null) {
+                    requestResult.onError(event, code, msg);
+                }
             }
 
             @Override
             public void onNetWorkError(@Nullable Throwable e) {
-                requestResult.onNetworkError(event);
+                if (requestResult != null) {
+                    requestResult.onNetworkError(event);
+                }
             }
         });
     }

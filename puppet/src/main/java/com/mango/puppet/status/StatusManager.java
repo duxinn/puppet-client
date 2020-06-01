@@ -73,11 +73,9 @@ public class StatusManager implements IStatusControl {
 
     @Override
     public void setJobEngineStatus(int status) {
-        if (jobEngineStatus != status) {
-            jobEngineStatus = status;
-            if (mListener != null) {
-                mListener.onJobEngineStatusChanged(jobEngineStatus);
-            }
+        jobEngineStatus = status;
+        if (mListener != null) {
+            mListener.onJobEngineStatusChanged(jobEngineStatus);
         }
     }
 
@@ -92,11 +90,9 @@ public class StatusManager implements IStatusControl {
 //        if (mListener != null) {
 //            mListener.onJobCountChanged(count);
 //        }
-        if (jobCount != count) {
-            jobCount = count;
-            if (mListener != null) {
-                mListener.onJobEngineStatusChanged(jobCount);
-            }
+        jobCount = count;
+        if (mListener != null) {
+            mListener.onJobCountChanged(jobCount);
         }
     }
 
@@ -114,7 +110,7 @@ public class StatusManager implements IStatusControl {
         if (jobResultCount != count) {
             jobResultCount = count;
             if (mListener != null) {
-                mListener.onJobEngineStatusChanged(jobResultCount);
+                mListener.onJobResultCountChanged(jobResultCount);
             }
         }
     }
