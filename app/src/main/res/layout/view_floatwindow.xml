@@ -287,7 +287,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/ll_send_event"
+                    android:id="@+id/ll_check_event_cache_send_watcher"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -299,7 +299,25 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:textColor="#eeeeee"
-                        android:text="发送事件"
+                        android:text="(事件缓存)注册"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_check_event_cache"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="#eeeeee"
+                        android:text="检查事件缓存"
                         android:textSize="14sp" />
 
                 </LinearLayout>

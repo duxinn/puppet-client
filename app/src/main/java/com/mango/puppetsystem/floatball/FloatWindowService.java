@@ -111,7 +111,9 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             LinearLayout llSendRetryJob = displayView.findViewById(R.id.ll_retry_job);
             LinearLayout llSendEventWatcher = displayView.findViewById(R.id.ll_event_watcher);
             mTvEventWatcher= displayView.findViewById(R.id.tv_event_watcher);
-            LinearLayout llSendEvent = displayView.findViewById(R.id.ll_send_event);
+
+            LinearLayout llCheckEventCacheSendWatcher = displayView.findViewById(R.id.ll_check_event_cache_send_watcher);
+            LinearLayout llCheckEventCache = displayView.findViewById(R.id.ll_check_event_cache);
             LinearLayout llClearDB = displayView.findViewById(R.id.ll_clear_db);
             tvLog = displayView.findViewById(R.id.tvlog);
             tvNet = displayView.findViewById(R.id.tvNetStatus);
@@ -129,9 +131,10 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             llSendCancelJob.setOnClickListener(this);
             llSingleSendErrorJob.setOnClickListener(this);
             llSendRetryJob.setOnClickListener(this);
+            llCheckEventCacheSendWatcher.setOnClickListener(this);
 
             llSendEventWatcher.setOnClickListener(this);
-            llSendEvent.setOnClickListener(this);
+            llCheckEventCache.setOnClickListener(this);
             llClearDB.setOnClickListener(this);
             windowManager.addView(displayView, layoutParams);
         }
@@ -184,10 +187,11 @@ public class FloatWindowService extends Service implements View.OnClickListener,
                 }
                 break;
 
-            case R.id.ll_send_event:
-                Event event = new Event();
-                event.event_name = "sendMessage";
-//                EventManager.getInstance().uploadNewEvent(event);
+            case R.id.ll_check_event_cache_send_watcher:
+                CallBackListener.getInstance().sendSingleEventWatcher();
+                break;
+            case R.id.ll_check_event_cache:
+                CallBackListener.getInstance().checkEventWatcherCache();
                 break;
 
             case R.id.ll_clear_db:

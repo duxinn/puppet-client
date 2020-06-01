@@ -51,8 +51,8 @@ public class CallBackListener {
     private INetwork.IEventRequestResult mSuccessEventResult;
     // 事件回调数
     private int mSuccessEventCallCount;
-    private ArrayList<Job> mOriginEventList = new ArrayList<>();
-    private ArrayList<Job> mSuccessEventList = new ArrayList<>();
+    private ArrayList<Event> mSuccessEventList = new ArrayList<>();
+    private ArrayList<INetwork.IEventRequestResult> mSuccessEventResultList = new ArrayList<>();
 
     /*****下发任务后，5s内收到执行后的上报回调，认为通过*****/
     /*****测任务下发-执行-上报模块之间链路连通性*****/
@@ -329,26 +329,27 @@ public class CallBackListener {
         mSuccessEvent = null;
         mSuccessEventResult = null;
         mSuccessEventCallCount = 0;
+        mSuccessEventList.clear();
 
-        EventManager.getInstance().setEventWatcher("com.wzg.trojandemo","testEvent1", isValid, "");
+        EventManager.getInstance().setEventWatcher("com.wzg.trojandemo", "testEvent1", isValid, "");
 
-        Event event1=new Event();
+        final Event event1 = new Event();
         event1.event_status = 0;
         event1.package_name = "com.wzg.trojandemo";
         event1.event_name = "testEvent1";
-        Event event2=new Event();
+        Event event2 = new Event();
         event2.event_status = 0;
         event2.package_name = "com.wzg.trojandemo";
         event2.event_name = "testEvent1";
-        Event event3=new Event();
+        Event event3 = new Event();
         event3.event_status = 0;
         event3.package_name = "com.wzg.trojandemo";
         event3.event_name = "testEvent1";
-        Event event4=new Event();
+        Event event4 = new Event();
         event4.event_status = 0;
         event4.package_name = "com.wzg.trojandemo";
         event4.event_name = "testEvent1";
-        Event event5=new Event();
+        Event event5 = new Event();
         event5.event_status = 0;
         event5.package_name = "com.wzg.trojandemo";
         event5.event_name = "testEvent1";
@@ -362,7 +363,11 @@ public class CallBackListener {
             @Override
             public void run() {
                 if (isValid) {
+                    for (int i = 0; i < mSuccessEventResultList.size(); i++) {
+                        mSuccessEventResultList.get(i).onSuccess(mSuccessEventList.get(i));
+                    }
                     if (mSuccessEventCallCount > 4) {
+                        mSuccessEventResult.onSuccess(mSuccessEvent);
                         LogManager.getInstance().recordLog("事件注册测试通过");
                     } else {
                         LogManager.getInstance().recordLog("事件注册测试未通过");
@@ -374,6 +379,38 @@ public class CallBackListener {
                         LogManager.getInstance().recordLog("事件注销测试未通过");
                     }
                 }
+
+            }
+        }, 3000);
+    }
+
+
+    public void sendSingleEventWatcher() {
+        EventManager.getInstance().setEventWatcher("com.wzg.trojandemo", "testEvent2", true, "");
+    }
+    /*****已经注册过的事件有缓存，测是否仍然注册*****/
+    /*****测试前先调用sendSingleEventWatcher*****/
+    public void checkEventWatcherCache() {
+        mSuccessEvent = null;
+        mSuccessEventResult = null;
+        mSuccessEventCallCount = 0;
+
+        final Event event1 = new Event();
+        event1.event_status = 0;
+        event1.package_name = "com.wzg.trojandemo";
+        event1.event_name = "testEvent2";
+        EventManager.getInstance().uploadNewEvent(event1);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mSuccessEvent != null && mSuccessEventResult != null) {
+                    mSuccessEventResult.onSuccess(mSuccessEvent);
+                    LogManager.getInstance().recordLog("事件注册缓存测试通过");
+                } else {
+                    LogManager.getInstance().recordLog("事件注册缓存测试未通过");
+                }
+
 
             }
         }, 3000);
@@ -404,6 +441,8 @@ public class CallBackListener {
         if (event.event_status == 0) {
             mSuccessEvent = event;
             mSuccessEventResult = requestResult;
+            mSuccessEventList.add(mSuccessEvent);
+            mSuccessEventResultList.add(mSuccessEventResult);
             mSuccessEventCallCount++;
         }
     }
