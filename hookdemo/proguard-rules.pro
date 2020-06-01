@@ -92,6 +92,7 @@
 
 ## model
 -keepclasseswithmembers public class com.mango.wechattool.bean.**{*;}
+-keepclasseswithmembers public class com.mango.puppetmodel.**{*;}
 
 -keepclasseswithmembers public class com.mango.wechattool.business.WechatEntrance {
     public static void entrance();
