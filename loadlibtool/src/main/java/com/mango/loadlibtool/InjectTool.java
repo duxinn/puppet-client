@@ -99,7 +99,7 @@ public class InjectTool {
                 break;
             }
         }
-        if (existFlag) return true;
+//        if (existFlag) return true;
 
         boolean isSuccess = true;
         for (int i = 0; i < needCopyFileList.size(); i++) {

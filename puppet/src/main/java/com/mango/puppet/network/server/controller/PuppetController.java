@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.network.server.model.ReturnData;
+import com.mango.puppet.network.utils.JsonUtils;
 import com.mango.puppet.tool.ThreadUtils;
 import com.mango.puppetmodel.Job;
 import com.yanzhenjie.andserver.annotation.PostMapping;
@@ -18,6 +19,7 @@ import com.yanzhenjie.andserver.http.HttpResponse;
 import com.yanzhenjie.andserver.http.ResponseBody;
 import com.yanzhenjie.andserver.util.MediaType;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -66,21 +68,26 @@ class PuppetController {
      */
     @PostMapping(path = "/addJob", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     void distributeJob(HttpResponse httpResponse,
-                       @RequestBody JSONObject jsonObject) {
+                       @RequestBody Object o) {
 
         int status = 0;
         String message = "";
-        if (jsonObject == null) {
+        if (!(o instanceof com.alibaba.fastjson.JSONObject)) {
             status = 1;
             message = "参数为空";
         }
-
         if (status == 0) {
-            long job_id = jsonObject.optLong("job_id");
-            String package_name = jsonObject.optString("package_name");
-            String job_name = jsonObject.optString("job_name");
-            String callback = jsonObject.optString("callback");
-            JSONObject job_data = jsonObject.optJSONObject("job_data");
+            com.alibaba.fastjson.JSONObject jsonObject = (com.alibaba.fastjson.JSONObject)o;
+            long job_id = jsonObject.getLong("job_id");
+            String package_name = jsonObject.getString("package_name");
+            String job_name = jsonObject.getString("job_name");
+            String callback = jsonObject.getString("callback");
+            JSONObject job_data = null;
+            try {
+                job_data = new JSONObject(JsonUtils.toJsonString(jsonObject.getJSONObject("job_data")));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             if (!TextUtils.isEmpty(package_name)
                     && !TextUtils.isEmpty(job_name)
