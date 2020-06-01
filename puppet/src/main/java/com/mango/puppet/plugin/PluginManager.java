@@ -8,7 +8,7 @@ import android.os.Message;
 
 import androidx.core.app.ActivityCompat;
 
-import com.mango.loadlibtool.InjectTool;
+//import com.mango.loadlibtool.InjectTool;
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.log.LogManager;
@@ -68,8 +68,8 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     /************   IPluginControl   ************/
     @Override
     public void runPuppetPlugin(Context context, String targetPackageName, String dexName, String className, String methodName, IPluginControlResult result) {
+//        InjectTool.inject(context, targetPackageName, dexName, className, methodName);
         LogManager.getInstance().recordDebugLog("启动插件"+targetPackageName+dexName);
-        InjectTool.inject(context, targetPackageName, dexName, className, methodName);
     }
 
     /**
@@ -289,21 +289,27 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
             if (model.getPackageName().equals(job.package_name))
                 activityName = model.getActivityName();
         }
-        SystemPluginManager.getInstance().changeForegroundApplication(job.package_name, activityName, new ISystemPluginExecute.ISystemPluginResult() {
-            @Override
-            public void onFinished(boolean isSucceed, String failReason) {
-                if (isSucceed) {
-                    if (runningPackageNames.contains(job.package_name)) {
-                        result.onFinished(job,true, "");
-                        TransmitManager.getInstance().sendJob(job.package_name, job);
-                    } else {
-                        result.onFinished(job,false, "插件未运行");
-                    }
-                } else {
-                    result.onFinished(job, isSucceed, failReason);
-                }
-            }
-        });
+        if (runningPackageNames.contains(job.package_name)) {
+            result.onFinished(job,true, "");
+            TransmitManager.getInstance().sendJob(job.package_name, job);
+        } else {
+            result.onFinished(job,false, "插件未运行");
+        }
+//        SystemPluginManager.getInstance().changeForegroundApplication(job.package_name, activityName, new ISystemPluginExecute.ISystemPluginResult() {
+//            @Override
+//            public void onFinished(boolean isSucceed, String failReason) {
+//                if (isSucceed) {
+//                    if (runningPackageNames.contains(job.package_name)) {
+//                        result.onFinished(job,true, "");
+//                        TransmitManager.getInstance().sendJob(job.package_name, job);
+//                    } else {
+//                        result.onFinished(job,false, "插件未运行");
+//                    }
+//                } else {
+//                    result.onFinished(job, isSucceed, failReason);
+//                }
+//            }
+//        });
     }
 
     @Override

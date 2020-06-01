@@ -3,10 +3,12 @@ package com.mango.puppet.network;
 import android.os.Handler;
 import android.util.Log;
 
+import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.dispatch.job.db.DBManager;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.i.INetwork;
+import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.Job;
 
 import org.json.JSONException;
@@ -43,6 +45,14 @@ public class CallBackListener {
     private INetwork.IJobRequestResult mFailedResult;
     // 任务回调数
     private int mFailedCallCount;
+
+    // 事件成功回调
+    private Event mSuccessEvent;
+    private INetwork.IEventRequestResult mSuccessEventResult;
+    // 事件回调数
+    private int mSuccessEventCallCount;
+    private ArrayList<Job> mOriginEventList = new ArrayList<>();
+    private ArrayList<Job> mSuccessEventList = new ArrayList<>();
 
     /*****下发任务后，5s内收到执行后的上报回调，认为通过*****/
     /*****测任务下发-执行-上报模块之间链路连通性*****/
@@ -314,13 +324,54 @@ public class CallBackListener {
         }, 3000);
     }
 
-    /*****注册事件成功回调*****/
+    /*****注册事件，连续发5个同类型事件，测是否注册成功*****/
     public void sendEventWatcher() {
+        mSuccessEvent = null;
+        mSuccessEventResult = null;
+        mSuccessEventCallCount = 0;
 
+        EventManager.getInstance().setEventWatcher("com.wzg.trojandemo","testEvent1",true, "");
+
+        Event event1=new Event();
+        event1.event_status = 0;
+        event1.package_name = "com.wzg.trojandemo";
+        event1.event_name = "testEvent1";
+        Event event2=new Event();
+        event2.event_status = 0;
+        event2.package_name = "com.wzg.trojandemo";
+        event2.event_name = "testEvent1";
+        Event event3=new Event();
+        event3.event_status = 0;
+        event3.package_name = "com.wzg.trojandemo";
+        event3.event_name = "testEvent1";
+        Event event4=new Event();
+        event4.event_status = 0;
+        event4.package_name = "com.wzg.trojandemo";
+        event4.event_name = "testEvent1";
+        Event event5=new Event();
+        event5.event_status = 0;
+        event5.package_name = "com.wzg.trojandemo";
+        event5.event_name = "testEvent1";
+        EventManager.getInstance().uploadNewEvent(event1);
+        EventManager.getInstance().uploadNewEvent(event2);
+        EventManager.getInstance().uploadNewEvent(event3);
+        EventManager.getInstance().uploadNewEvent(event4);
+        EventManager.getInstance().uploadNewEvent(event5);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mSuccessEventCallCount > 4) {
+                    LogManager.getInstance().recordLog("事件注册测试通过");
+                } else {
+                    LogManager.getInstance().recordLog("事件注册测试未通过");
+                }
+            }
+        }, 3000);
     }
 
     void reportJobResult(final Job jobResult, final INetwork.IJobRequestResult iJobRequestResult) {
-        // 任务执行成功未上报
+        // 任务执行成功
         if (jobResult.job_status == 3) {
             mSuccessJob = jobResult;
             mSuccessResult = iJobRequestResult;
@@ -336,6 +387,16 @@ public class CallBackListener {
             mFailedCallCount++;
         }
 
+    }
+
+
+    void reportEventResult(final Event event, final INetwork.IEventRequestResult requestResult) {
+        // 事件执行成功
+        if (event.event_status == 0) {
+            mSuccessEvent = event;
+            mSuccessEventResult = requestResult;
+            mSuccessEventCallCount++;
+        }
     }
 
 }

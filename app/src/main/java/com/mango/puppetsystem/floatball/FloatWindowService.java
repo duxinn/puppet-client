@@ -176,11 +176,11 @@ public class FloatWindowService extends Service implements View.OnClickListener,
                 if (hasRegisterEventWatcher == 0) {
                     mTvEventWatcher.setText("注销事件");
                     hasRegisterEventWatcher = 1;
+                    CallBackListener.getInstance().sendEventWatcher();
                 } else {
                     mTvEventWatcher.setText("注册事件");
                     hasRegisterEventWatcher = 0;
                 }
-                EventManager.getInstance().setEventWatcher("com.wzg.trojandemo", "sendMessage", hasRegisterEventWatcher == 1, "");
                 break;
 
             case R.id.ll_send_event:
