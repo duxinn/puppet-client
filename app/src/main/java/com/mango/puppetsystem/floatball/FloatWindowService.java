@@ -56,6 +56,8 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         LogManager.getInstance().setNewLogListener(this);
         StatusManager.getInstance().setStatusListener(this);
         init();
+        // todo 测试代码，临时解决方案
+        LogManager.init(this);
         showFloatingWindow();
     }
 
@@ -152,7 +154,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
                 break;
 
             case R.id.ll_error_job:
-//                CallBackListener.getInstance().sendDelayJob();
+                CallBackListener.getInstance().sendFailedJob();
                 break;
 
             case R.id.ll_delay_continue_job:

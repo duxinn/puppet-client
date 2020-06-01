@@ -30,8 +30,14 @@ public class DataReceiver implements ITransmitReceiver {
     public void onReceiveJob(String packageName, com.mango.puppetmodel.Job job) {
         if (MyApplication.instance.getPackageName().equals(job.package_name)) {
             // 假设任务做完，上报任务结果
-            job.result_data = "任务已完成";
-            job.job_status = 3; // 3成功 5失败
+            if (job.job_name.equals("失败的任务")) {
+                job.result_data = "任务失败";
+                job.job_status = 5; // 3成功 5失败
+            } else {
+                job.result_data = "任务已完成";
+                job.job_status = 3; // 3成功 5失败
+            }
+
             TransmitManager.getInstance().sendJob(TransmitManager.MANAGER_PACKAGE_NAME, job);
             Log.e("DataReceiver", "收到任务");
         }

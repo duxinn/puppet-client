@@ -78,12 +78,6 @@ public class NetworkManager implements INetwork{
     @Override
     public void reportJobResult(final Job jobResult, final IJobRequestResult iJobRequestResult) {
         LogManager.getInstance().recordDebugLog("上报任务结果"+jobResult.job_id);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (jobResult == null) throw new AssertionError("任务分发未成功");
-            }
-        }, 10000);
         CallBackListener.getInstance().reportJobResult(jobResult, iJobRequestResult);
 
         String jobJsonString = JSON.toJSONString(jobResult);
