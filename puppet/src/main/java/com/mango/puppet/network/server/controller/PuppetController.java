@@ -36,10 +36,21 @@ class PuppetController {
      */
     @PostMapping(path = "/setEventWatcher", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     void distributeEventWatcher(HttpResponse httpResponse,
-                                @RequestParam(name = "event_name") final String event_name,
-                                @RequestParam(name = "package_name") final String package_name,
-                                @RequestParam(name = "watcher_status") final int watcher_status,
-                                @RequestParam(name = "callback") final String callback) {
+                                @RequestBody Object o) {
+
+        if (!(o instanceof com.alibaba.fastjson.JSONObject)) {
+            ReturnData returnData = new ReturnData();
+            returnData.status = 1;
+            returnData.message = "参数为空";
+            ResponseBody body = new JsonBody(JSON.toJSONString(returnData));
+            httpResponse.setBody(body);
+            return;
+        }
+        final String event_name = ((com.alibaba.fastjson.JSONObject) o).getString("event_name");
+        final String package_name = ((com.alibaba.fastjson.JSONObject) o).getString("package_name");
+        final String callback = ((com.alibaba.fastjson.JSONObject) o).getString("callback");
+        final int watcher_status = ((com.alibaba.fastjson.JSONObject) o).getInteger("watcher_status");
+
         ReturnData returnData = new ReturnData();
         if (!TextUtils.isEmpty(event_name)
                 && !TextUtils.isEmpty(package_name)
