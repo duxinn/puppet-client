@@ -3,6 +3,8 @@ package com.mango.puppet.network.server.component;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.alibaba.fastjson.JSON;
+import com.mango.puppet.network.server.model.ReturnData;
 import com.mango.puppet.network.utils.JsonUtils;
 import com.yanzhenjie.andserver.annotation.Converter;
 import com.yanzhenjie.andserver.framework.MessageConverter;
@@ -21,7 +23,10 @@ public class AppMessageConverter implements MessageConverter {
 
     @Override
     public ResponseBody convert(@NonNull Object output, @Nullable MediaType mediaType) {
-        return new JsonBody(JsonUtils.successfulJson(output));
+        ReturnData returnData = new ReturnData();
+        returnData.status = 0;
+        returnData.data = output;
+        return new JsonBody(JSON.toJSONString(returnData));
     }
 
     @Nullable

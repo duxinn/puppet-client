@@ -18,7 +18,7 @@ public interface IJob {
      * 接收一个新的待执行任务
      * @param job 待执行任务
      */
-    void addJob(Job job);
+    boolean addJob(Job job);
 
     /**
      * 接收一个执行完毕的任务

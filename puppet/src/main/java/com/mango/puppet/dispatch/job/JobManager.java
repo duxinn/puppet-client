@@ -12,6 +12,7 @@ import com.mango.puppet.plugin.PluginManager;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginJob;
 import com.mango.puppet.status.StatusManager;
+import com.mango.puppet.tool.ThreadUtils;
 import com.mango.puppetmodel.Job;
 
 import org.json.JSONObject;
@@ -77,56 +78,60 @@ public class JobManager implements IJob {
     }
 
     @Override
-    public void addJob(Job job) {
+    public boolean addJob(final Job job) {
         Job storeJob = DBManager.getJobsById(job.job_id);
         if (storeJob != null) {
             LogManager.getInstance().recordLog("任务已存在 " + job.job_id);
-            return;
+            return false;
         }
+        ThreadUtils.runInMainThread(new Runnable() {
+            @Override
+            public void run() {
+                if (Job.RETRY_JOB.equals(job.job_name)
+                        || Job.CANCEL_JOB.equals(job.job_name)) {
+                    if (status == STATUS.STOP) {
+                        long job_id;
+                        if (Job.RETRY_JOB.equals(job.job_name)) {
+                            job_id = job.job_data.optLong("retry_job_id");
+                        } else {
+                            job_id = job.job_data.optLong("cancel_job_id");
+                        }
 
-        if (Job.RETRY_JOB.equals(job.job_name)
-                || Job.CANCEL_JOB.equals(job.job_name)) {
-            if (status == STATUS.STOP) {
-                long job_id;
-                if (Job.RETRY_JOB.equals(job.job_name)) {
-                    job_id = job.job_data.optLong("retry_job_id");
-                } else {
-                    job_id = job.job_data.optLong("cancel_job_id");
-                }
+                        Job targetJob = DBManager.getJobsById(job_id);
+                        if (targetJob != null && targetJob.job_status == 6) {
+                            job.job_status = 3;
+                            ReportManager.getInstance().reportToServiceNoCallback(job);
 
-                Job targetJob = DBManager.getJobsById(job_id);
-                if (targetJob != null && targetJob.job_status == 6) {
-                    job.job_status = 3;
-                    ReportManager.getInstance().reportToServiceNoCallback(job);
-
-                    if (Job.RETRY_JOB.equals(job.job_name)) {
-                        targetJob.job_status = 0;
-                        targetJob.result_data = (new JSONObject()).toString();
-                        targetJob.error_code = 0;
-                        targetJob.error_message = "";
-                        DBManager.updateJobStatus(targetJob);
+                            if (Job.RETRY_JOB.equals(job.job_name)) {
+                                targetJob.job_status = 0;
+                                targetJob.result_data = (new JSONObject()).toString();
+                                targetJob.error_code = 0;
+                                targetJob.error_message = "";
+                                DBManager.updateJobStatus(targetJob);
+                            } else {
+                                DBManager.deleteJob(job_id);
+                            }
+                        } else {
+                            job.job_status = 4;
+                            job.error_message = "任务引擎异常";
+                            job.error_code = 2;
+                            ReportManager.getInstance().reportToServiceNoCallback(job);
+                        }
                     } else {
-                        DBManager.deleteJob(job_id);
+                        job.job_status = 4;
+                        job.error_message = "当前没有失败任务";
+                        job.error_code = 1;
+                        ReportManager.getInstance().reportToServiceNoCallback(job);
                     }
-                } else {
-                    job.job_status = 4;
-                    job.error_message = "任务引擎异常";
-                    job.error_code = 2;
-                    ReportManager.getInstance().reportToServiceNoCallback(job);
                 }
-            } else {
-                job.job_status = 4;
-                job.error_message = "当前没有失败任务";
-                job.error_code = 1;
-                ReportManager.getInstance().reportToServiceNoCallback(job);
-            }
-            return;
-        }
 
-        boolean b = DBManager.insertJobIntoDb(job);
-        if (!b) {
-            Log.e("JobManager", "DBManager.insertJobIntoDb error ");
-        }
+                boolean b = DBManager.insertJobIntoDb(job);
+                if (!b) {
+                    Log.e("JobManager", "DBManager.insertJobIntoDb error ");
+                }
+            }
+        });
+        return true;
     }
 
     @Override

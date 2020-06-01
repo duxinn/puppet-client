@@ -2,7 +2,6 @@ package com.mango.puppet.network;
 
 import android.content.Context;
 
-import com.alibaba.fastjson.JSON;
 import com.mango.puppet.network.api.api.ApiClient;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
@@ -34,12 +33,21 @@ public class NetworkManager implements INetwork {
         return ourInstance;
     }
 
+    private int status = SERVER_STOP;
+
     private NetworkManager() {
     }
 
     /************   INetwork   ************/
     @Override
     public void setupNetwork(Context context, ISetupResult result) {
+
+        if (status == SERVER_START) {
+            if (result != null) {
+                result.onSuccess();
+                return;
+            }
+        }
 
         final ISetupResult[] iSetupResult = {result};
 
@@ -54,6 +62,7 @@ public class NetworkManager implements INetwork {
                     iSetupResult[0] = null;
                 }
                 StatusManager.getInstance().setNetworkStatus(SERVER_START);
+                status = SERVER_START;
             }
 
             @Override
@@ -63,11 +72,13 @@ public class NetworkManager implements INetwork {
                     iSetupResult[0] = null;
                 }
                 StatusManager.getInstance().setNetworkStatus(SERVER_ERROR);
+                status = SERVER_ERROR;
             }
 
             @Override
             public void onServerStop() {
                 StatusManager.getInstance().setNetworkStatus(SERVER_STOP);
+                status = SERVER_STOP;
             }
         });
     }
