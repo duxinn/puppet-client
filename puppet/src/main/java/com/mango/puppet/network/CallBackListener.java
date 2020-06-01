@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import static com.mango.puppetmodel.Job.CANCEL_JOB;
+import static com.mango.puppetmodel.Job.RETRY_JOB;
 
 public class CallBackListener {
     private static final CallBackListener ourInstance = new CallBackListener();
@@ -218,7 +219,7 @@ public class CallBackListener {
         }, 3000);
     }
 
-    /*****测取消任务是否成功*****/
+    /*****测取消/重试任务是否成功*****/
     /*****发送异常且上报的任务*****/
     public void sendFailedAndReportJob() {
         DBManager.clearDB();
@@ -272,6 +273,37 @@ public class CallBackListener {
         }, 3000);
 
     }
+
+    public void sendRetryJob() {
+        final Job retryJob = new Job();
+        retryJob.package_name = "com.wzg.trojandemo";
+        retryJob.job_name = RETRY_JOB;
+        retryJob.job_id = 3;
+        try {
+            retryJob.job_data = new JSONObject();
+            retryJob.job_data.put("retry_job_id", 1);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JobManager.getInstance().addJob(retryJob);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mFailedJob != null
+                        && mFailedResult != null
+                ) {
+                    if (mFailedJob.job_status == 5) {
+                        LogManager.getInstance().recordLog("测重试任务测试通过");
+                    } else {
+                        LogManager.getInstance().recordLog("测重试任务测试未通过");
+                    }
+                }
+            }
+        }, 3000);
+
+    }
+
 
 
 

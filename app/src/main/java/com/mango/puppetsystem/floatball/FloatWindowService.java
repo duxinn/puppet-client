@@ -108,6 +108,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             LinearLayout llSendErrorJob = displayView.findViewById(R.id.ll_error_job);
             LinearLayout llSendCancelJob = displayView.findViewById(R.id.ll_cancel_job);
             LinearLayout llSingleSendErrorJob = displayView.findViewById(R.id.ll_send_error_job);
+            LinearLayout llSendRetryJob = displayView.findViewById(R.id.ll_retry_job);
             LinearLayout llSendEventWatcher = displayView.findViewById(R.id.ll_event_watcher);
             mTvEventWatcher= displayView.findViewById(R.id.tv_event_watcher);
             LinearLayout llSendEvent = displayView.findViewById(R.id.ll_send_event);
@@ -127,7 +128,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             llSendErrorJob.setOnClickListener(this);
             llSendCancelJob.setOnClickListener(this);
             llSingleSendErrorJob.setOnClickListener(this);
-
+            llSendRetryJob.setOnClickListener(this);
 
             llSendEventWatcher.setOnClickListener(this);
             llSendEvent.setOnClickListener(this);
@@ -165,6 +166,10 @@ public class FloatWindowService extends Service implements View.OnClickListener,
 
             case R.id.ll_cancel_job:
                 CallBackListener.getInstance().sendCancelJob();
+                break;
+
+            case R.id.ll_retry_job:
+                CallBackListener.getInstance().sendRetryJob();
                 break;
 
             case R.id.ll_event_watcher:
