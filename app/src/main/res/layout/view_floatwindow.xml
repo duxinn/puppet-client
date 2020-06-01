@@ -43,6 +43,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dimens_30_dp"
@@ -71,6 +72,47 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/ll_clear_db"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="#eeeeee"
+                        android:text="清空数据库"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="1dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="测试用例"
+                android:textColor="@color/white"
+                android:layout_marginLeft="@dimen/dimens_10_dp"
+                android:layout_marginTop="@dimen/dimens_10_dp"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimens_30_dp"
+                android:layout_marginTop="@dimen/dimens_10_dp"
+                >
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="1dp" />
+                <LinearLayout
                     android:id="@+id/ll_send_job"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -87,6 +129,92 @@
                         android:textSize="14sp" />
 
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_send_delay_job"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="#eeeeee"
+                        android:text="延时任务"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_send_continuous_job"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="#eeeeee"
+                        android:text="连续任务"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_error_job"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="#eeeeee"
+                        android:text="错误任务"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_delay_continue_job"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="#eeeeee"
+                        android:text="延迟连续任务"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="1dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimens_30_dp"
+                android:layout_marginTop="@dimen/dimens_10_dp">
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="1dp" />
 
                 <LinearLayout
                     android:id="@+id/ll_event_watcher"
@@ -125,30 +253,11 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/ll_clear_db"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_background"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:textColor="#eeeeee"
-                        android:text="清空按钮"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
                 <View
                     android:layout_width="10dp"
                     android:layout_height="1dp" />
 
             </LinearLayout>
-
             <TextView
                 android:id="@+id/tvLocalStatus"
                 android:layout_width="match_parent"

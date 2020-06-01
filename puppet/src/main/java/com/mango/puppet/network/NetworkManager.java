@@ -79,24 +79,24 @@ public class NetworkManager implements INetwork{
         CallBackListener.getInstance().reportJobResult(jobResult, iJobRequestResult);
 
         String jobJsonString = JSON.toJSONString(jobResult);
-        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<Object>() {
-            @Override
-            public void onHandleSuccess(@Nullable Object objectBaseModel) {
-                iJobRequestResult.onSuccess(jobResult);
-            }
-
-            @Override
-            public void onHandleError(@Nullable String msg, int code) {
-                iJobRequestResult.onError(jobResult, code, msg);
-                LogManager.getInstance().recordLog(jobResult.job_name+"任务上报失败"+code+msg);
-            }
-
-            @Override
-            public void onNetWorkError(@Nullable Throwable e) {
-                iJobRequestResult.onNetworkError(jobResult);
-                LogManager.getInstance().recordLog(jobResult.job_name+"网络错误"+e.getLocalizedMessage());
-            }
-        });
+//        PuppetVM.Companion.reportJobResult(jobResult.callback, jobJsonString, new DesCallBack<Object>() {
+//            @Override
+//            public void onHandleSuccess(@Nullable Object objectBaseModel) {
+//                iJobRequestResult.onSuccess(jobResult);
+//            }
+//
+//            @Override
+//            public void onHandleError(@Nullable String msg, int code) {
+//                iJobRequestResult.onError(jobResult, code, msg);
+//                LogManager.getInstance().recordLog(jobResult.job_name+"任务上报失败"+code+msg);
+//            }
+//
+//            @Override
+//            public void onNetWorkError(@Nullable Throwable e) {
+//                iJobRequestResult.onNetworkError(jobResult);
+//                LogManager.getInstance().recordLog(jobResult.job_name+"网络错误"+e.getLocalizedMessage());
+//            }
+//        });
     }
 
     @Override
