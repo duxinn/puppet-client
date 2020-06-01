@@ -9,7 +9,12 @@ import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.i.INetwork;
 import com.mango.puppetmodel.Job;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+
+import static com.mango.puppetmodel.Job.CANCEL_JOB;
 
 public class CallBackListener {
     private static final CallBackListener ourInstance = new CallBackListener();
@@ -26,6 +31,17 @@ public class CallBackListener {
     private INetwork.IJobRequestResult mSuccessResult;
     // 任务回调数
     private int mSuccessCallCount;
+
+    // 多个任务成功
+    private ArrayList<Job> mOriginJobList = new ArrayList<>();
+    private ArrayList<Job> mSuccessJobList = new ArrayList<>();
+    private ArrayList<INetwork.IJobRequestResult> mSuccessResultList = new ArrayList<>();
+
+    // 单个失败任务回调使用
+    private Job mFailedJob;
+    private INetwork.IJobRequestResult mFailedResult;
+    // 任务回调数
+    private int mFailedCallCount;
 
     /*****下发任务后，5s内收到执行后的上报回调，认为通过*****/
     /*****测任务下发-执行-上报模块之间链路连通性*****/
@@ -102,9 +118,6 @@ public class CallBackListener {
 
     /*****连续下发4个任务，A，B，C，D，10s内收到4个任务的执行上报回调（依次为A，B，C，D），认为通过*****/
     /*****测任务顺序性，先进先出*****/
-    private ArrayList<Job> mOriginJobList = new ArrayList<>();
-    private ArrayList<Job> mSuccessJobList = new ArrayList<>();
-    private ArrayList<INetwork.IJobRequestResult> mSuccessResultList = new ArrayList<>();
 
     public void sendContinuousJob() {
         DBManager.clearDB();
@@ -154,7 +167,7 @@ public class CallBackListener {
                             && mSuccessJobList.get(i).job_status == 3
                     ) {
                         if (mOriginJobList.get(i).job_id == mSuccessJobList.get(i).job_id) {
-                            mSuccessResult.onSuccess(mSuccessJob);
+                            mSuccessResultList.get(i).onSuccess(mSuccessJobList.get(i));
                             Job j = DBManager.getJobsById(mSuccessJobList.get(i).job_id);
                             if (j != null) {
                                 LogManager.getInstance().recordLog("任务有序性测试未通过");
@@ -165,20 +178,14 @@ public class CallBackListener {
                         }
 
                     }
-
                 }
                 LogManager.getInstance().recordLog("任务有序性测试未通过");
             }
         }, 8000);
     }
 
-    // 单个失败任务回调使用
-    private Job mFailedJob;
-    private INetwork.IJobRequestResult mFailedResult;
-    // 任务回调数
-    private int mFailedCallCount;
-
     /*****下发任务后，任务执行完上报回调出错；重启App，3s内收到的是之前未上报的任务回调结果，认为通过*****/
+    /*****测回调结果错误时，数据库缓存及重试机制*****/
     public void sendFailedJob() {
         DBManager.clearDB();
         mFailedJob = null;
@@ -211,6 +218,63 @@ public class CallBackListener {
         }, 3000);
     }
 
+    /*****测取消任务是否成功*****/
+    /*****发送异常且上报的任务*****/
+    public void sendFailedAndReportJob() {
+        DBManager.clearDB();
+        mFailedJob = null;
+        mFailedResult = null;
+        mFailedCallCount = 0;
+
+        final Job job = new Job();
+        job.package_name = "com.wzg.trojandemo";
+        job.job_name = "失败的任务";
+        job.job_id = 1;
+        JobManager.getInstance().addJob(job);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mFailedJob != null
+                        && mFailedResult != null
+                ) {
+                    if (mFailedJob.job_status == 5) {
+                        mFailedResult.onSuccess(mFailedJob);
+                        LogManager.getInstance().recordLog("失败的任务上报成功");
+                    }
+                }
+            }
+        }, 3000);
+    }
+
+    public void sendCancelJob() {
+        final Job cancelJob = new Job();
+        cancelJob.package_name = "com.wzg.trojandemo";
+        cancelJob.job_name = CANCEL_JOB;
+        cancelJob.job_id = 2;
+        try {
+            cancelJob.job_data = new JSONObject();
+            cancelJob.job_data.put("cancel_job_id", 1);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JobManager.getInstance().addJob(cancelJob);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (DBManager.getJobsById(mFailedJob.job_id) == null) {
+                    LogManager.getInstance().recordLog("测取消任务测试通过");
+                } else {
+                    LogManager.getInstance().recordLog("测取消任务测试未通过");
+                }
+            }
+        }, 3000);
+
+    }
+
+
+
     void reportJobResult(final Job jobResult, final INetwork.IJobRequestResult iJobRequestResult) {
         // 任务执行成功未上报
         if (jobResult.job_status == 3) {
@@ -221,7 +285,7 @@ public class CallBackListener {
             mSuccessResultList.add(iJobRequestResult);
         }
 
-        // 任务执行失败并且上报过程网络出错
+        // 失败的任务
         if (jobResult.job_status == 5) {
             mFailedJob = jobResult;
             mFailedResult = iJobRequestResult;
