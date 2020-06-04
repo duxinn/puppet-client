@@ -9,6 +9,7 @@ import android.os.Message;
 import androidx.core.app.ActivityCompat;
 
 import com.mango.loadlibtool.InjectTool;
+import com.mango.puppet.bean.PluginModel;
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.log.LogManager;

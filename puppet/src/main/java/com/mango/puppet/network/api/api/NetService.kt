@@ -2,11 +2,8 @@ package com.mango.puppet.network.api.api
 
 import com.google.gson.JsonObject
 import com.mango.puppet.network.api.basemodel.BaseModel
-import com.mango.puppet.plugin.QinNiuInfo
-import com.mango.puppetmodel.EventWatcher
-import com.mango.puppetmodel.Job
+import com.mango.puppet.bean.QinNiuInfo
 import io.reactivex.Observable
-import org.json.JSONObject
 import retrofit2.http.*
 
 

@@ -70,6 +70,8 @@ public class DBManager {
                                     .build())
                     .build());
         }
+        logJobResultCount();
+        logJobCount();
     }
 
     public static boolean insertJobIntoDb(Job job) {
@@ -144,8 +146,9 @@ public class DBManager {
         if (jb != null) {
             ret = jb.delete();
             notify(REMOVE, handleJobBeanToJob(jb, new Gson()));
-            logJobResultCount();
         }
+        logJobResultCount();
+        logJobCount();
         return ret;
     }
 
@@ -179,9 +182,10 @@ public class DBManager {
             ret = jb.update();
             if (ret) {
                 notify(UPDATE, job);
-                logJobResultCount();
             }
         }
+        logJobResultCount();
+        logJobCount();
         return ret;
     }
 

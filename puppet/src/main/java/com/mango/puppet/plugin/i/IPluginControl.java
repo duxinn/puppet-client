@@ -2,8 +2,7 @@ package com.mango.puppet.plugin.i;
 
 import android.content.Context;
 
-import com.mango.puppet.plugin.PluginModel;
-import com.mango.puppet.systemplugin.i.ISystemPluginExecute;
+import com.mango.puppet.bean.PluginModel;
 
 import java.util.ArrayList;
 import java.util.List;

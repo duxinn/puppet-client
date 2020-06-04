@@ -1,4 +1,4 @@
-package com.mango.puppet.plugin;
+package com.mango.puppet.bean;
 
 /**
  * Created by hhz on 2017/11/17.

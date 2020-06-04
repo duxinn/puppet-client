@@ -6,7 +6,7 @@ import com.mango.puppet.dispatch.business.i.IBusiness;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.NetworkManager;
 import com.mango.puppet.network.i.INetwork;
-import com.mango.puppet.plugin.UploadChannelInfo;
+import com.mango.puppet.bean.UploadChannelInfo;
 
 import java.util.ArrayList;
 import java.util.List;

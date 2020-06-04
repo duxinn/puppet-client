@@ -1,6 +1,6 @@
 package com.mango.puppet.dispatch.business.i;
 
-import com.mango.puppet.plugin.UploadChannelInfo;
+import com.mango.puppet.bean.UploadChannelInfo;
 
 import java.util.ArrayList;
 import java.util.List;

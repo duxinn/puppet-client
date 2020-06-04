@@ -10,7 +10,7 @@ import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.NetworkManager;
 import com.mango.puppet.network.i.INetwork;
 import com.mango.puppet.plugin.PluginManager;
-import com.mango.puppet.plugin.PluginModel;
+import com.mango.puppet.bean.PluginModel;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginRunListener;
 import com.mango.puppet.status.StatusManager;

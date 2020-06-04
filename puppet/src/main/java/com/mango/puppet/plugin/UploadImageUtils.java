@@ -2,12 +2,9 @@ package com.mango.puppet.plugin;
 
 import android.text.TextUtils;
 
-import com.mango.puppet.dispatch.business.BusinessManager;
-import com.mango.puppet.dispatch.business.i.IBusiness;
-import com.mango.puppet.network.NetworkManager;
+import com.mango.puppet.bean.QinNiuInfo;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
-import com.mango.puppet.network.i.INetwork;
 import com.qiniu.android.common.AutoZone;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.Configuration;
@@ -20,10 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.Observable;
 
 /**
  * Created by hehongzhen on 2018/8/1.

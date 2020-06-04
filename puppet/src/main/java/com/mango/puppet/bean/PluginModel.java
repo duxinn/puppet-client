@@ -1,4 +1,4 @@
-package com.mango.puppet.plugin;
+package com.mango.puppet.bean;
 
 public class PluginModel {
     private String packageName;

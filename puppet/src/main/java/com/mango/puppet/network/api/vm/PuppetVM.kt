@@ -5,13 +5,11 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.mango.puppet.network.api.api.ApiClient
 import com.mango.puppet.network.api.api.NetService
-import com.mango.puppet.network.api.basemodel.BaseModel
 import com.mango.puppet.network.api.commen.Destiny
 import com.mango.puppet.network.api.observerCallBack.DesCallBack
 import com.mango.puppet.network.api.transformHelper.RxStreamHelper
-import com.mango.puppet.plugin.QinNiuInfo
+import com.mango.puppet.bean.QinNiuInfo
 import com.mango.puppetmodel.Event
-import com.mango.puppetmodel.EventWatcher
 import com.mango.puppetmodel.Job
 
 class PuppetVM {
