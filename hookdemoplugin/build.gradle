@@ -33,6 +33,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     compileOnly files('libs/hookdemo.jar')
-    implementation project(path: ':puppetmodel')
-    implementation project(path: ':transmit')
+    implementation 'com.github.zyswyq:testforrelationship:1.0'
+
 }
