@@ -10,12 +10,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/hookdemo" />
-            <option value="$PROJECT_DIR$/hookdemoplugin" />
             <option value="$PROJECT_DIR$/loadlibtool" />
             <option value="$PROJECT_DIR$/networkdemo" />
             <option value="$PROJECT_DIR$/puppet" />
-            <option value="$PROJECT_DIR$/wechattool" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
