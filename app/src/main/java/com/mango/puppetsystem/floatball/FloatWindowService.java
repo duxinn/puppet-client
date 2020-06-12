@@ -207,7 +207,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         StringBuilder sb = new StringBuilder();
         sb.append("所有插件状态:  ");
         List<String> list = StatusManager.getInstance().getAllRunningPlugin();
-        if (list == null || list.size() == 0)
+        if (list == null)
             return;
         for (String s : list) {
             sb.append("\n").append(s).append(":  ").append(StatusManager.getInstance().isPluginRunning(s) ? "正在运行" : "未运行");
