@@ -3,6 +3,8 @@ package com.mango.loadlibtool;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -16,6 +18,11 @@ import java.util.ArrayList;
 
 public class InjectTool {
 
+    public interface InjectResult {
+
+        void injectFinished(boolean isSuccess, String failReason);
+    }
+
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
@@ -27,40 +34,139 @@ public class InjectTool {
      * targetPackageName: 目标app包名
      * className: 要在目标app中运行入口类名
      * methodName: 该类名下要调用的静态方法的方法名 注:必须是静态方法
+     * activityName: 目标进程启动activity的名称
+     * injectResult: 运行结果
      *
-     * return : 有值为错误原因 null代表成功
      * */
-    public static String inject(final Context context, final String targetPackageName, final String dexName, final String className, final String methodName) {
+    public static void inject(final Context context,
+                              final String targetPackageName,
+                              final String dexName,
+                              final String className,
+                              final String methodName,
+                              final String activityName,
+                              final InjectResult injectResult) {
 
-        Log.d("hhz", "1");
-        if (!CommandTool.hasRoot()) return "未获取Root权限";
-        Log.d("hhz", "2");
-        if (!hasStoragePermission(context)) return "没有写权限";
-        Log.d("hhz", "3");
-        if (!copyAllFiles(context, dexName)) return "写入文件失败";
-        Log.d("hhz", "4");
-        int runningResult = CommandTool.execRootCmdSilent(getTmpStorePath() + "exelib "
-                + "isAppRunning "
-                + targetPackageName);
-        if (runningResult <= 0) return "目标程序未运行";
-        Log.d("hhz", "5");
-
-        new Thread(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
-                CommandTool.execRootCmdSilent(getTmpStorePath() + "exelib "
-                        + "inject "
-                        + targetPackageName + " "
-                        + getTmpStorePath() + "libloaddex.so " + " "
-                        + getTmpStorePath() + dexName + " "
-                        + className + " "
-                        + methodName);
-                Log.d("hhz", "7");
+                if (!CommandTool.hasRoot()) {
+                    if (injectResult != null) {
+                        injectResult.injectFinished(false, "未获取Root权限");
+                    }
+                    return;
+                }
+                if (!hasStoragePermission(context)) {
+                    if (injectResult != null) {
+                        injectResult.injectFinished(false, "没有写权限");
+                    }
+                    return;
+                }
+                if (!copyAllFiles(context, dexName)) {
+                    if (injectResult != null) {
+                        injectResult.injectFinished(false, "写入文件失败");
+                    }
+                    return;
+                }
+                injectDetail(targetPackageName, dexName, className, methodName, activityName, injectResult, 0);
             }
-        }).start();
-        Log.d("hhz", "6");
+        });
 
+    }
+
+    private static String getCurrentForegroundApplication() {
+
+        String ret = CommandTool.execRootCmd("dumpsys window windows | grep mFocusedApp");
+        if (ret.contains("u0 ")) {
+            ret = ret.substring(ret.indexOf("u0 ") + 3);
+            if (ret.contains("/")) {
+                return ret.substring(0, ret.indexOf("/"));
+            }
+        }
         return null;
+    }
+
+    private static void injectDetail(final String targetPackageName,
+                                     final String dexName,
+                                     final String className,
+                                     final String methodName,
+                                     final String activityName,
+                                     final InjectResult injectResult,
+                                     final int times) {
+        long delay;
+        if (times == 0 && targetPackageName.equals(getCurrentForegroundApplication())) {
+            delay = 100L;
+        } else {
+            Log.d("gbinjectc" , "start app");
+            CommandTool.execRootCmdSilent(CommandTool.stopApplicationCommand(targetPackageName));
+            CommandTool.execRootCmdSilent(CommandTool.startApplicationCommand(targetPackageName, activityName));
+            delay = 6000L;
+        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                final int[] ret = {-1};
+                final boolean[] runFinished = {false};
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ret[0] = CommandTool.execRootCmdSilent(getTmpStorePath() + "exelib "
+                                + "inject "
+                                + targetPackageName + " "
+                                + getTmpStorePath() + "libloaddex.so " + " "
+                                + getTmpStorePath() + dexName + " "
+                                + className + " "
+                                + methodName);
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                runFinished[0] = true;
+                                injectEnd(ret[0], targetPackageName, dexName, className, methodName, activityName, injectResult, times);
+                            }
+                        });
+                    }
+                }).start();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!runFinished[0]) {
+                            injectEnd(-2, targetPackageName, dexName, className, methodName, activityName, injectResult, times);
+                        }
+                    }
+                }, 1000);
+            }
+        }, delay);
+    }
+
+    private static void injectEnd(int ret,
+                                  final String targetPackageName,
+                                  final String dexName,
+                                  final String className,
+                                  final String methodName,
+                                  final String activityName,
+                                  final InjectResult injectResult,
+                                  final int times) {
+        if (ret == 0) {
+            if (injectResult != null) {
+                injectResult.injectFinished(true, "");
+            }
+        } else {
+            if (times >= 3) {
+                if (injectResult != null) {
+                    injectResult.injectFinished(false, "jni failed");
+                }
+            } else {
+                injectDetail(targetPackageName,
+                        dexName,
+                        className,
+                        methodName,
+                        activityName,
+                        injectResult,
+                        times + 1);
+            }
+        }
     }
 
     private static boolean hasStoragePermission(Context context) {

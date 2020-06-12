@@ -68,9 +68,18 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     /************   IPluginControl   ************/
     @Override
-    public void runPuppetPlugin(Context context, String targetPackageName, String dexName, String className, String methodName, IPluginControlResult result) {
+    public void runPuppetPlugin(Context context, final String targetPackageName, String dexName, String className, String methodName, String activityName) {
         LogManager.getInstance().recordDebugLog("启动插件"+targetPackageName+dexName);
-        InjectTool.inject(context, targetPackageName, dexName, className, methodName);
+        InjectTool.inject(context, targetPackageName, dexName, className, methodName, activityName, new InjectTool.InjectResult() {
+            @Override
+            public void injectFinished(boolean isSuccess, String failReason) {
+                if (isSuccess) {
+                    LogManager.getInstance().recordDebugLog("注入成功:" + targetPackageName);
+                } else {
+                    LogManager.getInstance().recordDebugLog("注入失败:" + targetPackageName + " " + failReason);
+                }
+            }
+        });
     }
 
     /**
@@ -200,7 +209,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                             }
                         }
                         for (final PluginModel pluginModel : pluginModels) {
-                            runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexName(), pluginModel.getClassName(), pluginModel.getMethodName(), result);
+                            runPuppetPlugin(context, pluginModel.getPackageName(), pluginModel.getDexName(), pluginModel.getClassName(), pluginModel.getMethodName(), pluginModel.getActivityName());
                         }
                         new Handler().postDelayed(new Runnable() {
                             @Override
@@ -211,7 +220,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                                     callBack = true;
                                 }
                             }
-                        }, 5000);
+                        }, 20000);
                     }
                 }
             } catch (Exception e) {

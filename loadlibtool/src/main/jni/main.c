@@ -72,6 +72,7 @@ int inject(char const *targetPackageName,
     if (DEBUG) {
         printf("ret:%lx\n", ret);
     }
+
     CallMunmap(pid, apkPathSpace, strlen(apkPath) + 1);
     CallMunmap(pid, classNameSpace, strlen(className) + 1);
     CallMunmap(pid, methodNameSpace, strlen(methodName) + 1);
@@ -79,7 +80,11 @@ int inject(char const *targetPackageName,
     CallDlclose(pid, soHandle);
     PtraceDetach(pid);
 
-    return 0;
+    if (ret == 0x100) {
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 int main(int argc, char const *argv[]) {
