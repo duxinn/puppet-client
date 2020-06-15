@@ -92,6 +92,7 @@ public class InjectTool {
                                      final String activityName,
                                      final InjectResult injectResult,
                                      final int times) {
+        Log.d("hhzzz", "injectDetail" + times);
         long delay;
         if (times == 0 && targetPackageName.equals(getCurrentForegroundApplication())) {
             delay = 100L;
@@ -108,34 +109,35 @@ public class InjectTool {
                 final int[] ret = {-1};
                 final boolean[] runFinished = {false};
 
-                new Thread(new Runnable() {
+                Log.d("hhzzz", "start");
+                ret[0] = CommandTool.execRootCmdSilent(getTmpStorePath() + "exelib "
+                        + "inject "
+                        + targetPackageName + " "
+                        + getTmpStorePath() + "libloaddex.so " + " "
+                        + getTmpStorePath() + dexName + " "
+                        + className + " "
+                        + methodName);
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        ret[0] = CommandTool.execRootCmdSilent(getTmpStorePath() + "exelib "
-                                + "inject "
-                                + targetPackageName + " "
-                                + getTmpStorePath() + "libloaddex.so " + " "
-                                + getTmpStorePath() + dexName + " "
-                                + className + " "
-                                + methodName);
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                runFinished[0] = true;
-                                injectEnd(ret[0], targetPackageName, dexName, className, methodName, activityName, injectResult, times);
-                            }
-                        });
+
+                        Log.d("hhzzz", "end");
+                        if (!runFinished[0]) {
+                            runFinished[0] = true;
+                            injectEnd(ret[0], targetPackageName, dexName, className, methodName, activityName, injectResult, times);
+                        }
                     }
-                }).start();
+                });
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         if (!runFinished[0]) {
+                            runFinished[0] = true;
                             injectEnd(-2, targetPackageName, dexName, className, methodName, activityName, injectResult, times);
                         }
                     }
-                }, 1000);
+                }, 2000);
             }
         }, delay);
     }
@@ -148,6 +150,7 @@ public class InjectTool {
                                   final String activityName,
                                   final InjectResult injectResult,
                                   final int times) {
+        Log.d("hhzzz", "injectEnd" + times + "ret" + ret);
         if (ret == 0) {
             if (injectResult != null) {
                 injectResult.injectFinished(true, "");

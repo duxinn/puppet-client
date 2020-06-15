@@ -220,7 +220,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                                     callBack = true;
                                 }
                             }
-                        }, 20000);
+                        }, 25000);
                     }
                 }
             } catch (Exception e) {
