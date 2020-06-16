@@ -141,6 +141,7 @@ public class JobManager implements IJob {
     public void receiveJobResult(Job jobResult) {
         LogManager.getInstance().recordLog("接收到一个执行完毕的任务" + jobResult.job_id);
         ExecutorManager.getInstance().receiveJobResult();
+        Log.d("JobManager", "receiveJobResult job_status:" + jobResult.job_status);
         boolean b = DBManager.updateJobStatus(jobResult);
         if (!b) {
             Log.e("JobManager", "DBManager.updateJobStatus error ");

@@ -60,7 +60,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     @Override
     public void onJobStatusChange(Job job) {
         boolean flag = canDistributeJob();
-        if (flag) {
+        if (job.job_status != 1 &&  flag) {
             distributeJob();
         }
     }
