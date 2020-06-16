@@ -72,7 +72,7 @@ public class UploadImageUtils {
 //            }
 //        });
         // TODO TMP
-        PuppetVM.Companion.getQiNiuToken("https://api.gbzc168.com/api/utils/gettoken", new DesCallBack<QinNiuInfo>() {
+        PuppetVM.Companion.getQiNiuToken("http://api.gbzc168.com/api/utils/gettoken", new DesCallBack<QinNiuInfo>() {
             @Override
             public void onHandleSuccess(@Nullable QinNiuInfo qinNiuInfo) {
                 mQinNiuInfo = qinNiuInfo;
