@@ -34,6 +34,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
      */
     void start() {
         DBManager.addJobDbListener(ExecutorManager.this);
+        isDistributedJob = false;
         boolean flag = canDistributeJob();
         if (flag) {
             distributeJob();

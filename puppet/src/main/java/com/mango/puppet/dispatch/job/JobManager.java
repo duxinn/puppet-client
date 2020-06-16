@@ -126,11 +126,11 @@ public class JobManager implements IJob {
                         job.error_code = 1;
                         ReportManager.getInstance().reportToServiceNoCallback(job);
                     }
-                }
-
-                boolean b = DBManager.insertJobIntoDb(job);
-                if (!b) {
-                    Log.e("JobManager", "DBManager.insertJobIntoDb error ");
+                } else {
+                    boolean b = DBManager.insertJobIntoDb(job);
+                    if (!b) {
+                        Log.e("JobManager", "DBManager.insertJobIntoDb error ");
+                    }
                 }
             }
         });
