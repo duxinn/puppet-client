@@ -264,7 +264,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     @Override
     public void distributeEventWatcher(EventWatcher eventWatcher, IPluginControlResult result) {
         LogManager.getInstance().recordDebugLog("注册/注销事件的监听" + eventWatcher.event_name);
-        if (runningPackageNames.contains(eventWatcher.package_name)) {
+        if (runningPackageNames.contains(eventWatcher.package_name)||context.getPackageName().equals(eventWatcher.package_name)) {
             result.onFinished(true, "");
             if (!EventWatcher.EVENT_PUPPET_STOP.equals(eventWatcher.event_name)) {
                 TransmitManager.getInstance().sendEventWatcher(eventWatcher.package_name, eventWatcher);
