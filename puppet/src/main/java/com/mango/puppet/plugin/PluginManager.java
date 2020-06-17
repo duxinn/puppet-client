@@ -2,6 +2,7 @@ package com.mango.puppet.plugin;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
@@ -30,6 +31,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -140,14 +142,26 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                     public void run() {
                         for (PluginModel model : models) {
                             if (model.isRun()) {
-                                if (!runningPackageNames.contains(model.getPackageName())){
+                                if (!runningPackageNames.contains(model.getPackageName())) {
                                     runningPackageNames.add(model.getPackageName());
                                     if (listener != null) {
                                         listener.onPluginRunningStatusChange(model.getPackageName(), true);
                                     }
                                 }
                             } else {
-                                if (runningPackageNames.contains(model.getPackageName())){
+                                if (runningPackageNames.contains(model.getPackageName())) {
+                                    Event event = new Event();
+                                    event.event_name = EventWatcher.EVENT_PUPPET_STOP;
+                                    event.event_status = 1;
+                                    event.package_name = context.getPackageName();
+                                    JSONObject object = new JSONObject();
+                                    try {
+                                        object.put("stop_package", model.getPackageName());
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    event.event_data = object;
+                                    EventManager.getInstance().uploadNewEvent(event);
                                     runningPackageNames.remove(model.getPackageName());
                                     if (listener != null) {
                                         listener.onPluginRunningStatusChange(model.getPackageName(), false);
@@ -249,10 +263,12 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     /************   IPluginEvent   ************/
     @Override
     public void distributeEventWatcher(EventWatcher eventWatcher, IPluginControlResult result) {
-        LogManager.getInstance().recordDebugLog("注册/注销事件的监听"+eventWatcher.event_name);
-        if (runningPackageNames.contains(eventWatcher.package_name)) {
+        LogManager.getInstance().recordDebugLog("注册/注销事件的监听" + eventWatcher.event_name);
+        if (runningPackageNames.contains(eventWatcher.package_name)||context.getPackageName().equals(eventWatcher.package_name)) {
             result.onFinished(true, "");
-            TransmitManager.getInstance().sendEventWatcher(eventWatcher.package_name, eventWatcher);
+            if (!EventWatcher.EVENT_PUPPET_STOP.equals(eventWatcher.event_name)) {
+                TransmitManager.getInstance().sendEventWatcher(eventWatcher.package_name, eventWatcher);
+            }
         } else {
             result.onFinished(false, "插件未运行");
         }
@@ -263,6 +279,9 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         LogManager.getInstance().recordDebugLog("开始向插件传递已经上传完毕的事件 用于记录事件进度"+event.event_name);
         if (runningPackageNames.contains(event.package_name)) {
             result.onFinished(true, "");
+            if (EventWatcher.EVENT_PUPPET_STOP.equals(event.event_name)) {
+                return;
+            }
             TransmitManager.getInstance().sendEvent(event.package_name, event);
         } else {
             result.onFinished(false, "插件未运行");

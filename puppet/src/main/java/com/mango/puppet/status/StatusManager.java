@@ -1,7 +1,5 @@
 package com.mango.puppet.status;
 
-import android.util.Log;
-
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.status.i.IStatusControl;
 import com.mango.puppet.status.i.IStatusListener;
@@ -73,11 +71,11 @@ public class StatusManager implements IStatusControl {
     }
 
     @Override
-    public void setJobEngineStatus(int status) {
+    public void setJobEngineStatus(String job_id, int status) {
         jobEngineStatus = status;
         if (mListener != null) {
             LogManager.getInstance().recordLog("任务引擎状态改变"+status);
-            mListener.onJobEngineStatusChanged(jobEngineStatus);
+            mListener.onJobEngineStatusChanged(job_id,jobEngineStatus);
         }
     }
 

@@ -18,9 +18,10 @@ public interface IStatusListener {
 
     /**
      * 任务引擎状态改变
+     * @param job_id
      * @param status 任务引擎状态
      */
-    void onJobEngineStatusChanged(int status);
+    void onJobEngineStatusChanged(String job_id, int status);
 
     /**
      * 待执行任务数发生改变
