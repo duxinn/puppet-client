@@ -34,6 +34,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
      */
     void start() {
         DBManager.addJobDbListener(ExecutorManager.this);
+        isDistributedJob = false;
         boolean flag = canDistributeJob();
         if (flag) {
             distributeJob();
@@ -60,7 +61,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     @Override
     public void onJobStatusChange(Job job) {
         boolean flag = canDistributeJob();
-        if (flag) {
+        if (job.job_status != 1 &&  flag) {
             distributeJob();
         }
     }

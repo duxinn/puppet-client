@@ -126,11 +126,11 @@ public class JobManager implements IJob {
                         job.error_code = 1;
                         ReportManager.getInstance().reportToServiceNoCallback(job);
                     }
-                }
-
-                boolean b = DBManager.insertJobIntoDb(job);
-                if (!b) {
-                    Log.e("JobManager", "DBManager.insertJobIntoDb error ");
+                } else {
+                    boolean b = DBManager.insertJobIntoDb(job);
+                    if (!b) {
+                        Log.e("JobManager", "DBManager.insertJobIntoDb error ");
+                    }
                 }
             }
         });
@@ -141,6 +141,7 @@ public class JobManager implements IJob {
     public void receiveJobResult(Job jobResult) {
         LogManager.getInstance().recordLog("接收到一个执行完毕的任务" + jobResult.job_id);
         ExecutorManager.getInstance().receiveJobResult();
+        Log.d("JobManager", "receiveJobResult job_status:" + jobResult.job_status);
         boolean b = DBManager.updateJobStatus(jobResult);
         if (!b) {
             Log.e("JobManager", "DBManager.updateJobStatus error ");
