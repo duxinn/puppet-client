@@ -6,18 +6,11 @@ import android.util.Log;
 import com.mango.puppet.dispatch.job.db.DBManager;
 import com.mango.puppet.dispatch.job.i.IJob;
 import com.mango.puppet.log.LogManager;
-import com.mango.puppet.network.NetworkManager;
-import com.mango.puppet.network.i.INetwork;
-import com.mango.puppet.plugin.PluginManager;
-import com.mango.puppet.plugin.i.IPluginControl;
-import com.mango.puppet.plugin.i.IPluginJob;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.tool.ThreadUtils;
 import com.mango.puppetmodel.Job;
 
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 /**
  * JobManager
@@ -147,8 +140,8 @@ public class JobManager implements IJob {
         }
     }
 
-    protected void setStatus(STATUS s) {
+    protected void setStatus(String job_id, STATUS s) {
         status = s;
-        StatusManager.getInstance().setJobEngineStatus(status.getCode());
+        StatusManager.getInstance().setJobEngineStatus(job_id,status.getCode());
     }
 }

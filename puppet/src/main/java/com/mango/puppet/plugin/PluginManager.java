@@ -2,6 +2,7 @@ package com.mango.puppet.plugin;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
@@ -30,6 +31,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -53,6 +55,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     private boolean callBack = false;
     private IPluginControlResult iPluginControlResult;
     private Timer timer;
+    private List<String> pluginWatchers=new ArrayList<>();
 
     public static PluginManager getInstance() {
         return ourInstance;
@@ -151,6 +154,13 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                                     runningPackageNames.remove(model.getPackageName());
                                     if (listener != null) {
                                         listener.onPluginRunningStatusChange(model.getPackageName(), false);
+                                    }
+                                    if (pluginWatchers.contains(model.getPackageName())){
+                                        Event event=new Event();
+                                        event.event_name=EventWatcher.EVENT_PUPPET_STOP;
+                                        event.event_status=1;
+                                        event.package_name=model.getPackageName();
+                                        EventManager.getInstance().uploadNewEvent(event);
                                     }
                                 }
                             }
@@ -252,7 +262,15 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         LogManager.getInstance().recordDebugLog("注册/注销事件的监听"+eventWatcher.event_name);
         if (runningPackageNames.contains(eventWatcher.package_name)) {
             result.onFinished(true, "");
-            TransmitManager.getInstance().sendEventWatcher(eventWatcher.package_name, eventWatcher);
+            if (EventWatcher.EVENT_PUPPET_STOP.equals(eventWatcher.event_name)){
+                if (eventWatcher.watcher_status==1){
+                    pluginWatchers.add(eventWatcher.package_name);
+                }else {
+                    pluginWatchers.remove(eventWatcher.package_name);
+                }
+            }else {
+                TransmitManager.getInstance().sendEventWatcher(eventWatcher.package_name, eventWatcher);
+            }
         } else {
             result.onFinished(false, "插件未运行");
         }

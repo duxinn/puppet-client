@@ -27,9 +27,10 @@ public interface IStatusControl {
 
     /**
      * 设置任务引擎状态 等待新任务/已停止/进行中
+     * @param job_id
      * @param status 负责任务模块的同学补充
      */
-    void setJobEngineStatus(int status);
+    void setJobEngineStatus(String job_id, int status);
 
     /**
      * 查看任务引擎状态 等待新任务/已停止/进行中
