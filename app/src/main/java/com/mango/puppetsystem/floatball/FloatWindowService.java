@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.log.i.ILog;
-import com.mango.puppet.plugin.PluginManager;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.status.i.IStatusListener;
 import com.mango.puppetsystem.AppApplication;
@@ -164,14 +163,14 @@ public class FloatWindowService extends Service implements View.OnClickListener,
     }
 
     @Override
-    public void onJobEngineStatusChanged(int status) {
+    public void onJobEngineStatusChanged(String job_id, int status) {
         String text;
         if (status == 1) {
             text = "执行中";
         } else if (status == 0) {
             text = "等待新任务";
         } else if (status == -1) {
-            text = "有失败任务";
+            text = "有失败任务,任务ID为"+job_id;
         } else if (status == -2) {
             text = "等待任务结果上报完成";
         } else {

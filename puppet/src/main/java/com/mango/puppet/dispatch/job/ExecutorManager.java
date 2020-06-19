@@ -7,6 +7,8 @@ import com.mango.puppet.plugin.PluginManager;
 import com.mango.puppet.plugin.i.IPluginJob;
 import com.mango.puppetmodel.Job;
 
+import java.util.ArrayList;
+
 /**
  * ExecutorManager
  *
@@ -88,13 +90,18 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     private boolean canDistributeJob() {
         if (DBManager.getJobsDependOnStatus(5).size() > 0 ||
                 DBManager.getJobsDependOnStatus(6).size() > 0) {
-            JobManager.getInstance().setStatus(JobManager.STATUS.STOP);
+            StringBuilder jobid= new StringBuilder();
+            ArrayList<Job> list=DBManager.getJobsDependOnStatus(6);
+            for (int i = 0; i < list.size(); i++) {
+                jobid.append(list.get(i).job_id).append(";");
+            }
+            JobManager.getInstance().setStatus(jobid.toString(),JobManager.STATUS.STOP);
             return false;
         } else if (DBManager.getReportJobs().size() > 5) {
-            JobManager.getInstance().setStatus(JobManager.STATUS.WAIT);
+            JobManager.getInstance().setStatus("", JobManager.STATUS.WAIT);
             return false;
         } else if (isDistributedJob) {
-            JobManager.getInstance().setStatus(JobManager.STATUS.RUNNING);
+            JobManager.getInstance().setStatus("", JobManager.STATUS.RUNNING);
             return false;
         } else {
             return true;
@@ -104,11 +111,11 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     private void distributeJob() {
         Job currentJob = DBManager.getSingleNotDoneJobsFromDb();
         if (currentJob != null) {
-            JobManager.getInstance().setStatus(JobManager.STATUS.RUNNING);
+            JobManager.getInstance().setStatus("", JobManager.STATUS.RUNNING);
             isDistributedJob = true;
             PluginManager.getInstance().distributeJob(currentJob, this);
         } else {
-            JobManager.getInstance().setStatus(JobManager.STATUS.REST);
+            JobManager.getInstance().setStatus("", JobManager.STATUS.REST);
         }
     }
 }

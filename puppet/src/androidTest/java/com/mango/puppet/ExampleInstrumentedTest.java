@@ -50,7 +50,7 @@ public class ExampleInstrumentedTest {
             }
 
             @Override
-            public void onJobEngineStatusChanged(int status) {
+            public void onJobEngineStatusChanged(String job_id, int status) {
                 Log.i("OnStatuaTest", "onJobEngineStatusChanged: ----" + status);
             }
 
