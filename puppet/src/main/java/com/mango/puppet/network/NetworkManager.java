@@ -1,21 +1,31 @@
 package com.mango.puppet.network;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.mango.puppet.dispatch.event.EventManager;
+import com.mango.puppet.dispatch.job.JobManager;
+import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.api.api.ApiClient;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
 import com.mango.puppet.network.i.INetwork;
 import com.mango.puppet.network.server.ServerManager;
+import com.mango.puppet.network.server.model.ReturnData;
+import com.mango.puppet.network.utils.JsonUtils;
 import com.mango.puppet.network.wsmanager.WsManager;
 import com.mango.puppet.network.wsmanager.listener.WsStatusListener;
 import com.mango.puppet.status.StatusManager;
+import com.mango.puppet.tool.ThreadUtils;
 import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.Job;
 
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 
@@ -58,7 +68,7 @@ public class NetworkManager implements INetwork {
 
 
     @Override
-    public void setupNetwork(Context context, Boolean isLocalServer, ISetupResult result) {
+    public void setupNetwork(final Context context, Boolean isLocalServer, ISetupResult result) {
         LogManager.getInstance().recordDebugLog("启动本地server/长连接");
         final ISetupResult[] iSetupResult = {result};
 
@@ -114,6 +124,81 @@ public class NetworkManager implements INetwork {
                 public void onMessage(String text) {
                     super.onMessage(text);
                     Log.d(TAG, "WsManager-----onMessage(String): " + text + "\n");
+                    JSONObject object = JSON.parseObject(text);
+                    String requestId = (String) object.get("request_id");
+                    String type = (String) object.get("type");
+                    Object data = object.get("data");
+
+                    ReturnData returnData = new ReturnData();
+                    int status = 0;
+                    String message = "";
+                    if (!(data instanceof com.alibaba.fastjson.JSONObject)) {
+                        status = 1;
+                        message = "参数为空";
+                    }
+                    if (status == 0) {
+                        if ("setEventWatcher".equals(type)) {
+                            final String event_name = ((com.alibaba.fastjson.JSONObject) data).getString("event_name");
+                            final String package_name = ((com.alibaba.fastjson.JSONObject) data).getString("package_name");
+                            final String callback = ((com.alibaba.fastjson.JSONObject) data).getString("callback");
+                            final int watcher_status = ((com.alibaba.fastjson.JSONObject) data).getInteger("watcher_status");
+                            if (!TextUtils.isEmpty(event_name)
+                                    && !TextUtils.isEmpty(package_name)
+                                    && !TextUtils.isEmpty(callback)
+                                    && (watcher_status == 1 || watcher_status == 0)) {
+                                ThreadUtils.runInMainThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        EventManager.getInstance().setEventWatcher(package_name, event_name, watcher_status == 1, callback);
+                                    }
+                                });
+                                status = 0;
+                            } else {
+                                status = 1;
+                                message = "参数错误";
+                            }
+                        } else if ("addJob".equals(type)) {
+                            com.alibaba.fastjson.JSONObject jsonObject = (com.alibaba.fastjson.JSONObject)data;
+                            long job_id = jsonObject.getLong("job_id");
+                            String package_name = jsonObject.getString("package_name");
+                            String job_name = jsonObject.getString("job_name");
+                            String callback = jsonObject.getString("callback");
+                            org.json.JSONObject job_data = null;
+                            try {
+                                job_data = new org.json.JSONObject(JsonUtils.toJsonString(jsonObject.getJSONObject("job_data")));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (!TextUtils.isEmpty(package_name)
+                                    && !TextUtils.isEmpty(job_name)
+                                    && !TextUtils.isEmpty(callback)) {
+                                Job job = new Job();
+                                job.job_id = job_id;
+                                job.package_name = package_name;
+                                job.job_name = job_name;
+                                job.callback = callback;
+                                if (job_data != null) {
+                                    job.job_data = job_data;
+                                } else {
+                                    job.job_data = new org.json.JSONObject();
+                                }
+                                boolean flag = JobManager.getInstance().addJob(job);
+                                if (!flag) {
+                                    status = 2;
+                                    message = "任务已存在";
+                                }
+                            } else {
+                                status = 3;
+                                message = "参数错误";
+                            }
+                        }
+                    }
+
+                    returnData.deviceid = SystemManager.getInstance().getDeviceId();
+                    returnData.status = status;
+                    returnData.message = message;
+                    WsManager.getInstance(context).sendMessage(JSONObject.toJSONString(returnData));
                 }
 
                 @Override
