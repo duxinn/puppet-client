@@ -96,6 +96,33 @@
                 android:layout_height="1dp" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            >
+            <EditText
+                android:id="@+id/edit_ws_url"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginRight="20dp"
+                android:layout_height="60dp"
+                android:hint="sp中存的url 若没有用默认的" />
+
+            <Button
+                android:id="@+id/btn_set_ws_url"
+                android:layout_width="70dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/button_background"
+                android:text="确定"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/tvLocalStatus"
             android:layout_width="match_parent"
@@ -138,7 +165,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="@dimen/dimens_5_dp"
+            android:layout_marginBottom="@dimen/dimens_35_dp"
             android:paddingLeft="@dimen/dimens_10_dp"
             android:paddingRight="@dimen/dimens_10_dp">
             <TextView

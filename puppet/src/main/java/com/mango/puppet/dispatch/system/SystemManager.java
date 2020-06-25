@@ -95,7 +95,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
                         } else {
                             LogManager.getInstance().recordLog("Event启动成功");
                             // 4 网络模块
-                            NetworkManager.getInstance().setupNetwork(context, new INetwork.ISetupResult() {
+                            NetworkManager.getInstance().setupNetwork(context, false, new INetwork.ISetupResult() {
                                 @Override
                                 public void onSuccess() {
                                     LogManager.getInstance().recordLog("Network启动成功");
