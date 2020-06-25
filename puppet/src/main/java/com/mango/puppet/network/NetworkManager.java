@@ -196,6 +196,7 @@ public class NetworkManager implements INetwork {
                     }
 
                     returnData.deviceid = SystemManager.getInstance().getDeviceId();
+                    returnData.response_id = requestId;
                     returnData.status = status;
                     returnData.message = message;
                     WsManager.getInstance(context).sendMessage(JSONObject.toJSONString(returnData));

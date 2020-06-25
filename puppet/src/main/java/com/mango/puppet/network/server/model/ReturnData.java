@@ -10,4 +10,6 @@ public class ReturnData<T> {
 
     public String deviceid;
 
+    public String response_id;
+
 }
