@@ -21,9 +21,11 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
 
+import static com.mango.puppet.tool.DeviceIdTool.KEY_CLIENT_DEVICE_ID;
+
 public class WsManager implements IWsManager {
     public final static String KEY_SOCKET_URL = "KEY_SOCKET_URL";
-    public final static String WEB_SOCKET_URL = "ws://proxy.hzdaba.cn:35005/wx_api?deviceid=?";
+    public final static String WEB_SOCKET_URL = "ws://proxy.hzdaba.cn:35005/wx_api?deviceid=";
 
     private final static int RECONNECT_INTERVAL = 10 * 1000;    //重连自增步长
     private final static long RECONNECT_MAX_TIME = 120 * 1000;   //最大重连间隔
@@ -42,11 +44,13 @@ public class WsManager implements IWsManager {
     private static WsManager mWsManager;
 
     public static WsManager getInstance(Context context) {
+        // url: baseUrl + deviceId
+        String url = (!TextUtils.isEmpty(PreferenceUtils.getInstance().getString(KEY_SOCKET_URL, "")) ? PreferenceUtils.getInstance().getString(KEY_SOCKET_URL, "") : WEB_SOCKET_URL)
+                + PreferenceUtils.getInstance().getString(KEY_CLIENT_DEVICE_ID, null);
         if (mWsManager == null) {
             mContext = context;
             mWsManager = new Builder(context)
-                    .wsUrl(!TextUtils.isEmpty(PreferenceUtils.getInstance().getString(KEY_SOCKET_URL, "")) ?
-                            PreferenceUtils.getInstance().getString(KEY_SOCKET_URL, "") : WEB_SOCKET_URL)
+                    .wsUrl(url)
                     .needReconnect(true)
                     .client(InternalOkHttpClient.Companion.getOkhttpClient())
                     .build();

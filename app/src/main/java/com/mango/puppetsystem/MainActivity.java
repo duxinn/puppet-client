@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         retryLL = findViewById(R.id.retryTv);
         mEditWsUrl = findViewById(R.id.edit_ws_url);
         mBtnSetWsUrl = findViewById(R.id.btn_set_ws_url);
+        mBtnSetWsUrl.setOnClickListener(this);
 
         tvLog = findViewById(R.id.tvlog);
         tvNet = findViewById(R.id.tvNetStatus);
@@ -186,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v.getId() == R.id.btn_set_ws_url) {
             if (!TextUtils.isEmpty(mEditWsUrl.getText().toString().trim())) {
                 PreferenceUtils.getInstance().setString(KEY_SOCKET_URL, mEditWsUrl.getText().toString().trim());
+                System.exit(1);
             }
         }
     }
