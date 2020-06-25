@@ -1,6 +1,7 @@
 package com.mango.puppet.dispatch.system;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.mango.puppet.dispatch.event.EventManager;
@@ -15,6 +16,8 @@ import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginRunListener;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.systemplugin.SystemPluginManager;
+import com.mango.puppet.tool.DeviceIdTool;
+import com.mango.puppet.tool.PreferenceUtils;
 
 import java.util.ArrayList;
 
@@ -32,12 +35,29 @@ public class SystemManager implements ISystem, IPluginRunListener {
         return ourInstance;
     }
 
+    private Context context = null;
+    private String deviceId = null;
+
     private SystemManager() {
+    }
+
+    /************   public   ************/
+    public String getDeviceId() {
+        if (!TextUtils.isEmpty(deviceId)) {
+            return deviceId;
+        } else if (context != null){
+            deviceId = DeviceIdTool.getDeviceId(context);
+            return deviceId;
+        }
+        return null;
     }
 
     /************   ISystem   ************/
     @Override
     public void startSystem(final Context context) {
+        this.context = context;
+        PreferenceUtils.getInstance().init(context);
+        deviceId = DeviceIdTool.getDeviceId(context);
         LogManager.init(context);
         LogManager.getInstance().recordDebugLog("开始启动程序");
         SystemPluginManager.getInstance().setSystemPluginListener(context);

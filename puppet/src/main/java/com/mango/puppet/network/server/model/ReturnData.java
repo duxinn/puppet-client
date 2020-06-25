@@ -8,4 +8,6 @@ public class ReturnData<T> {
 
     public int status;
 
+    public String deviceid;
+
 }
