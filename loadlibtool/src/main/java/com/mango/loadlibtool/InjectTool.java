@@ -189,7 +189,7 @@ public class InjectTool {
         ArrayList<String> needCopyFileList = new ArrayList<>();
         needCopyFileList.add("exelib");
         needCopyFileList.add("libloaddex.so");
-//        needCopyFileList.add("libhook.so");
+        needCopyFileList.add("libhook.so");
         needCopyFileList.add(dexName);
         if (copyFileDetail(needCopyFileList, context)) {
             return true;
