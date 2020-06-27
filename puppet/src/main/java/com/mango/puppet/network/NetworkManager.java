@@ -125,8 +125,8 @@ public class NetworkManager implements INetwork {
                     super.onMessage(text);
                     Log.d(TAG, "WsManager-----onMessage(String): " + text + "\n");
                     JSONObject object = JSON.parseObject(text);
-                    String requestId = (String) object.get("request_id");
-                    String type = (String) object.get("type");
+                    String requestId = object.getString("request_id");
+                    String type = object.getString("type");
                     Object data = object.get("data");
 
                     ReturnData returnData = new ReturnData();
