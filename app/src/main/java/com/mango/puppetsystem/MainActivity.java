@@ -13,6 +13,8 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,21 +22,27 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.mango.puppet.tool.PreferenceUtils;
 import com.mango.puppetsystem.floatball.FloatBallService;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 
+import static com.mango.puppet.network.wsmanager.WsManager.KEY_SOCKET_URL;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private LinearLayout retryLL;
     private ArrayList<String> logList = new ArrayList<>();
     private TextView tvLog, tvNet, tvJobCount, tvJobResultCount, tvJobEngineStatus, tvLocalStatus, tvEventWatcher;
+    private EditText mEditWsUrl;
+    private Button mBtnSetWsUrl;
     private MyReceiver myReceiver;
     private long mExitTime = 0;
 
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
-            "android.permission.WRITE_EXTERNAL_STORAGE"};
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.READ_PHONE_STATE"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public static void verifyStoragePermissions(Activity activity) {
         try {
-            //检测是否有写的权限
-            int permission = ActivityCompat.checkSelfPermission(activity,
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
-            if (permission != PackageManager.PERMISSION_GRANTED) {
-                // 没有写的权限，去申请写的权限，会弹出对话框
-                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, 1);
-            }
+            ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         retryLL = findViewById(R.id.retryTv);
+        mEditWsUrl = findViewById(R.id.edit_ws_url);
+        mBtnSetWsUrl = findViewById(R.id.btn_set_ws_url);
+        mBtnSetWsUrl.setOnClickListener(this);
 
         tvLog = findViewById(R.id.tvlog);
         tvNet = findViewById(R.id.tvNetStatus);
@@ -84,7 +89,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         retryLL.setOnClickListener(this);
         int permission = ActivityCompat.checkSelfPermission(this,
                 "android.permission.WRITE_EXTERNAL_STORAGE");
-        if (permission != PackageManager.PERMISSION_GRANTED) {
+        int permission1 = ActivityCompat.checkSelfPermission(this,
+                "android.permission.READ_PHONE_STATE");
+        if (permission != PackageManager.PERMISSION_GRANTED || permission1 != PackageManager.PERMISSION_GRANTED) {
             verifyStoragePermissions(this);
         }
     }
@@ -174,6 +181,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v.getId() == R.id.retryTv) {
             startFloatBallService();
+        } else if (v.getId() == R.id.btn_set_ws_url) {
+            if (!TextUtils.isEmpty(mEditWsUrl.getText().toString().trim())) {
+                PreferenceUtils.getInstance().setString(KEY_SOCKET_URL, mEditWsUrl.getText().toString().trim());
+                System.exit(1);
+            }
         }
     }
 

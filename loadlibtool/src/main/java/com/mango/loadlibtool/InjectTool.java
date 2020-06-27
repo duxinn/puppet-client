@@ -46,7 +46,7 @@ public class InjectTool {
                               final String activityName,
                               final InjectResult injectResult) {
 
-        new Handler().post(new Runnable() {
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (!CommandTool.hasRoot()) {
@@ -69,7 +69,7 @@ public class InjectTool {
                 }
                 injectDetail(targetPackageName, dexName, className, methodName, activityName, injectResult, 0);
             }
-        });
+        }, 10);
 
     }
 

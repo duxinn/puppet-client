@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSON;
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
+import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.network.server.model.ReturnData;
 import com.mango.puppet.network.utils.JsonUtils;
 import com.mango.puppet.tool.ThreadUtils;
@@ -40,6 +41,7 @@ class PuppetController {
 
         if (!(o instanceof com.alibaba.fastjson.JSONObject)) {
             ReturnData returnData = new ReturnData();
+            returnData.deviceid = SystemManager.getInstance().getDeviceId();
             returnData.status = 1;
             returnData.message = "参数为空";
             ResponseBody body = new JsonBody(JSON.toJSONString(returnData));
@@ -52,6 +54,7 @@ class PuppetController {
         final int watcher_status = ((com.alibaba.fastjson.JSONObject) o).getInteger("watcher_status");
 
         ReturnData returnData = new ReturnData();
+        returnData.deviceid = SystemManager.getInstance().getDeviceId();
         if (!TextUtils.isEmpty(event_name)
                 && !TextUtils.isEmpty(package_name)
                 && !TextUtils.isEmpty(callback)
@@ -125,6 +128,7 @@ class PuppetController {
         }
 
         ReturnData returnData = new ReturnData();
+        returnData.deviceid = SystemManager.getInstance().getDeviceId();
         returnData.status = status;
         returnData.message = message;
         ResponseBody body = new JsonBody(JSON.toJSONString(returnData));

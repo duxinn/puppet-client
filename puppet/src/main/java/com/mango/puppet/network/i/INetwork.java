@@ -20,9 +20,10 @@ public interface INetwork {
     void setupApi();
     /**
      * 启动本地server/长连接
+     * 是否是本地服务
      * @param result 启动结果
      */
-    void setupNetwork(Context context, ISetupResult result);
+    void setupNetwork(Context context, Boolean isLocalServer, ISetupResult result);
 
     /**
      * 上报任务结果
