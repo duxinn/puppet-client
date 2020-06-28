@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.mango.puppet.systemplugin.SystemPluginManager;
 import com.mango.puppet.systemplugin.i.ISystemPluginListener;
+import com.mango.puppet.tool.PreferenceUtils;
 
 public class AppApplication extends Application {
 
@@ -14,5 +15,6 @@ public class AppApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        PreferenceUtils.getInstance().init(this);
     }
 }
