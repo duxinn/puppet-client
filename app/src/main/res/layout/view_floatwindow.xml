@@ -9,7 +9,7 @@
         android:layout_marginLeft="@dimen/dimens_20_dp"
         android:layout_marginTop="@dimen/dimens_25_dp"
         android:layout_marginRight="@dimen/dimens_20_dp"
-        android:layout_marginBottom="@dimen/dimens_100_dp"
+        android:layout_marginBottom="@dimen/dimens_40_dp"
         android:background="@drawable/shape_floatwindow">
 
         <RelativeLayout

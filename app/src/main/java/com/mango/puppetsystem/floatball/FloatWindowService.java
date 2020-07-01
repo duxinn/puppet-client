@@ -152,7 +152,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
 
     private void writeLogDetail(String content) {
         if (!TextUtils.isEmpty(content)) {
-            if (logList.size() > 12) {
+            if (logList.size() > 10) {
                 logList.remove(0);
             }
             logList.add(content);

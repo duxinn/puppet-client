@@ -22,6 +22,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.mango.loadlibtool.CommandTool;
 import com.mango.puppet.tool.PreferenceUtils;
 import com.mango.puppetsystem.floatball.FloatBallService;
 
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         boolean isRoot = hasRoot();
         if (!isRoot) {
             writeLog("请先开启ROOT权限");
+        } else {
+            CommandTool.execRootCmdSilent("settings put system screen_off_timeout 2147483647");
         }
     }
 
