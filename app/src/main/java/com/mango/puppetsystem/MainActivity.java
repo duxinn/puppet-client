@@ -50,11 +50,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initView();
         initData();
-        initEvent();
         boolean isRoot = hasRoot();
         if (!isRoot) {
             writeLog("请先开启ROOT权限");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initEvent();
     }
 
     public static void verifyStoragePermissions(Activity activity) {
@@ -70,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEditWsUrl = findViewById(R.id.edit_ws_url);
         mBtnSetWsUrl = findViewById(R.id.btn_set_ws_url);
         mBtnSetWsUrl.setOnClickListener(this);
+        String storeUrl = PreferenceUtils.getInstance().getString(KEY_SOCKET_URL, "");
+        mEditWsUrl.setText(storeUrl);
 
         tvLog = findViewById(R.id.tvlog);
         tvNet = findViewById(R.id.tvNetStatus);
@@ -78,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvJobEngineStatus = findViewById(R.id.tvJobEngineStatus);
         tvLocalStatus = findViewById(R.id.tvLocalStatus);
         tvEventWatcher = findViewById(R.id.tvEventWatcher);
+        retryLL.setOnClickListener(this);
     }
 
     private void initData() {
@@ -86,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initEvent() {
-        retryLL.setOnClickListener(this);
         int permission = ActivityCompat.checkSelfPermission(this,
                 "android.permission.WRITE_EXTERNAL_STORAGE");
         int permission1 = ActivityCompat.checkSelfPermission(this,
@@ -184,7 +191,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v.getId() == R.id.btn_set_ws_url) {
             if (!TextUtils.isEmpty(mEditWsUrl.getText().toString().trim())) {
                 PreferenceUtils.getInstance().setString(KEY_SOCKET_URL, mEditWsUrl.getText().toString().trim());
-                System.exit(1);
+                Toast.makeText(this, "设置成功即将重启", Toast.LENGTH_LONG).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.exit(1);
+                    }
+                }, 1500);
             }
         }
     }

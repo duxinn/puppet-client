@@ -56,7 +56,6 @@ public class SystemManager implements ISystem, IPluginRunListener {
     @Override
     public void startSystem(final Context context) {
         this.context = context;
-        PreferenceUtils.getInstance().init(context);
         deviceId = DeviceIdTool.getDeviceId(context);
         LogManager.init(context);
         LogManager.getInstance().recordDebugLog("开始启动程序");
