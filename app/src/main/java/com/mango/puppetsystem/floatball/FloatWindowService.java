@@ -1,5 +1,6 @@
 package com.mango.puppetsystem.floatball;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -35,8 +36,11 @@ import java.util.Map;
 public class FloatWindowService extends Service implements View.OnClickListener, ILog.ILogListener, IStatusListener {
 
     private WindowManager windowManager;
+    private WindowManager windowmanagerOut;
     private WindowManager.LayoutParams layoutParams;
+    private WindowManager.LayoutParams layoutParamsOut;
     private View displayView;
+    private View displayViewOut;
     private ArrayList<String> logList = new ArrayList<>();
     private TextView tvLog, tvNet, tvJobCount, tvJobResultCount, tvJobEngineStatus, tvLocalStatus, tvEventWatcher;
 
@@ -51,6 +55,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         showFloatingWindow();
     }
 
+    @SuppressLint("ServiceCast")
     public void init() {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         layoutParams = new WindowManager.LayoutParams();
@@ -61,7 +66,23 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         }
         layoutParams.format = PixelFormat.RGBA_8888;
         layoutParams.gravity = Gravity.CENTER | Gravity.TOP;
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE ;
+
+
+        int height = windowManager.getDefaultDisplay().getHeight();
+        windowmanagerOut = (WindowManager) getSystemService(WINDOW_SERVICE);
+        layoutParamsOut = new WindowManager.LayoutParams();
+        layoutParamsOut.width = LinearLayout.LayoutParams.MATCH_PARENT;
+        layoutParamsOut.height = (int) (height * 0.3f);
+        layoutParamsOut.y = -((int) (height * 0.32f));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            layoutParamsOut.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            layoutParamsOut.type = WindowManager.LayoutParams.TYPE_PHONE;
+        }
+        layoutParamsOut.format = PixelFormat.RGBA_8888;
+        layoutParams.gravity = Gravity.TOP;
+        layoutParamsOut.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
     }
 
     @Nullable
@@ -72,9 +93,10 @@ public class FloatWindowService extends Service implements View.OnClickListener,
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        displayView.findViewById(R.id.btnFloating).setOnClickListener(new View.OnClickListener() {
+        displayViewOut.findViewById(R.id.btnFloating).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                displayViewOut.setVisibility(View.GONE);
                 displayView.setVisibility(View.GONE);
                 Intent intent = new Intent(FloatWindowService.this, FloatBallService.class);
                 intent.putExtra("injectStatus", injectStatus);
@@ -83,6 +105,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             }
         });
         displayView.setVisibility(View.VISIBLE);
+        displayViewOut.setVisibility(View.VISIBLE);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -90,7 +113,8 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         if (Settings.canDrawOverlays(this)) {
             LayoutInflater layoutInflater = LayoutInflater.from(this);
             displayView = layoutInflater.inflate(R.layout.view_floatwindow, null);
-            LinearLayout llRetry = displayView.findViewById(R.id.llRetry);
+            displayViewOut = layoutInflater.inflate(R.layout.view_floatwindow_out, null);
+            LinearLayout llRetry = displayViewOut.findViewById(R.id.llRetry);
             tvLog = displayView.findViewById(R.id.tvlog);
             tvNet = displayView.findViewById(R.id.tvNetStatus);
             tvJobCount = displayView.findViewById(R.id.tvJob);
@@ -101,6 +125,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             StatusManager.getInstance().setNetworkStatus(StatusManager.getInstance().getNetworkStatus());//重设网络状态
             llRetry.setOnClickListener(this);
             windowManager.addView(displayView, layoutParams);
+            windowmanagerOut.addView(displayViewOut, layoutParamsOut);
         }
     }
 
@@ -146,6 +171,9 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         if (windowManager != null && displayView != null) {
             windowManager.removeView(displayView);
         }
+        if (windowmanagerOut != null && displayViewOut != null) {
+            windowmanagerOut.removeView(displayViewOut);
+        }
         super.onDestroy();
     }
 
@@ -170,7 +198,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         } else if (status == 0) {
             text = "等待新任务";
         } else if (status == -1) {
-            text = "有失败任务,任务ID为"+job_id;
+            text = "有失败任务,任务ID为" + job_id;
         } else if (status == -2) {
             text = "等待任务结果上报完成";
         } else {
