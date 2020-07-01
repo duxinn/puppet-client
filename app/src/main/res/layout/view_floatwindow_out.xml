@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimens_30_dp"
+        android:layout_marginLeft="@dimen/dimens_40_dp"
+        android:layout_marginTop="@dimen/dimens_70_dp"
+        android:layout_marginRight="@dimen/dimens_40_dp">
+
+        <LinearLayout
+            android:id="@+id/llRetry"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/button_background"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="运行插件"
+                android:textColor="#eeeeee"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/btnFloating"
+        android:layout_width="@dimen/dimens_35_dp"
+        android:layout_height="@dimen/dimens_35_dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/dimens_7_dp"
+        android:src="@mipmap/image_float_close" />
+
+</RelativeLayout>

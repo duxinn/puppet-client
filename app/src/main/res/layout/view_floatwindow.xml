@@ -14,7 +14,6 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_marginTop="@dimen/dimens_10_dp"
             android:layout_height="@dimen/dimens_50_dp">
 
             <TextView
@@ -32,7 +31,6 @@
                 android:text="@string/app_name"
                 android:textColor="@color/white"
                 android:textSize="17sp" />
-
 
 
         </RelativeLayout>
@@ -58,14 +56,15 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@drawable/button_background"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:textColor="#eeeeee"
                         android:text="运行插件"
+                        android:textColor="#eeeeee"
                         android:textSize="14sp" />
 
                 </LinearLayout>
@@ -86,14 +85,15 @@
                 android:text="所有插件状态:  "
                 android:textColor="#fff"
                 android:textSize="14sp" />
+
             <TextView
                 android:id="@+id/tvEventWatcher"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimens_5_dp"
                 android:paddingLeft="@dimen/dimens_10_dp"
-                android:textColor="@color/white"
                 android:text="监听事件: "
+                android:textColor="@color/white"
                 android:textSize="@dimen/dimens_14_sp" />
 
             <TextView
@@ -119,36 +119,40 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="@dimen/dimens_5_dp"
+                android:orientation="horizontal"
                 android:paddingLeft="@dimen/dimens_10_dp"
                 android:paddingRight="@dimen/dimens_10_dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="待执行任务数:  "
                     android:textColor="@color/white"
-                    android:textSize="@dimen/dimens_14_sp"
-                    android:text="待执行任务数:  "/>
+                    android:textSize="@dimen/dimens_14_sp" />
+
                 <TextView
                     android:id="@+id/tvJob"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
                     android:text="0"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/dimens_14_sp" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/dimens_14_sp"
                     android:layout_marginLeft="@dimen/dimens_20_dp"
-                    android:text="待上报任务数:  "/>
+                    android:text="待上报任务数:  "
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dimens_14_sp" />
+
                 <TextView
                     android:id="@+id/tvJobResult"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
                     android:text="0"
+                    android:textColor="@color/white"
 
                     android:textSize="@dimen/dimens_14_sp" />
             </LinearLayout>
@@ -173,6 +177,6 @@
         android:layout_marginTop="@dimen/dimens_10_dp"
         android:layout_marginRight="@dimen/dimens_7_dp"
         android:src="@mipmap/image_float_close"
-       />
+        android:visibility="gone" />
 
 </RelativeLayout>
