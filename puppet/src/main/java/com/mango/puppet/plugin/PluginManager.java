@@ -316,8 +316,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     @Override
     public void onReceiveJob(String packageName, Job job) {
-        LogManager.getInstance().recordDebugLog("开始将任务下发给插件"+job.job_id);
-
+        LogManager.getInstance().recordDebugLog("收到任务回执"+job.job_id);
         JobManager.getInstance().receiveJobResult(job);
     }
 
@@ -335,7 +334,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     @Override
     public void onReceiveData(final String packageName, JSONObject jsonObject) {
-        LogManager.getInstance().recordDebugLog("插件层收到JSONObject内容"+packageName);
+//        LogManager.getInstance().recordDebugLog("插件层收到JSONObject内容"+packageName);
         try {
             String type = jsonObject.getString(TransmitManager.TYPE_KEY);
             if (TransmitManager.HEART_KEY.equals(type)) {
@@ -412,6 +411,6 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
 
     @Override
     public void onReceiveDataString(String packageName, String dataString) {
-        LogManager.getInstance().recordDebugLog("插件层收到String内容"+packageName);
+//        LogManager.getInstance().recordDebugLog("插件层收到String内容"+packageName);
     }
 }

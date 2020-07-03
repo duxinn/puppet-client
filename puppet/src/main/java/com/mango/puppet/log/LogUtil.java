@@ -1,6 +1,7 @@
 package com.mango.puppet.log;
 
 import android.content.Context;
+import android.os.Environment;
 import android.text.format.Time;
 
 import java.io.BufferedWriter;
@@ -62,7 +63,7 @@ public class LogUtil {
     }
 
     public static String getStorePath(Context context) {
-        return context.getFilesDir().getAbsolutePath() + File.separator + "mango/";
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath() + File.separator + "mango/";
     }
 
     static String ymd() {
