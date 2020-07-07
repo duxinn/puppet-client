@@ -26,6 +26,7 @@ public class UploadImageUtils {
 
     private static QinNiuInfo mQinNiuInfo = null;
     private static Configuration mQiNiuConfig = null;
+    private static UploadManager mUploadManager = null;
 
     public static void uploadImage(final int requestCode,
                                    final String identifier,
@@ -104,8 +105,7 @@ public class UploadImageUtils {
             return;
         }
         final int nextTryCount = tryCount + 1;
-        UploadManager uploadManager = new UploadManager(getmQiNiuConfig());
-        uploadManager.put(path, identifier, mQinNiuInfo.getToken(), new UpCompletionHandler() {
+        getUploadManager().put(path, identifier, mQinNiuInfo.getToken(), new UpCompletionHandler() {
             @Override
             public void complete(String key, ResponseInfo info, JSONObject response) {
                 if (null != callBack) {
@@ -145,7 +145,7 @@ public class UploadImageUtils {
         }, null));
     }
 
-    private static Configuration getmQiNiuConfig() {
+    private static Configuration getQiNiuConfig() {
         if (null == mQiNiuConfig) {
             mQiNiuConfig = new Configuration.Builder().
                     zone(AutoZone.autoZone).
@@ -154,6 +154,13 @@ public class UploadImageUtils {
                     build();
         }
         return mQiNiuConfig;
+    }
+
+    private static UploadManager getUploadManager() {
+        if (null == mUploadManager) {
+            mUploadManager = new UploadManager(getQiNiuConfig());
+        }
+        return mUploadManager;
     }
 
 
