@@ -16,5 +16,6 @@ public class AppApplication extends Application {
         super.onCreate();
         instance = this;
         PreferenceUtils.getInstance().init(this);
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     }
 }
