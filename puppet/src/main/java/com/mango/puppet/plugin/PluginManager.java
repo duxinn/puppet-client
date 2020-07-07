@@ -223,6 +223,18 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
             result.onFinished(false, "插件正在启动中,请勿重复调用");
             return;
         }
+        //过滤已启动的插件
+        toStartPllugin = new ArrayList<>();
+        for (PluginModel pluginModel : pluginModels) {
+            if (!runningPackageNames.contains(pluginModel.getPackageName())) {
+                toStartPllugin.add(pluginModel);
+            }
+        }
+        if (toStartPllugin.size() == 0) {
+            iPluginControlResult=null;
+            result.onFinished(false, "插件已全部启动");
+            return;
+        }
         callBack = false;
         models = pluginModels;
         this.context = context;
@@ -243,17 +255,6 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                         result.onFinished(false, "无支持插件");
                         iPluginControlResult = null;
                     } else {
-                        //过滤已启动的插件
-                        toStartPllugin = new ArrayList<>();
-                        for (PluginModel pluginModel : pluginModels) {
-                            if (!runningPackageNames.contains(pluginModel.getPackageName())) {
-                                toStartPllugin.add(pluginModel);
-                            }
-                        }
-                        if (toStartPllugin.size() == 0) {
-                            result.onFinished(false, "插件已全部启动");
-                            return;
-                        }
                         TransmitManager.getInstance().setTransmitReceiver(this);
                         ArrayList<String> actions = new ArrayList<>();
                         actions.add(TransmitManager.MANAGER_PACKAGE_NAME);
