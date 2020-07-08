@@ -27,20 +27,8 @@ public interface IPluginControl {
 
     /**
      * 运行木马插件
-     *
-     * @param context context
-     * @param targetPackageName 目标app包名
-     * @param dexName assets 目录下插件名称
-     * @param className 要在目标app中运行入口类名
-     * @param methodName 该类名下要调用的静态方法的方法名 注:必须是静态方法
-     * @param activityName 目标启动activityName
      */
-    void runPuppetPlugin(Context context,
-                         String targetPackageName,
-                         String dexName,
-                         String className,
-                         String methodName,
-                         String activityName);
+    void runPuppetPlugin();
 
     /**
      * 获取可使用的插件 注:需已经安装目标app且版本正确
