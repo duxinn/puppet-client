@@ -137,6 +137,20 @@ public class DBManager {
         return jobBean;
     }
 
+    @Nullable
+    public static Job getSingleNewJobFromDb() {
+        Job jobBean = null;
+
+        List<JobBean> beans = SQLite.
+                select().
+                from(JobBean.class).where(JobBean_Table.job_status.in(0)).
+                queryList();
+        if (beans != null && beans.size() > 0) {
+            jobBean = handleJobBeanToJob(beans.get(0), new Gson());
+        }
+        return jobBean;
+    }
+
     public static boolean deleteJob(long jobId) {
         boolean ret = false;
         JobBean jb = SQLite.select()

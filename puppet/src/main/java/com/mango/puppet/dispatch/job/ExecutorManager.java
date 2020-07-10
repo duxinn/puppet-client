@@ -39,7 +39,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
         isDistributedJob = false;
         boolean flag = canDistributeJob();
         if (flag) {
-            distributeJob();
+            distributeJob(true);
         }
     }
 
@@ -109,7 +109,12 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     }
 
     private void distributeJob() {
-        Job currentJob = DBManager.getSingleNotDoneJobsFromDb();
+        distributeJob(false);
+    }
+
+    private void distributeJob(boolean isInit) {
+        Job currentJob = isInit ?
+                DBManager.getSingleNotDoneJobsFromDb() : DBManager.getSingleNewJobFromDb();
         if (currentJob != null) {
             JobManager.getInstance().setStatus("", JobManager.STATUS.RUNNING);
             isDistributedJob = true;
