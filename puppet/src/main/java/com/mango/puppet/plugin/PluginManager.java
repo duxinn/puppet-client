@@ -379,41 +379,15 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
             } else if (TransmitManager.UPLOAD_KEY.equals(type)) {
                 final String filePath = jsonObject.getString(TransmitManager.LOCAL_URL_KEY);
                 final String fileName = jsonObject.getString(TransmitManager.FILE_NAME);
-                if (new File(filePath).exists()) {
-                    UploadImageUtils.uploadImage(0x00, fileName, filePath, new UploadImageUtils.UploadImageCallBack() {
-                        @Override
-                        public void uploadImageSuccess(int requestCode, String identifier, String urlPath) {
-                            try {
-                                JSONObject receiptObject = new JSONObject();
-                                receiptObject.put(TransmitManager.TYPE_KEY, TransmitManager.UPLOAD_KEY);
-                                receiptObject.put(TransmitManager.LOCAL_URL_KEY, filePath);
-                                receiptObject.put(TransmitManager.FILE_NAME, fileName);
-                                receiptObject.put(TransmitManager.REMOTE_URL_KEY, urlPath);
-                                TransmitManager.getInstance().sendMessage(packageName, receiptObject);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void uploadImageFailed(int requestCode, String identifier) {
-                            try {
-                                JSONObject receiptObject = new JSONObject();
-                                receiptObject.put(TransmitManager.TYPE_KEY, TransmitManager.UPLOAD_KEY);
-                                receiptObject.put(TransmitManager.LOCAL_URL_KEY, filePath);
-                                receiptObject.put(TransmitManager.FILE_NAME, fileName);
-                                TransmitManager.getInstance().sendMessage(packageName, receiptObject);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void uploadImageProgress(int requestCode, String identifier, double percent) {
-
-                        }
-                    });
-                } else {
+                int rd=Math.random()>0.5?1:0;
+                if (rd==1){
+                    JSONObject receiptObject = new JSONObject();
+                    receiptObject.put(TransmitManager.TYPE_KEY, TransmitManager.UPLOAD_KEY);
+                    receiptObject.put(TransmitManager.LOCAL_URL_KEY, filePath);
+                    receiptObject.put(TransmitManager.FILE_NAME, fileName);
+                    receiptObject.put(TransmitManager.REMOTE_URL_KEY, "成功啦");
+                    TransmitManager.getInstance().sendMessage(packageName, receiptObject);
+                }else {
                     JSONObject receiptObject = new JSONObject();
                     receiptObject.put(TransmitManager.TYPE_KEY, TransmitManager.UPLOAD_KEY);
                     receiptObject.put(TransmitManager.LOCAL_URL_KEY, filePath);
