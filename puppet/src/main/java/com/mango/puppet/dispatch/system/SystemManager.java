@@ -65,10 +65,10 @@ public class SystemManager implements ISystem, IPluginRunListener {
         PluginModel wechatModel = new PluginModel();
         wechatModel.setPackageName("com.tencent.mm");
         wechatModel.setActivityName("ui.LauncherUI");
-        wechatModel.setDexName("wechat704.apk");
+        wechatModel.setDexName("wechat.apk");
         wechatModel.setClassName("com.mango.wechattool.business.WechatEntrance");
         wechatModel.setMethodName("entrance");
-        wechatModel.setDexVersion("7.0.4");
+        wechatModel.setDexVersion("7.0.16");
         ArrayList<PluginModel> models = new ArrayList<>();
         models.add(wechatModel);
         PluginManager.getInstance().setPluginControlListener(SystemManager.this);
