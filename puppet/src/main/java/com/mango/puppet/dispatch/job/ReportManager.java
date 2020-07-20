@@ -91,7 +91,24 @@ public class ReportManager implements
 
     @Override
     public void onNetworkError(Job jobResult) {
-        onErrorReport();
+        if ("1".equals(jobResult.job_repeat)) {
+            onErrorReport();
+        } else {
+            if (jobResult.job_status == 2) {
+                jobResult.job_status = 1;
+                DBManager.updateJobStatus(jobResult);
+            } else if (jobResult.job_status == 3
+                    || jobResult.job_status == 4) {
+                removeFromDb(jobResult);
+            } else if (jobResult.job_status == 5) {
+                jobResult.job_status = 6;
+                DBManager.updateJobStatus(jobResult);
+            } else if (jobResult.job_status == 1) {
+                // 两步任务第一步上报成功前 第二步执行完成了
+            } else {
+                throw new RuntimeException("status:" + jobResult.job_status);
+            }
+        }
     }
 
     private void reportToService(Job job) {
