@@ -91,7 +91,7 @@ public class ReportManager implements
 
     @Override
     public void onNetworkError(Job jobResult) {
-        if ("1".equals(jobResult.job_repeat)) {
+        if (jobResult.no_repeat == 0) {
             onErrorReport();
         } else {
             if (jobResult.job_status == 2) {
