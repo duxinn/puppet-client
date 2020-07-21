@@ -15,11 +15,12 @@ import java.util.concurrent.TimeUnit;
 public class TestService extends Service {
 
     private Server mServer;
+    public static final int PORT = 8081;
 
     @Override
     public void onCreate() {
         mServer = AndServer.webServer(this)
-            .port(8081)
+            .port(PORT)
             .timeout(10, TimeUnit.SECONDS)
             .listener(new Server.ServerListener() {
                 @Override

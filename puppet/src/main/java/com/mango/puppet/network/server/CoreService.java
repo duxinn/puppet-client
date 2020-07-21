@@ -17,10 +17,12 @@ public class CoreService extends Service {
 
     private Server mServer;
 
+    public static final int PORT = 8080;
+
     @Override
     public void onCreate() {
         mServer = AndServer.webServer(this)
-            .port(8080)
+            .port(PORT)
             .timeout(10, TimeUnit.SECONDS)
             .listener(new Server.ServerListener() {
                 @Override

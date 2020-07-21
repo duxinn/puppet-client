@@ -148,7 +148,7 @@ public class ReportManager implements
 
     private void removeFromDb(Job jobResult) {
         boolean b = DBManager.deleteJob(jobResult.job_id);
-        if (b) {
+        if (!b) {
             Log.e("ReportManager", "DBManager.deleteJob error ");
         }
     }
