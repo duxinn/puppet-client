@@ -4,6 +4,7 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="testRunner" value="PLATFORM" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
@@ -13,11 +14,11 @@
             <option value="$PROJECT_DIR$/hookdemo" />
             <option value="$PROJECT_DIR$/loadlibtool" />
             <option value="$PROJECT_DIR$/networkdemo" />
+            <option value="$PROJECT_DIR$/plugintest" />
             <option value="$PROJECT_DIR$/puppet" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
-        <option name="testRunner" value="PLATFORM" />
       </GradleProjectSettings>
     </option>
   </component>

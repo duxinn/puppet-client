@@ -21,7 +21,7 @@ class ApiClient {
     }
 
 
-    fun <T> getApiService(clazz: Class<T>): T {
+    public fun <T> getApiService(clazz: Class<T>): T {
         if (apiService == null) {
             apiService = retrofit!!.create(clazz)
         }
@@ -40,15 +40,13 @@ class ApiClient {
         if (netInterceptor != null) {
             okHttpClient.newBuilder().addInterceptor(netInterceptor!!)
         }
-
-        this.retrofit = Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .baseUrl(BASE_URL_MAIN)
-                .client(okHttpClient)
-                .build()
-
-
+        if (this.retrofit == null) {
+            this.retrofit = Retrofit.Builder()
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .baseUrl(BASE_URL_MAIN)
+                    .client(okHttpClient)
+                    .build()
+        }
     }
-
 }
