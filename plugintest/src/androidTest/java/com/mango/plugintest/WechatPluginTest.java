@@ -241,47 +241,35 @@ public class WechatPluginTest {
                 }
                 boolean isOK = true;
                 boolean hasAlias = false;
-                boolean hasLocalIcon = false;
                 for (User user : userArrayList) {
                     if (TextUtils.isEmpty(user.field_nickname)
                             || TextUtils.isEmpty(user.field_pyInitial)
                             || TextUtils.isEmpty(user.field_quanPin)
-                            || TextUtils.isEmpty(user.field_username)) {
-                        isOK = false;
+                            || TextUtils.isEmpty(user.field_username)
+                            || TextUtils.isEmpty(user.icon_url)) {
                         Log.e(TAG, "\n" + "user.field_username:" + user.field_username
                                 + "\n" + "user.field_alias:" + user.field_alias
                                 + "\n" + "user.field_nickname:" + user.field_nickname
                                 + "\n" + "user.field_pyInitial:" + user.field_pyInitial
                                 + "\n" + "user.field_quanPin:" + user.field_quanPin
                                 + "\n" + "user.icon_url:" + user.icon_url);
-                        break;
                     }
                     if (!user.field_username.equals(selfWxid)) {
                         if (TextUtils.isEmpty(user.field_encryptUsername)) {
                             isOK = false;
                             Log.e(TAG, "\n" + "user.field_username:" + user.field_username
                                     + "\n" + "user.field_encryptUsername:" + user.field_encryptUsername);
-                            break;
                         }
                     }
 
                     if (!TextUtils.isEmpty(user.field_alias)) {
                         hasAlias = true;
                     }
-
-                    if (!TextUtils.isEmpty(user.icon_url)) {
-                        hasLocalIcon = true;
-                    }
                 }
 
                 if (!hasAlias) {
                     isOK = false;
                     Log.e(TAG, job.job_name + " no one has alias");
-                }
-
-                if (!hasLocalIcon) {
-                    isOK = false;
-                    Log.e(TAG, job.job_name + " no one has icon_url");
                 }
 
                 if (isOK) {
