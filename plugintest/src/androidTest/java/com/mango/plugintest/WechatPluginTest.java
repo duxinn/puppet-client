@@ -14,13 +14,15 @@ import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppetmodel.Job;
 import com.mango.puppetmodel.wechat.User;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -40,12 +42,14 @@ public class WechatPluginTest {
 
     public static final String TAG = "WechatPluginTest";
 
-    private boolean isEverythingOK = false;
-    private boolean isFinished = false;
-    private String ipString = "";
+    private static boolean isEverythingOK = false;
+    private static boolean isFinished = false;
+    private static String ipString = "";
 
-    @Before
-    public void prepareNetwork() {
+    private static String selfWxid = "";
+
+    @BeforeClass
+    public static void prepareNetwork() {
 
         Log.i(TAG, "prepareNetwork");
 
@@ -96,12 +100,12 @@ public class WechatPluginTest {
 
     }
 
-    @After
-    public void closeNetwork() {
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        TestServerManager.getInstance(appContext).stopServer();
+    @AfterClass
+    public static void closeNetwork() {
         isEverythingOK = false;
         isFinished = true;
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        TestServerManager.getInstance(appContext).stopServer();
         Log.i(TAG, "server closed");
     }
 
@@ -117,7 +121,7 @@ public class WechatPluginTest {
         final CountDownLatch signal = new CountDownLatch(1);
 
         String jobString = "{\n" +
-                "\t\"job_id\":1,\n" +
+                "\t\"job_id\":0,\n" +
                 "\t\"package_name\":\"com.tencent.mm\",\n" +
                 "\t\"job_name\":\"get_local_user_info\",\n" +
                 "\t\"callback\":\"\"\n" +
@@ -157,7 +161,6 @@ public class WechatPluginTest {
                 User user = new Gson().fromJson(userObject.toString(), User.class);
                 boolean isOK = false;
                 if (!TextUtils.isEmpty(user.field_alias)
-                        && !TextUtils.isEmpty(user.field_encryptUsername)
                         && !TextUtils.isEmpty(user.field_nickname)
                         && !TextUtils.isEmpty(user.field_pyInitial)
                         && !TextUtils.isEmpty(user.field_quanPin)
@@ -166,6 +169,7 @@ public class WechatPluginTest {
                     isOK = true;
                 }
                 if (isOK) {
+                    selfWxid = user.field_username;
                     Log.i(TAG, job.job_name + " everything is OK");
                 } else {
                     Log.e(TAG, job.job_name + " sth wrong");
@@ -183,4 +187,118 @@ public class WechatPluginTest {
         }
     }
 
+    @Test
+    public void getUserList() {
+        checkPrevious();
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        String jobString = "{\n" +
+                "\t\"job_id\":0,\n" +
+                "\t\"package_name\":\"com.tencent.mm\",\n" +
+                "\t\"job_name\":\"get_user_list\",\n" +
+                "\t\"callback\":\"\"\n" +
+                "}";
+        Job job = Job.fromString(jobString);
+        RequestHandler.getInstance().dealRequest(ipString, job, new DesCallBack<Object>() {
+            @Override
+            public void onHandleSuccess(@Nullable Object objectBaseModel) {
+                Log.i(TAG, "add job ok");
+            }
+
+            @Override
+            public void onHandleError(@Nullable String msg, int code) {
+                Log.e(TAG, "add job error:" + msg);
+                isEverythingOK = false;
+                signal.countDown();
+            }
+
+            @Override
+            public void onNetWorkError(@Nullable Throwable e) {
+                Log.e(TAG, "add job network error");
+                isEverythingOK = false;
+                signal.countDown();
+            }
+        }, new ResultCallBack() {
+            @Override
+            public void onHandleResponseSuccess(Job job) {
+
+                String result = job.result_data;
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                JSONArray jsonArray = jsonObject.optJSONArray("users");
+                ArrayList<User> userArrayList = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    try {
+                        User user = new Gson().fromJson(jsonArray.get(i).toString(), User.class);
+                        userArrayList.add(user);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                boolean isOK = true;
+                boolean hasAlias = false;
+                boolean hasLocalIcon = false;
+                for (User user : userArrayList) {
+                    if (TextUtils.isEmpty(user.field_nickname)
+                            || TextUtils.isEmpty(user.field_pyInitial)
+                            || TextUtils.isEmpty(user.field_quanPin)
+                            || TextUtils.isEmpty(user.field_username)) {
+                        isOK = false;
+                        Log.e(TAG, "\n" + "user.field_username:" + user.field_username
+                                + "\n" + "user.field_alias:" + user.field_alias
+                                + "\n" + "user.field_nickname:" + user.field_nickname
+                                + "\n" + "user.field_pyInitial:" + user.field_pyInitial
+                                + "\n" + "user.field_quanPin:" + user.field_quanPin
+                                + "\n" + "user.icon_url:" + user.icon_url);
+                        break;
+                    }
+                    if (!user.field_username.equals(selfWxid)) {
+                        if (TextUtils.isEmpty(user.field_encryptUsername)) {
+                            isOK = false;
+                            Log.e(TAG, "\n" + "user.field_username:" + user.field_username
+                                    + "\n" + "user.field_encryptUsername:" + user.field_encryptUsername);
+                            break;
+                        }
+                    }
+
+                    if (!TextUtils.isEmpty(user.field_alias)) {
+                        hasAlias = true;
+                    }
+
+                    if (!TextUtils.isEmpty(user.icon_url)) {
+                        hasLocalIcon = true;
+                    }
+                }
+
+                if (!hasAlias) {
+                    isOK = false;
+                    Log.e(TAG, job.job_name + " no one has alias");
+                }
+
+                if (!hasLocalIcon) {
+                    isOK = false;
+                    Log.e(TAG, job.job_name + " no one has icon_url");
+                }
+
+                if (isOK) {
+                    Log.i(TAG, job.job_name + " everything is OK");
+                } else {
+                    Log.e(TAG, job.job_name + " sth wrong");
+                    isEverythingOK = false;
+                }
+                signal.countDown();
+            }
+        });
+
+        try {
+            signal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.e(TAG, "signal.await InterruptedException");
+        }
+    }
 }
