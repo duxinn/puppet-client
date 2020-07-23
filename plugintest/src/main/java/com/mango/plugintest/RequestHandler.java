@@ -1,9 +1,11 @@
 package com.mango.plugintest;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppet.network.api.vm.PuppetVM;
@@ -26,9 +28,10 @@ class RequestHandler extends BroadcastReceiver {
 
     public static final String RequestHandlerAction = "RequestHandlerAction";
     private static long jobId = System.currentTimeMillis();
+    @SuppressLint("StaticFieldLeak")
     private static final RequestHandler instance = new RequestHandler();
 
-    private HashMap<String, ResultCallBack> resultCallBackHashMap = new HashMap<>();
+    private HashMap<String, CallbackBean> resultCallBackHashMap = new HashMap<>();
     private Context context;
 
     public static RequestHandler getInstance() {
@@ -48,12 +51,15 @@ class RequestHandler extends BroadcastReceiver {
         return context;
     }
 
-    public void dealRequest(String ipString, Job job, DesCallBack<Object> requestCallback, ResultCallBack resultCallBack) {
+    public void dealRequest(String ipString, Job job, boolean isDoubleStep, DesCallBack<Object> requestCallback, ResultCallBack resultCallBack) {
         job.job_id = jobId++;
         job.no_repeat = 1;
         job.callback = "http://" + ipString + ":" + TestService.PORT + "/test/receive_job_result";
         String url = "http://" + ipString + ":" + CoreService.PORT + "/dispatch/addJob";
-        resultCallBackHashMap.put(String.valueOf(job.job_id), resultCallBack);
+        CallbackBean callbackBean = new CallbackBean();
+        callbackBean.isDoubleStep = isDoubleStep;
+        callbackBean.resultCallBack = resultCallBack;
+        resultCallBackHashMap.put(String.valueOf(job.job_id), callbackBean);
         PuppetVM.Companion.reportJobResult(url, job, requestCallback);
     }
 
@@ -90,9 +96,26 @@ class RequestHandler extends BroadcastReceiver {
                 job.job_data = new JSONObject();
             }
 
-            ResultCallBack resultCallBack = resultCallBackHashMap.get(String.valueOf(job_id));
-            resultCallBackHashMap.remove(String.valueOf(job_id));
-            resultCallBack.onHandleResponseSuccess(job);
+            CallbackBean callbackBean = resultCallBackHashMap.get(String.valueOf(job_id));
+            assert callbackBean != null;
+            callbackBean.resultCallBack.onHandleResponseSuccess(job);
+            callbackBean.currentCallbackTimes = callbackBean.currentCallbackTimes + 1;
+            if (!callbackBean.isDoubleStep || callbackBean.currentCallbackTimes >= 2) {
+                final String jobId = String.valueOf(job_id);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        resultCallBackHashMap.remove(jobId);
+                    }
+                }, 5000);
+            }
         }
+    }
+
+    public static class CallbackBean {
+
+        ResultCallBack resultCallBack;
+        boolean isDoubleStep = false;
+        int currentCallbackTimes = 0;
     }
 }
