@@ -12,6 +12,8 @@ import com.mango.puppet.network.api.api.ApiClient;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppetmodel.Job;
 
+import org.junit.Assert;
+
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -113,7 +115,7 @@ class TestHelper {
         }
     }
 
-    public static void testSingleStepJob(final Job job, final TestSingleStepJobHandler testSingleStepJobHandler) {
+    public static void testSingleStepJob(final Job originJob, final TestSingleStepJobHandler testSingleStepJobHandler) {
         if (!isSomethingWrong()) {
             return;
         }
@@ -123,29 +125,29 @@ class TestHelper {
             return;
         }
 
-        if (job == null) {
+        if (originJob == null) {
             Log.e(TAG, "job null");
             return;
         }
 
         final int[] callbackTimes = {0};
         final CountDownLatch signal = new CountDownLatch(1);
-        RequestHandler.getInstance().dealRequest(ipString, job, false, new DesCallBack<Object>() {
+        RequestHandler.getInstance().dealRequest(ipString, originJob, false, new DesCallBack<Object>() {
             @Override
             public void onHandleSuccess(@Nullable Object objectBaseModel) {
-                Log.i(TAG, "add job ok:" + job.job_name);
+                Log.i(TAG, "add job ok:" + originJob.job_name);
             }
 
             @Override
             public void onHandleError(@Nullable String msg, int code) {
-                Log.e(TAG, "add job server error:" +  job.job_name + " msg:" + msg);
+                Log.e(TAG, "add job server error:" +  originJob.job_name + " msg:" + msg);
                 isEverythingOK = false;
                 signal.countDown();
             }
 
             @Override
             public void onNetWorkError(@Nullable Throwable e) {
-                Log.e(TAG, "add job network error:" + job.job_name);
+                Log.e(TAG, "add job network error:" + originJob.job_name);
                 isEverythingOK = false;
                 signal.countDown();
             }
@@ -154,6 +156,17 @@ class TestHelper {
             public void onHandleResponseSuccess(Job job) {
                 callbackTimes[0]++;
                 if (callbackTimes[0] == 1) {
+
+                    if (!originJob.job_name.equals(job.job_name)) {
+                        TestHelper.logE("job name not equal:" + originJob.job_name);
+                        TestHelper.setSomethingWrong();
+                    }
+
+                    if (job.job_status != 3) {
+                        TestHelper.logE("job status wrong:" + originJob.job_name + " status:" + job.job_status);
+                        TestHelper.setSomethingWrong();
+                    }
+
                     testSingleStepJobHandler.onSingleStepSuccess(job);
                 } else {
                     Log.e(TAG, "callback more times:" + job.job_name);
@@ -176,7 +189,7 @@ class TestHelper {
         }
     }
 
-    public static void testDoubleStepJob(final Job job, final TestDoubleStepJobHandler testDoubleStepJobHandler) {
+    public static void testDoubleStepJob(final Job originJob, final TestDoubleStepJobHandler testDoubleStepJobHandler) {
         if (!isSomethingWrong()) {
             return;
         }
@@ -186,29 +199,29 @@ class TestHelper {
             return;
         }
 
-        if (job == null) {
+        if (originJob == null) {
             Log.e(TAG, "job null");
             return;
         }
 
         final int[] callbackTimes = {0};
         final CountDownLatch signal = new CountDownLatch(1);
-        RequestHandler.getInstance().dealRequest(ipString, job, true, new DesCallBack<Object>() {
+        RequestHandler.getInstance().dealRequest(ipString, originJob, true, new DesCallBack<Object>() {
             @Override
             public void onHandleSuccess(@Nullable Object objectBaseModel) {
-                Log.i(TAG, "add job ok:" + job.job_name);
+                Log.i(TAG, "add job ok:" + originJob.job_name);
             }
 
             @Override
             public void onHandleError(@Nullable String msg, int code) {
-                Log.e(TAG, "add job server error:" +  job.job_name + " msg:" + msg);
+                Log.e(TAG, "add job server error:" +  originJob.job_name + " msg:" + msg);
                 isEverythingOK = false;
                 signal.countDown();
             }
 
             @Override
             public void onNetWorkError(@Nullable Throwable e) {
-                Log.e(TAG, "add job network error:" + job.job_name);
+                Log.e(TAG, "add job network error:" + originJob.job_name);
                 isEverythingOK = false;
                 signal.countDown();
             }
@@ -217,8 +230,32 @@ class TestHelper {
             public void onHandleResponseSuccess(Job job) {
                 callbackTimes[0]++;
                 if (callbackTimes[0] == 1) {
+
+                    if (!originJob.job_name.equals(job.job_name)) {
+                        TestHelper.logE("job name not equal:" + originJob.job_name);
+                        TestHelper.setSomethingWrong();
+                    }
+
+                    if (job.job_status != 2) {
+                        TestHelper.logE("job status wrong:" + originJob.job_name + " status:" + job.job_status);
+                        TestHelper.setSomethingWrong();
+                    }
+
                     testDoubleStepJobHandler.onFirstStepSuccess(job);
+                    Log.i(TAG, "first step:" + job.job_name);
                 } else if (callbackTimes[0] == 2){
+
+                    if (!originJob.job_name.equals(job.job_name)) {
+                        TestHelper.logE("job name not equal:" + originJob.job_name);
+                        TestHelper.setSomethingWrong();
+                    }
+
+                    if (job.job_status != 3) {
+                        TestHelper.logE("job status wrong:" + originJob.job_name + " status:" + job.job_status);
+                        TestHelper.setSomethingWrong();
+                    }
+
+                    Log.i(TAG, "second step:" + job.job_name);
                     testDoubleStepJobHandler.onSecondStepSuccess(job);
                 } else {
                     Log.e(TAG, "callback more times:" + job.job_name);

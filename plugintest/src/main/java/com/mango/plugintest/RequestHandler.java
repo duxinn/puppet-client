@@ -75,6 +75,7 @@ class RequestHandler extends BroadcastReceiver {
             String job_name = jsonObject.getString("job_name");
             String callback = jsonObject.getString("callback");
             int noRepeat = jsonObject.getIntValue("no_repeat");
+            int job_status = jsonObject.getIntValue("job_status");
             String result_data = jsonObject.getString("result_data");
             JSONObject job_data = null;
             try {
@@ -89,6 +90,7 @@ class RequestHandler extends BroadcastReceiver {
             job.job_name = job_name;
             job.no_repeat = noRepeat;
             job.callback = callback;
+            job.job_status = job_status;
             job.result_data = result_data;
             if (job_data != null) {
                 job.job_data = job_data;
