@@ -104,8 +104,7 @@ class PuppetController {
                 e.printStackTrace();
             }
 
-            if (!TextUtils.isEmpty(package_name)
-                    && !TextUtils.isEmpty(job_name)
+            if (TextUtils.isEmpty(job_name)
                     && !TextUtils.isEmpty(callback)) {
                 Job job = new Job();
                 job.job_id = job_id;

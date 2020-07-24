@@ -11,6 +11,7 @@ import com.mango.puppetmodel.wechat.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -51,9 +52,17 @@ public class WechatPluginInfoTest {
      * 6 所有日志未出现错误日志视为测试通过
      * <p>
      * 7 不允许出现警告
+     * <p>
+     * 8 Job的job_status  4为取消 5为失败
+     * 单步任务 3为成功
+     * 双步任务 2为第一步成功 3为完全成功
+     * <p>
+     * 9 如果测试希望失败且失败后应该跳过任务
      */
 
+    private static Job errorJob = null;
     private static String selfWxid = "";
+
 
     @BeforeClass
     public static void beforeTest() {
@@ -63,6 +72,14 @@ public class WechatPluginInfoTest {
     @AfterClass
     public static void afterTest() {
         TestHelper.afterClass();
+    }
+
+    @After
+    public void afterMethod() {
+        if (errorJob != null) {
+            TestHelper.cancelJob(errorJob);
+            errorJob = null;
+        }
     }
 
     @Test
@@ -77,6 +94,12 @@ public class WechatPluginInfoTest {
         TestHelper.testSingleStepJob(job, new TestSingleStepJobHandler() {
             @Override
             public void onSingleStepSuccess(Job job) {
+
+                if (job.job_status != 3) {
+                    TestHelper.logE("job status wrong:" + job.job_name + " status:" + job.job_status);
+                    TestHelper.setSomethingWrong();
+                }
+
                 String result = job.result_data;
                 JSONObject jsonObject = null;
                 try {
@@ -120,6 +143,12 @@ public class WechatPluginInfoTest {
         TestHelper.testSingleStepJob(job, new TestSingleStepJobHandler() {
             @Override
             public void onSingleStepSuccess(Job job) {
+
+                if (job.job_status != 3) {
+                    TestHelper.logE("job status wrong:" + job.job_name + " status:" + job.job_status);
+                    TestHelper.setSomethingWrong();
+                }
+
                 String result = job.result_data;
                 JSONObject jsonObject = null;
                 try {
@@ -198,10 +227,20 @@ public class WechatPluginInfoTest {
             @Override
             public void onFirstStepSuccess(Job job) {
 
+                if (job.job_status != 2) {
+                    TestHelper.logE("job status wrong:" + job.job_name + " status:" + job.job_status);
+                    TestHelper.setSomethingWrong();
+                }
             }
 
             @Override
             public void onSecondStepSuccess(Job job) {
+
+                if (job.job_status != 3) {
+                    TestHelper.logE("job status wrong:" + job.job_name + " status:" + job.job_status);
+                    TestHelper.setSomethingWrong();
+                }
+
                 String result = job.result_data;
                 JSONObject jsonObject = null;
                 try {
@@ -225,6 +264,75 @@ public class WechatPluginInfoTest {
                 } else {
                     TestHelper.logI(job.job_name + " everything is OK");
                 }
+            }
+        });
+    }
+
+    @Test
+    public void adSearchFriendPhoneNotRight() {
+        String jobString = "{\n" +
+                "\t\"job_id\":0,\n" +
+                "\t\"package_name\":\"com.tencent.mm\",\n" +
+                "\t\"job_name\":\"search_friend\",\n" +
+                "\t\"callback\":\"\",\n" +
+                "\t\"job_data\":{\n" +
+                "        \"phone\":\"186126903\"\n" +
+                "\t}\n" +
+                "}\n";
+        Job job = Job.fromString(jobString);
+        TestHelper.testDoubleStepJob(job, new TestDoubleStepJobHandler() {
+            @Override
+            public void onFirstStepSuccess(Job job) {
+
+                if (job.job_status != 2) {
+                    TestHelper.logE("job status wrong:" + job.job_name + " status:" + job.job_status);
+                    TestHelper.setSomethingWrong();
+                }
+            }
+
+            @Override
+            public void onSecondStepSuccess(Job job) {
+
+                if (job.job_status != 4) {
+                    TestHelper.logE("job status wrong:" + job.job_name + " status:" + job.job_status);
+                    TestHelper.setSomethingWrong();
+                } else {
+                    TestHelper.logI(job.job_name + " everything is OK");
+                }
+            }
+        });
+    }
+
+
+    @Test
+    public void aeSearchFriendPhoneEmpty() {
+        String jobString = "{\n" +
+                "\t\"job_id\":0,\n" +
+                "\t\"package_name\":\"com.tencent.mm\",\n" +
+                "\t\"job_name\":\"search_friend\",\n" +
+                "\t\"callback\":\"\",\n" +
+                "\t\"job_data\":{\n" +
+                "        \"phone\":\"\"\n" +
+                "\t}\n" +
+                "}\n";
+        Job job = Job.fromString(jobString);
+        TestHelper.testDoubleStepJob(job, new TestDoubleStepJobHandler() {
+            @Override
+            public void onFirstStepSuccess(Job job) {
+
+                if (job.job_status != 5) {
+                    TestHelper.logE("job status wrong:" + job.job_name + " status:" + job.job_status);
+                    TestHelper.setSomethingWrong();
+                } else {
+                    TestHelper.logI(job.job_name + " everything is OK");
+                    errorJob = job;
+                }
+            }
+
+            @Override
+            public void onSecondStepSuccess(Job job) {
+                TestHelper.logE("job should not callback:" + job.job_name + " status:" + job.job_status);
+                TestHelper.setSomethingWrong();
             }
         });
     }

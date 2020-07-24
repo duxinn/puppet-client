@@ -12,6 +12,8 @@ import com.mango.puppet.network.api.api.ApiClient;
 import com.mango.puppet.network.api.observerCallBack.DesCallBack;
 import com.mango.puppetmodel.Job;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 
 import java.util.concurrent.CountDownLatch;
@@ -88,6 +90,53 @@ class TestHelper {
         Log.i(TAG, "server closed");
     }
 
+    public static void cancelJob(Job job) {
+
+        Job cancelJob = new Job();
+        cancelJob.job_name = "cancel_job";
+        cancelJob.job_data = new JSONObject();
+        try {
+            cancelJob.job_data.put("cancel_job_id", String.valueOf(job.job_id));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal = new CountDownLatch(1);
+        RequestHandler.getInstance().dealRequest(ipString, cancelJob, false, new DesCallBack<Object>() {
+            @Override
+            public void onHandleSuccess(@Nullable Object objectBaseModel) {
+                Log.i(TAG, "cancel job ok");
+                signal.countDown();
+            }
+
+            @Override
+            public void onHandleError(@Nullable String msg, int code) {
+                Log.e(TAG, "cancel job server error:" + msg);
+                isEverythingOK = false;
+                signal.countDown();
+            }
+
+            @Override
+            public void onNetWorkError(@Nullable Throwable e) {
+                Log.e(TAG, "cancel job network error");
+                isEverythingOK = false;
+                signal.countDown();
+            }
+        }, new ResultCallBack() {
+            @Override
+            public void onHandleResponseSuccess(Job job) {
+
+            }
+        });
+
+        try {
+            signal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.e(TAG, "signal.await InterruptedException");
+        }
+    }
+
     public static boolean isSomethingWrong() {
         if (!isEverythingOK) {
             Log.e(TAG, "something wrong");
@@ -162,11 +211,6 @@ class TestHelper {
                         TestHelper.setSomethingWrong();
                     }
 
-                    if (job.job_status != 3) {
-                        TestHelper.logE("job status wrong:" + originJob.job_name + " status:" + job.job_status);
-                        TestHelper.setSomethingWrong();
-                    }
-
                     testSingleStepJobHandler.onSingleStepSuccess(job);
                 } else {
                     Log.e(TAG, "callback more times:" + job.job_name);
@@ -237,8 +281,12 @@ class TestHelper {
                     }
 
                     if (job.job_status != 2) {
-                        TestHelper.logE("job status wrong:" + originJob.job_name + " status:" + job.job_status);
-                        TestHelper.setSomethingWrong();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                signal.countDown();
+                            }
+                        }, 3000);
                     }
 
                     testDoubleStepJobHandler.onFirstStepSuccess(job);
@@ -247,11 +295,6 @@ class TestHelper {
 
                     if (!originJob.job_name.equals(job.job_name)) {
                         TestHelper.logE("job name not equal:" + originJob.job_name);
-                        TestHelper.setSomethingWrong();
-                    }
-
-                    if (job.job_status != 3) {
-                        TestHelper.logE("job status wrong:" + originJob.job_name + " status:" + job.job_status);
                         TestHelper.setSomethingWrong();
                     }
 
