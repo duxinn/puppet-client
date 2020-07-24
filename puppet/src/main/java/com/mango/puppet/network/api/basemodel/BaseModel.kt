@@ -7,7 +7,7 @@ open class BaseModel<T> {
     @SerializedName("status")
     var code = 0
 
-    @SerializedName("meesage")
+    @SerializedName("message")
     var msg: String? = null
 
     @SerializedName("data")
