@@ -178,7 +178,11 @@ class TestHelper {
             Log.e(TAG, "job null");
             return;
         }
-
+        try {
+            Log.i(TAG, "test:" + Thread.currentThread().getStackTrace()[3].getMethodName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         final int[] callbackTimes = {0};
         final CountDownLatch signal = new CountDownLatch(1);
         RequestHandler.getInstance().dealRequest(ipString, originJob, false, new DesCallBack<Object>() {
@@ -247,7 +251,11 @@ class TestHelper {
             Log.e(TAG, "job null");
             return;
         }
-
+        try {
+            Log.i(TAG, "test:" + Thread.currentThread().getStackTrace()[3].getMethodName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         final int[] callbackTimes = {0};
         final CountDownLatch signal = new CountDownLatch(1);
         RequestHandler.getInstance().dealRequest(ipString, originJob, true, new DesCallBack<Object>() {

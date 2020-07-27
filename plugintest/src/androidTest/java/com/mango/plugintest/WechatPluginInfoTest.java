@@ -82,15 +82,14 @@ public class WechatPluginInfoTest {
         }
     }
 
+    /**
+     * 获取当前登录用户的个人信息
+     */
     @Test
-    public void aaGetLocalUserInfo() {
-        String jobString = "{\n" +
-                "\t\"job_id\":0,\n" +
-                "\t\"package_name\":\"com.tencent.mm\",\n" +
-                "\t\"job_name\":\"get_local_user_info\",\n" +
-                "\t\"callback\":\"\"\n" +
-                "}";
-        Job job = Job.fromString(jobString);
+    public void test000_GetLocalUserInfo() {
+        Job job = new Job();
+        job.package_name = "com.tencent.mm";
+        job.job_name = "get_local_user_info";
         TestHelper.testSingleStepJob(job, new TestSingleStepJobHandler() {
             @Override
             public void onSingleStepSuccess(Job job) {
@@ -131,15 +130,14 @@ public class WechatPluginInfoTest {
         });
     }
 
+    /**
+     * 获取联系人列表
+     */
     @Test
-    public void abGetUserList() {
-        String jobString = "{\n" +
-                "\t\"job_id\":0,\n" +
-                "\t\"package_name\":\"com.tencent.mm\",\n" +
-                "\t\"job_name\":\"get_user_list\",\n" +
-                "\t\"callback\":\"\"\n" +
-                "}";
-        Job job = Job.fromString(jobString);
+    public void test010_GetUserList() {
+        Job job = new Job();
+        job.package_name = "com.tencent.mm";
+        job.job_name = "get_user_list";
         TestHelper.testSingleStepJob(job, new TestSingleStepJobHandler() {
             @Override
             public void onSingleStepSuccess(Job job) {
@@ -211,18 +209,20 @@ public class WechatPluginInfoTest {
         });
     }
 
+    /**
+     * 通过手机号搜索微信用户
+     */
     @Test
-    public void acSearchFriend() {
-        String jobString = "{\n" +
-                "\t\"job_id\":0,\n" +
-                "\t\"package_name\":\"com.tencent.mm\",\n" +
-                "\t\"job_name\":\"search_friend\",\n" +
-                "\t\"callback\":\"\",\n" +
-                "\t\"job_data\":{\n" +
-                "        \"phone\":\"18612690351\"\n" +
-                "\t}\n" +
-                "}\n";
-        Job job = Job.fromString(jobString);
+    public void test020_SearchFriend() {
+        Job job = new Job();
+        job.package_name = "com.tencent.mm";
+        job.job_name = "search_friend";
+        job.job_data = new JSONObject();
+        try {
+            job.job_data.put("phone", "18612690351");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         TestHelper.testDoubleStepJob(job, new TestDoubleStepJobHandler() {
             @Override
             public void onFirstStepSuccess(Job job) {
@@ -268,18 +268,20 @@ public class WechatPluginInfoTest {
         });
     }
 
+    /**
+     * 通过手机号搜索微信用户 号码不正确的情况
+     */
     @Test
-    public void adSearchFriendPhoneNotRight() {
-        String jobString = "{\n" +
-                "\t\"job_id\":0,\n" +
-                "\t\"package_name\":\"com.tencent.mm\",\n" +
-                "\t\"job_name\":\"search_friend\",\n" +
-                "\t\"callback\":\"\",\n" +
-                "\t\"job_data\":{\n" +
-                "        \"phone\":\"186126903\"\n" +
-                "\t}\n" +
-                "}\n";
-        Job job = Job.fromString(jobString);
+    public void test021_SearchFriendPhoneNotRight() {
+        Job job = new Job();
+        job.package_name = "com.tencent.mm";
+        job.job_name = "search_friend";
+        job.job_data = new JSONObject();
+        try {
+            job.job_data.put("phone", "186126903");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         TestHelper.testDoubleStepJob(job, new TestDoubleStepJobHandler() {
             @Override
             public void onFirstStepSuccess(Job job) {
@@ -304,18 +306,15 @@ public class WechatPluginInfoTest {
     }
 
 
+    /**
+     * 通过手机号搜索微信用户 号码为空的情况
+     */
     @Test
-    public void aeSearchFriendPhoneEmpty() {
-        String jobString = "{\n" +
-                "\t\"job_id\":0,\n" +
-                "\t\"package_name\":\"com.tencent.mm\",\n" +
-                "\t\"job_name\":\"search_friend\",\n" +
-                "\t\"callback\":\"\",\n" +
-                "\t\"job_data\":{\n" +
-                "        \"phone\":\"\"\n" +
-                "\t}\n" +
-                "}\n";
-        Job job = Job.fromString(jobString);
+    public void test022_SearchFriendPhoneEmpty() {
+        Job job = new Job();
+        job.package_name = "com.tencent.mm";
+        job.job_name = "search_friend";
+        job.job_data = new JSONObject();
         TestHelper.testDoubleStepJob(job, new TestDoubleStepJobHandler() {
             @Override
             public void onFirstStepSuccess(Job job) {
