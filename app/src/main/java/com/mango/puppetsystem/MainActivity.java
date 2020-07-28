@@ -37,13 +37,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tvLog, tvNet, tvJobCount, tvJobResultCount, tvJobEngineStatus, tvLocalStatus, tvEventWatcher;
     private EditText mEditWsUrl;
     private Button mBtnSetWsUrl;
+    private Button mBtnQrCode;
     private MyReceiver myReceiver;
     private long mExitTime = 0;
 
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE",
-            "android.permission.READ_PHONE_STATE"};
+            "android.permission.READ_PHONE_STATE",
+            "android.permission.CAMERA"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEditWsUrl = findViewById(R.id.edit_ws_url);
         mBtnSetWsUrl = findViewById(R.id.btn_set_ws_url);
         mBtnSetWsUrl.setOnClickListener(this);
+        mBtnQrCode = findViewById(R.id.btn_qrcode);
+        mBtnQrCode.setOnClickListener(this);
         String storeUrl = PreferenceUtils.getInstance().getString(KEY_SOCKET_URL, "");
         mEditWsUrl.setText(storeUrl);
 
@@ -101,7 +105,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 "android.permission.WRITE_EXTERNAL_STORAGE");
         int permission1 = ActivityCompat.checkSelfPermission(this,
                 "android.permission.READ_PHONE_STATE");
-        if (permission != PackageManager.PERMISSION_GRANTED || permission1 != PackageManager.PERMISSION_GRANTED) {
+        int permission2 = ActivityCompat.checkSelfPermission(this,
+                "android.permission.CAMERA");
+        if (permission != PackageManager.PERMISSION_GRANTED
+                || permission1 != PackageManager.PERMISSION_GRANTED
+                || permission2 != PackageManager.PERMISSION_GRANTED) {
             verifyStoragePermissions(this);
         }
     }
@@ -200,7 +208,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void run() {
                         System.exit(1);
                     }
-                }, 1500);
+                }, 2500);
+            }
+        } else if (v.getId() == R.id.btn_qrcode) {
+            int permission = ActivityCompat.checkSelfPermission(this,
+                    "android.permission.CAMERA");
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                verifyStoragePermissions(this);
+            } else {
+                Intent intent = new Intent(this, QrCodeActivity.class);
+                startActivityForResult(intent, 100);
             }
         }
     }
@@ -238,6 +255,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent home = new Intent(Intent.ACTION_MAIN);
                 home.addCategory(Intent.CATEGORY_HOME);
                 startActivity(home);
+            }
+        } else if (requestCode == 100 && resultCode == 100) {
+            String qrString = data.getStringExtra("qrString");
+            if (TextUtils.isEmpty(qrString)) {
+                Toast.makeText(this, "未识别二维码", Toast.LENGTH_SHORT).show();
+            } else {
+                mEditWsUrl.setText(qrString);
+                PreferenceUtils.getInstance().setString(KEY_SOCKET_URL, mEditWsUrl.getText().toString().trim());
+                Toast.makeText(this, "设置成功即将重启", Toast.LENGTH_LONG).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.exit(1);
+                    }
+                }, 2500);
             }
         }
     }
