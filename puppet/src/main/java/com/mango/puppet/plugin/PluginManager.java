@@ -1,10 +1,12 @@
 package com.mango.puppet.plugin;
 
 import android.annotation.SuppressLint;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 
 import androidx.core.app.ActivityCompat;
 
@@ -19,6 +21,7 @@ import com.mango.puppet.plugin.i.IPluginJob;
 import com.mango.puppet.plugin.i.IPluginRunListener;
 import com.mango.puppet.systemplugin.SystemPluginManager;
 import com.mango.puppet.systemplugin.i.ISystemPluginExecute;
+import com.mango.puppet.tool.PuppetTool;
 import com.mango.puppetmodel.Event;
 import com.mango.puppetmodel.EventWatcher;
 import com.mango.puppetmodel.Job;
@@ -33,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static android.content.Context.KEYGUARD_SERVICE;
 
 /**
  * PluginManager
@@ -231,7 +236,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
             }
         }
         if (toStartPllugin.size() == 0) {
-            iPluginControlResult=null;
+            iPluginControlResult = null;
             result.onFinished(false, "插件已全部启动");
             return;
         }
@@ -325,6 +330,42 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     @Override
     public void distributeJob(final Job job, final IPluginJobCallBack result) {
         LogManager.getInstance().recordDebugLog("开始将任务下发给插件" + job.job_id);
+        if (PuppetTool.needWakeUp(job)) {
+            wakeUpAndUnlock(job, result);
+        } else {
+            if (runningPackageNames.contains(job.package_name)) {
+                result.onFinished(job, true, "");
+                TransmitManager.getInstance().sendJob(job.package_name, job);
+            } else {
+                result.onFinished(job, false, "插件未运行");
+            }
+        }
+    }
+
+    /**
+     * 唤醒手机屏幕并解锁并调回前台
+     */
+    private void wakeUpAndUnlock(final Job job, final IPluginJobCallBack result) {
+        // 获取电源管理器对象
+        PowerManager pm = (PowerManager) context
+                .getSystemService(Context.POWER_SERVICE);
+        boolean screenOn = pm.isScreenOn();
+        if (!screenOn) {
+            // 获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
+            @SuppressLint("InvalidWakeLockTag") PowerManager.WakeLock wl = pm.newWakeLock(
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP |
+                            PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "bright");
+            wl.acquire(10000); // 点亮屏幕
+            wl.release(); // 释放
+        }
+        // 屏幕解锁
+        KeyguardManager keyguardManager = (KeyguardManager) context
+                .getSystemService(KEYGUARD_SERVICE);
+        KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("unLock");
+        // 屏幕锁定
+        keyguardLock.reenableKeyguard();
+        keyguardLock.disableKeyguard(); // 解锁
+
         String activityName = "";
         for (PluginModel model : models) {
             if (model.getPackageName().equals(job.package_name))
