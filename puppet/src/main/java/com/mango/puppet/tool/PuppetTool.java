@@ -7,19 +7,20 @@ import java.util.Map;
 
 public class PuppetTool {
     private static String[] weixinPageJob = new String[]{
-            Job.SCAN_ADD_GROUP,
-            Job.URL_ADD_CHATROOM,
             Job.RECEIVE_RED,
             Job.RECEIVE_TRANSFER,
             Job.CHATROOM_RED,
             Job.SINGLE_RED,
+            Job.SEND_TRANSFER,
             Job.GET_BALANCE,
             Job.SEND_VIDEO_TIMELINE,
             Job.SEND_NORMAL_TIMELINE,
             Job.SEND_LINK_TIMELINE,
             Job.CREATE_CHATROOM,
-            Job.SEND_TRANSFER,
-            Job.GET_CHATROOM_QRCODE
+            Job.SCAN_ADD_GROUP,
+            Job.GET_CHATROOM_QRCODE,
+            Job.URL_ADD_CHATROOM,
+            Job.EXIT_CHATROOM
     };
     private static Map map = new HashMap();
 
