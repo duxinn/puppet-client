@@ -109,6 +109,8 @@ public class EventManager implements IEvent {
                     if (!isValid) {
                         eventWatcherList.remove(i);
                         i = i - 1;
+                    } else {
+                        eventWatcherList.get(i).callback = url;
                     }
                     isNeed = false;
                 }

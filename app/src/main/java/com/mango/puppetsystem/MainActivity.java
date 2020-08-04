@@ -67,25 +67,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         initEvent();
-        if (!isIgnoringBatteryOptimizations()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                try {
-                    PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-                    boolean hasIgnored = powerManager.isIgnoringBatteryOptimizations(getPackageName());
-                    /**
-                     * 判断当前APP是否有加入电池优化的白名单，
-                     * 如果没有，弹出加入电池优化的白名单的设置对话框
-                     * */
-                    if (!hasIgnored) {
-                        Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                        intent.setData(Uri.parse("package:" + getPackageName()));
-                        startActivity(intent);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     private boolean isIgnoringBatteryOptimizations() {
