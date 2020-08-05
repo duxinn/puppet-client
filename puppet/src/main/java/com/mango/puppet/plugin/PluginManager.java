@@ -237,7 +237,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         }
         if (toStartPllugin.size() == 0) {
             iPluginControlResult = null;
-            result.onFinished(false, "插件已全部启动");
+            result.onFinished(true, "插件已全部启动");
             return;
         }
         callBack = false;

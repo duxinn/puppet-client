@@ -109,7 +109,7 @@ public class NetworkManager implements INetwork {
                 }
             });
         } else {
-            WsManager.getInstance(context).startConnect().setWsStatusListener(new WsStatusListener() {
+            WsManager.getInstance(context).setWsStatusListener(new WsStatusListener() {
                 @Override
                 public void onOpen(Response response) {
                     super.onOpen(response);
@@ -118,12 +118,14 @@ public class NetworkManager implements INetwork {
                         iSetupResult[0].onSuccess();
                         iSetupResult[0] = null;
                     }
+                    StatusManager.getInstance().setNetworkStatus(SERVER_START);
+                    status = SERVER_START;
                 }
 
                 @Override
                 public void onMessage(String text) {
                     super.onMessage(text);
-                    Log.d(TAG, "WsManager-----onMessage(String): " + text + "\n");
+//                    Log.d(TAG, "WsManager-----onMessage(String): " + text + "\n");
                     JSONObject object = JSON.parseObject(text);
                     String requestId = object.getString("request_id");
                     String type = object.getString("type");
@@ -205,7 +207,7 @@ public class NetworkManager implements INetwork {
                 @Override
                 public void onMessage(ByteString bytes) {
                     super.onMessage(bytes);
-                    Log.d(TAG, "WsManager-----onMessage(ByteString): " + bytes + "\n");
+//                    Log.d(TAG, "WsManager-----onMessage(ByteString): " + bytes + "\n");
                 }
 
                 @Override
@@ -224,6 +226,8 @@ public class NetworkManager implements INetwork {
                 public void onClosed(int code, String reason) {
                     super.onClosed(code, reason);
                     Log.d(TAG, "WsManager-----onClosed reason: " + reason + "\n");
+                    StatusManager.getInstance().setNetworkStatus(SERVER_STOP);
+                    status = SERVER_STOP;
                 }
 
                 @Override
@@ -234,10 +238,11 @@ public class NetworkManager implements INetwork {
                         iSetupResult[0].onFailure();
                         iSetupResult[0] = null;
                     }
+                    StatusManager.getInstance().setNetworkStatus(SERVER_ERROR);
+                    status = SERVER_ERROR;
                 }
-            });
+            }).startConnect();
         }
-
     }
 
     @Override

@@ -27,8 +27,8 @@ public class WsManager implements IWsManager {
     public final static String KEY_SOCKET_URL = "KEY_SOCKET_URL";
     public final static String WEB_SOCKET_URL = "ws://proxy.hzdaba.cn:35005/wx_api?deviceid=";
 
-    private final static int RECONNECT_INTERVAL = 10 * 1000;    //重连自增步长
-    private final static long RECONNECT_MAX_TIME = 120 * 1000;   //最大重连间隔
+    private final static int RECONNECT_INTERVAL = 5 * 1000;    //重连自增步长
+    private final static long RECONNECT_MAX_TIME = 60 * 1000;   //最大重连间隔
     private static Context mContext;
     private String wsUrl;
     private WebSocket mWebSocket;
@@ -47,6 +47,7 @@ public class WsManager implements IWsManager {
         // url: baseUrl + deviceId
         String url = (!TextUtils.isEmpty(PreferenceUtils.getInstance().getString(KEY_SOCKET_URL, "")) ? PreferenceUtils.getInstance().getString(KEY_SOCKET_URL, "") : WEB_SOCKET_URL)
                 + PreferenceUtils.getInstance().getString(KEY_CLIENT_DEVICE_ID, null);
+//        url = "ws://47.110.152.176:8888/websocket";
         if (mWsManager == null) {
             mContext = context;
             mWsManager = new Builder(context)
@@ -207,8 +208,9 @@ public class WsManager implements IWsManager {
     }
 
 
-    public void setWsStatusListener(WsStatusListener wsStatusListener) {
+    public WsManager setWsStatusListener(WsStatusListener wsStatusListener) {
         this.wsStatusListener = wsStatusListener;
+        return this;
     }
 
     @Override
@@ -229,7 +231,22 @@ public class WsManager implements IWsManager {
     @Override
     public WsManager startConnect() {
         isManualClose = false;
-        buildConnect();
+        if (mCurrentStatus == WsStatus.CONNECTED) {
+            if (wsStatusListener != null) {
+                if (Looper.myLooper() != Looper.getMainLooper()) {
+                    wsMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            wsStatusListener.onOpen(null);
+                        }
+                    });
+                } else {
+                    wsStatusListener.onOpen(null);
+                }
+            }
+        } else {
+            buildConnect();
+        }
         return this;
     }
 
@@ -289,6 +306,7 @@ public class WsManager implements IWsManager {
     private synchronized void buildConnect() {
         if (!isNetworkConnected(mContext)) {
             setCurrentStatus(WsStatus.DISCONNECTED);
+            tryReconnect();
             return;
         }
         switch (getCurrentStatus()) {

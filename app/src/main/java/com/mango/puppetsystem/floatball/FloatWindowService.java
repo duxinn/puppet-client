@@ -186,7 +186,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
 
     @Override
     public void onNetworkStatusChanged(boolean isNetOk) {
-        tvNet.setText(isNetOk ? "服务器运行中" : "服务器已停止");
+        tvNet.setText(isNetOk ? "网络状态:已连接" : "网络状态:已断开");
         sendBroadCastToActivity(tvNet.getText().toString(), NormalConst.TYPE_NET);
     }
 
