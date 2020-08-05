@@ -1,4 +1,4 @@
-package com.mango.puppetsystem;
+package com.mango.puppet.bean;
 
 public class NormalConst {
     public static String TYPE_JOB="job";

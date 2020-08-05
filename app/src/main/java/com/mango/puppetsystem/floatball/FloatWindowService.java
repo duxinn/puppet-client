@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,13 +20,14 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.mango.puppet.bean.NormalConst;
 import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.log.i.ILog;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.status.i.IStatusListener;
+import com.mango.puppet.tool.TextTool;
 import com.mango.puppetsystem.AppApplication;
-import com.mango.puppetsystem.NormalConst;
 import com.mango.puppetsystem.R;
 
 import java.util.ArrayList;
@@ -66,7 +68,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         }
         layoutParams.format = PixelFormat.RGBA_8888;
         layoutParams.gravity = Gravity.CENTER | Gravity.TOP;
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE ;
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 
 
         int height = windowManager.getDefaultDisplay().getHeight();
@@ -126,6 +128,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             llRetry.setOnClickListener(this);
             windowManager.addView(displayView, layoutParams);
             windowmanagerOut.addView(displayViewOut, layoutParamsOut);
+            TextTool.setText(tvLog, tvNet,tvJobEngineStatus,tvEventWatcher,tvLocalStatus,tvJobCount,tvJobResultCount);
         }
     }
 
@@ -164,6 +167,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         }
         string += "...";
         tvLog.setText(string);
+        TextTool.statusChange(NormalConst.TYPE_LOG,string);
     }
 
     @Override
@@ -187,6 +191,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
     @Override
     public void onNetworkStatusChanged(boolean isNetOk) {
         tvNet.setText(isNetOk ? "网络状态:已连接" : "网络状态:已断开");
+        TextTool.statusChange(NormalConst.TYPE_NET,tvNet.getText().toString());
         sendBroadCastToActivity(tvNet.getText().toString(), NormalConst.TYPE_NET);
     }
 
@@ -205,6 +210,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             text = "未知状态";
         }
         tvJobEngineStatus.setText(text);
+        TextTool.statusChange(NormalConst.TYPE_JOB_ENGINE_STATUS,tvJobEngineStatus.getText().toString());
         sendBroadCastToActivity(tvJobEngineStatus.getText().toString(), NormalConst.TYPE_JOB_ENGINE_STATUS);
     }
 
@@ -226,6 +232,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             }
         }
         tvEventWatcher.setText(sb.toString());
+        TextTool.statusChange(NormalConst.TYPE_EVENT_WATCHER,tvEventWatcher.getText().toString());
         sendBroadCastToActivity(tvEventWatcher.getText().toString(), NormalConst.TYPE_EVENT_WATCHER);
     }
 
@@ -246,18 +253,21 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             }
         }
         tvLocalStatus.setText(sb);
+        TextTool.statusChange(NormalConst.TYPE_PLUGIN_RUNNING,tvLocalStatus.getText().toString());
         sendBroadCastToActivity(sb.toString(), NormalConst.TYPE_PLUGIN_RUNNING);
     }
 
     @Override
     public void onJobCountChanged(int count) {
         tvJobCount.setText(count + "");
+        TextTool.statusChange(NormalConst.TYPE_JOB,tvJobCount.getText().toString());
         sendBroadCastToActivity(count + "", NormalConst.TYPE_JOB);
     }
 
     @Override
     public void onJobResultCountChanged(int count) {
         tvJobResultCount.setText(count + "");
+        TextTool.statusChange(NormalConst.TYPE_JOB_RESULT,tvJobResultCount.getText().toString());
         sendBroadCastToActivity(count + "", NormalConst.TYPE_JOB_RESULT);
     }
 

@@ -14,6 +14,7 @@ import com.mango.loadlibtool.InjectTool;
 import com.mango.puppet.bean.PluginModel;
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
+import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginEvent;
@@ -59,6 +60,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     private boolean callBack = false;
     private IPluginControlResult iPluginControlResult;
     private Timer timer;
+    private boolean restarted = false;
 
     public static PluginManager getInstance() {
         return ourInstance;
@@ -178,7 +180,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        for (PluginModel model : models) {
+                        for (final PluginModel model : models) {
                             if (model.isRun()) {
                                 if (!runningPackageNames.contains(model.getPackageName())) {
                                     runningPackageNames.add(model.getPackageName());
@@ -201,6 +203,18 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                                     event.event_data = object;
                                     EventManager.getInstance().uploadNewEvent(event);
                                     runningPackageNames.remove(model.getPackageName());
+                                    if (!restarted) {
+                                        restarted = true;
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (!runningPackageNames.contains(model.getPackageName())) {
+                                                    SystemManager.getInstance().startSystem(context);
+                                                    restarted = false;
+                                                }
+                                            }
+                                        }, 7000);
+                                    }
                                     if (listener != null) {
                                         listener.onPluginRunningStatusChange(model.getPackageName(), false);
                                     }

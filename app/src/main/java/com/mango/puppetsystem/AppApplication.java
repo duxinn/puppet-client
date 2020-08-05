@@ -6,6 +6,7 @@ import android.util.Log;
 import com.mango.puppet.systemplugin.SystemPluginManager;
 import com.mango.puppet.systemplugin.i.ISystemPluginListener;
 import com.mango.puppet.tool.PreferenceUtils;
+import com.mango.puppet.tool.TextTool;
 
 public class AppApplication extends Application {
 
@@ -16,6 +17,7 @@ public class AppApplication extends Application {
         super.onCreate();
         instance = this;
         PreferenceUtils.getInstance().init(this);
+        TextTool.resetAllLog();
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     }
 }
