@@ -61,6 +61,8 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     private IPluginControlResult iPluginControlResult;
     private Timer timer;
     private boolean restarted = false;
+    private List<String> heartModel = new ArrayList<>();
+    private boolean isRunningPlugin = false;
 
     public static PluginManager getInstance() {
         return ourInstance;
@@ -85,11 +87,13 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
      */
     @Override
     public void runPuppetPlugin() {
+        isRunningPlugin = true;
         final PluginModel pluginModel = toStartPllugin.get(0);
         LogManager.getInstance().recordDebugLog("启动插件" + pluginModel.getPackageName() + pluginModel.getDexName());
         InjectTool.inject(context, pluginModel.getPackageName(), pluginModel.getDexName(), pluginModel.getClassName(), pluginModel.getMethodName(), pluginModel.getActivityName(), new InjectTool.InjectResult() {
             @Override
             public void injectFinished(boolean isSuccess, String failReason) {
+                isRunningPlugin = false;
                 if (isSuccess) {
                     LogManager.getInstance().recordDebugLog("注入成功:" + pluginModel.getPackageName());
                     runningPackageNames.add(pluginModel.getPackageName());
@@ -203,18 +207,24 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                                     event.event_data = object;
                                     EventManager.getInstance().uploadNewEvent(event);
                                     runningPackageNames.remove(model.getPackageName());
-                                    if (!restarted) {
-                                        restarted = true;
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (!runningPackageNames.contains(model.getPackageName())) {
-                                                    SystemManager.getInstance().startSystem(context);
-                                                    restarted = false;
+                                    if (!restarted){
+                                        heartModel.clear();
+                                    }
+                                    restarted =true;
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            restarted = false;
+                                            if (!heartModel.contains(model.getPackageName())) {
+                                                if (!toStartPllugin.contains(model)) {
+                                                    toStartPllugin.add(model);
+                                                    if (!isRunningPlugin) {
+                                                        runPuppetPlugin();
+                                                    }
                                                 }
                                             }
-                                        }, 7000);
-                                    }
+                                        }
+                                    }, 7000);
                                     if (listener != null) {
                                         listener.onPluginRunningStatusChange(model.getPackageName(), false);
                                     }
@@ -426,6 +436,9 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         try {
             String type = jsonObject.getString(TransmitManager.TYPE_KEY);
             if (TransmitManager.HEART_KEY.equals(type)) {
+                if (!heartModel.contains(packageName)) {
+                    heartModel.add(packageName);
+                }
                 for (PluginModel model : models) {
                     if (packageName.equals(model.getPackageName())) {
                         model.setRun(true);
