@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.mango.loadlibtool.CommandTool;
 import com.mango.puppet.bean.NormalConst;
 import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
@@ -116,7 +117,8 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             LayoutInflater layoutInflater = LayoutInflater.from(this);
             displayView = layoutInflater.inflate(R.layout.view_floatwindow, null);
             displayViewOut = layoutInflater.inflate(R.layout.view_floatwindow_out, null);
-            LinearLayout llRetry = displayViewOut.findViewById(R.id.llRetry);
+            displayViewOut.findViewById(R.id.runTv).setOnClickListener(this);
+            displayViewOut.findViewById(R.id.closeTv).setOnClickListener(this);
             tvLog = displayView.findViewById(R.id.tvlog);
             tvNet = displayView.findViewById(R.id.tvNetStatus);
             tvJobCount = displayView.findViewById(R.id.tvJob);
@@ -125,7 +127,6 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             tvLocalStatus = displayView.findViewById(R.id.tvLocalStatus);
             tvEventWatcher = displayView.findViewById(R.id.tvEventWatcher);
             StatusManager.getInstance().setNetworkStatus(StatusManager.getInstance().getNetworkStatus());//重设网络状态
-            llRetry.setOnClickListener(this);
             windowManager.addView(displayView, layoutParams);
             windowmanagerOut.addView(displayViewOut, layoutParamsOut);
             TextTool.setText(tvLog, tvNet,tvJobEngineStatus,tvEventWatcher,tvLocalStatus,tvJobCount,tvJobResultCount);
@@ -134,8 +135,10 @@ public class FloatWindowService extends Service implements View.OnClickListener,
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.llRetry) {
+        if (view.getId() == R.id.runTv) {
             SystemManager.getInstance().startSystem(AppApplication.instance);
+        } else if (view.getId() == R.id.closeTv) {
+            CommandTool.execRootCmdSilent(CommandTool.stopApplicationCommand(getPackageName()));
         }
     }
 
