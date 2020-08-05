@@ -114,6 +114,8 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                             iPluginControlResult = null;
                             sendHeart();
                             callBack = true;
+                        } else {
+                            JobManager.getInstance().startJobSystem(SystemManager.getInstance().getContext());
                         }
                     }
                 } else {

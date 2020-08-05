@@ -42,6 +42,10 @@ public class SystemManager implements ISystem, IPluginRunListener {
     }
 
     /************   public   ************/
+    public Context getContext() {
+        return context;
+    }
+
     public String getDeviceId() {
         if (!TextUtils.isEmpty(deviceId)) {
             return deviceId;
