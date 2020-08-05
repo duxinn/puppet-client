@@ -287,7 +287,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                         TransmitManager.getInstance().setTransmitReceiver(this);
                         ArrayList<String> actions = new ArrayList<>();
                         actions.add(TransmitManager.MANAGER_PACKAGE_NAME);
-                        TransmitManager.getInstance().setRegister(context, actions);
+                        TransmitManager.getInstance().setRegister(context, actions, null);
                         for (final PluginModel pluginModel : toStartPllugin) {
                             if (!pluginPackageNames.contains(pluginModel.getPackageName())) {
                                 result.onFinished(false, pluginModel.getPackageName() + "插件不可用");
