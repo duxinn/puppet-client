@@ -353,6 +353,12 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
     }
 
     /************   IPluginJob   ************/
+
+    @Override
+    public boolean isAllPluginRun() {
+        return toStartPllugin.size() == 0;
+    }
+
     @Override
     public void distributeJob(final Job job, final IPluginJobCallBack result) {
         LogManager.getInstance().recordDebugLog("开始将任务下发给插件" + job.job_id);

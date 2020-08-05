@@ -88,6 +88,9 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     /* private */
 
     private boolean canDistributeJob() {
+        if (!PluginManager.getInstance().isAllPluginRun()) {
+            return false;
+        }
         if (DBManager.getJobsDependOnStatus(5).size() > 0 ||
                 DBManager.getJobsDependOnStatus(6).size() > 0) {
             StringBuilder jobid= new StringBuilder();

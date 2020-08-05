@@ -20,6 +20,8 @@ public interface IPluginJob {
      */
     void distributeJob(Job job, IPluginJobCallBack result);
 
+    boolean isAllPluginRun();
+
     interface IPluginJobCallBack {
 
         /**
