@@ -73,7 +73,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     public void onFinished(Job job, boolean isSucceed, String failReason) {
         if (!isSucceed) {
             isDistributedJob = false;
-            job.job_status = 5;
+            job.job_status = 0;
             boolean b = DBManager.updateJobStatus(job);
             if (!b) {
                 Log.e("JobManager", "DBManager.updateJobStatus error ");
