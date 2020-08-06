@@ -109,6 +109,8 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         });
         displayView.setVisibility(View.VISIBLE);
         displayViewOut.setVisibility(View.VISIBLE);
+        LogManager.getInstance().setNewLogListener(this);
+        StatusManager.getInstance().setStatusListener(this);
         return super.onStartCommand(intent, flags, startId);
     }
 
