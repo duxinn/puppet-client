@@ -161,6 +161,6 @@ public class SystemManager implements ISystem, IPluginRunListener {
             }
         };
         timer = new Timer();
-        timer.schedule(timerTask, 5000, 60 * 1000);
+        timer.schedule(timerTask, 5000, 60 * 10 * 1000);
     }
 }
