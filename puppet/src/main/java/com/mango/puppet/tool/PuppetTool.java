@@ -12,15 +12,16 @@ public class PuppetTool {
             Job.CHATROOM_RED,
             Job.SINGLE_RED,
             Job.SEND_TRANSFER,
+
             Job.GET_BALANCE,
+            Job.GET_CHATROOM_QRCODE,
 //            Job.SEND_VIDEO_TIMELINE,
 //            Job.SEND_NORMAL_TIMELINE,
 //            Job.SEND_LINK_TIMELINE,
-            Job.CREATE_CHATROOM,
-            Job.SCAN_ADD_GROUP,
-            Job.GET_CHATROOM_QRCODE,
-            Job.URL_ADD_CHATROOM,
-            Job.EXIT_CHATROOM
+//            Job.CREATE_CHATROOM,
+//            Job.SCAN_ADD_GROUP,
+//            Job.URL_ADD_CHATROOM,
+//            Job.EXIT_CHATROOM
     };
     private static Map map = new HashMap();
 

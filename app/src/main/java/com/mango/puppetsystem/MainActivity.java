@@ -28,6 +28,7 @@ import com.mango.loadlibtool.CommandTool;
 import com.mango.puppet.bean.NormalConst;
 import com.mango.puppet.tool.PreferenceUtils;
 import com.mango.puppetsystem.floatball.FloatBallService;
+import com.mango.puppetsystem.floatball.FloatWindowService;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -59,15 +60,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         boolean isRoot = hasRoot();
         if (!isRoot) {
             writeLog("请先开启ROOT权限");
-        } else {
-            CommandTool.execRootCmdSilent("settings put system screen_off_timeout 2147483647");
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initEvent();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initEvent();
+            }
+        }, 800);
     }
 
     private boolean isIgnoringBatteryOptimizations() {
@@ -192,18 +196,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void startFloatBallService() {
-        if (FloatBallService.isStarted) {
-            return;
-        }
+
+        Intent stopIntent = new Intent(this, FloatBallService.class);
+        stopService(stopIntent);
+        stopIntent = new Intent(this, FloatWindowService.class);
+        stopService(stopIntent);
+
         if (!Settings.canDrawOverlays(this)) {
             startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), 1);
         } else {
-            Intent intent = new Intent(this, FloatBallService.class);
-            startService(intent);
 
-            Intent home = new Intent(Intent.ACTION_MAIN);
-            home.addCategory(Intent.CATEGORY_HOME);
-            startActivity(home);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(MainActivity.this, FloatBallService.class);
+                    startService(intent);
+
+                    Intent home = new Intent(Intent.ACTION_MAIN);
+                    home.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(home);
+                }
+            }, 500);
         }
     }
 
@@ -214,11 +227,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v.getId() == R.id.btn_set_ws_url) {
             if (!TextUtils.isEmpty(mEditWsUrl.getText().toString().trim())) {
                 PreferenceUtils.getInstance().setString(KEY_SOCKET_URL, mEditWsUrl.getText().toString().trim());
-                Toast.makeText(this, "设置成功即将重启", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "设置成功即将关闭,请重启", Toast.LENGTH_LONG).show();
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        System.exit(1);
+                        CommandTool.execRootCmdSilent(CommandTool.stopApplicationCommand(getPackageName()));
                     }
                 }, 2500);
             }
@@ -275,11 +288,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 mEditWsUrl.setText(qrString);
                 PreferenceUtils.getInstance().setString(KEY_SOCKET_URL, mEditWsUrl.getText().toString().trim());
-                Toast.makeText(this, "设置成功即将重启", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "设置成功即将关闭,请重启", Toast.LENGTH_LONG).show();
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        System.exit(1);
+                        CommandTool.execRootCmdSilent(CommandTool.stopApplicationCommand(getPackageName()));
                     }
                 }, 2500);
             }

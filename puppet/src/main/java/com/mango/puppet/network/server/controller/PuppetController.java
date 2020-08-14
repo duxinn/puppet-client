@@ -96,7 +96,8 @@ class PuppetController {
             String package_name = jsonObject.getString("package_name");
             String job_name = jsonObject.getString("job_name");
             String callback = jsonObject.getString("callback");
-            int noRepeat = jsonObject.getIntValue("no_repeat");
+            int no_repeat = jsonObject.getIntValue("no_repeat");
+            int fail_stop = jsonObject.getIntValue("fail_stop");
             JSONObject job_data = null;
             try {
                 job_data = new JSONObject(JsonUtils.toJsonString(jsonObject.getJSONObject("job_data")));
@@ -110,7 +111,8 @@ class PuppetController {
                 job.job_id = job_id;
                 job.package_name = package_name;
                 job.job_name = job_name;
-                job.no_repeat = noRepeat;
+                job.no_repeat = no_repeat;
+                job.fail_stop = fail_stop;
                 job.callback = callback;
                 if (job_data != null) {
                     job.job_data = job_data;

@@ -120,6 +120,7 @@ public class NetworkManager implements INetwork {
                     }
                     StatusManager.getInstance().setNetworkStatus(SERVER_START);
                     status = SERVER_START;
+                    LogManager.getInstance().recordLog("webSocket onOpen");
                 }
 
                 @Override
@@ -165,6 +166,8 @@ public class NetworkManager implements INetwork {
                             String package_name = jsonObject.getString("package_name");
                             String job_name = jsonObject.getString("job_name");
                             String callback = jsonObject.getString("callback");
+                            int no_repeat = jsonObject.getIntValue("no_repeat");
+                            int fail_stop = jsonObject.getIntValue("fail_stop");
                             org.json.JSONObject job_data = null;
                             try {
                                 job_data = new org.json.JSONObject(JsonUtils.toJsonString(jsonObject.getJSONObject("job_data")));
@@ -180,6 +183,8 @@ public class NetworkManager implements INetwork {
                                 job.package_name = package_name;
                                 job.job_name = job_name;
                                 job.callback = callback;
+                                job.no_repeat = no_repeat;
+                                job.fail_stop = fail_stop;
                                 if (job_data != null) {
                                     job.job_data = job_data;
                                 } else {
@@ -228,6 +233,7 @@ public class NetworkManager implements INetwork {
                     Log.d(TAG, "WsManager-----onClosed reason: " + reason + "\n");
                     StatusManager.getInstance().setNetworkStatus(SERVER_STOP);
                     status = SERVER_STOP;
+                    LogManager.getInstance().recordLog("webSocket onClosed");
                 }
 
                 @Override
@@ -240,6 +246,7 @@ public class NetworkManager implements INetwork {
                     }
                     StatusManager.getInstance().setNetworkStatus(SERVER_ERROR);
                     status = SERVER_ERROR;
+                    LogManager.getInstance().recordLog("webSocket onFailure");
                 }
             }).startConnect();
         }

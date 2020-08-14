@@ -139,6 +139,7 @@ public class WsManager implements IWsManager {
 
         @Override
         public void onClosed(WebSocket webSocket, final int code, final String reason) {
+            tryReconnect();
             if (wsStatusListener != null) {
                 if (Looper.myLooper() != Looper.getMainLooper()) {
                     wsMainHandler.post(new Runnable() {
@@ -347,7 +348,7 @@ public class WsManager implements IWsManager {
     }
 
     //检查网络是否连接
-    private boolean isNetworkConnected(Context context) {
+    public static boolean isNetworkConnected(Context context) {
         if (context != null) {
             ConnectivityManager mConnectivityManager = (ConnectivityManager) context
                     .getSystemService(Context.CONNECTIVITY_SERVICE);

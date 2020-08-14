@@ -28,7 +28,6 @@ public class FloatBallService extends Service {
     public static boolean flag;
     private float x;
     private float y;
-    public static boolean isStarted = false;
     private int injectStatus;
 
     @Override
@@ -49,7 +48,6 @@ public class FloatBallService extends Service {
     public int onStartCommand(final Intent intent, int flags, int startId) {
         init();
         injectStatus = intent.getIntExtra("injectStatus", 0);
-        isStarted = true;
         //点击关闭悬浮窗 显示悬浮球
         if (flag) {
             floatBall.setVisibility(View.VISIBLE);

@@ -4,22 +4,24 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.mango.puppet.bean.PluginModel;
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.dispatch.system.i.ISystem;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.network.NetworkManager;
 import com.mango.puppet.network.i.INetwork;
+import com.mango.puppet.network.wsmanager.WsManager;
 import com.mango.puppet.plugin.PluginManager;
-import com.mango.puppet.bean.PluginModel;
 import com.mango.puppet.plugin.i.IPluginControl;
 import com.mango.puppet.plugin.i.IPluginRunListener;
 import com.mango.puppet.status.StatusManager;
 import com.mango.puppet.systemplugin.SystemPluginManager;
 import com.mango.puppet.tool.DeviceIdTool;
-import com.mango.puppet.tool.PreferenceUtils;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * SystemManager
@@ -37,6 +39,9 @@ public class SystemManager implements ISystem, IPluginRunListener {
 
     private Context context = null;
     private String deviceId = null;
+
+    private Timer timer = null;
+    private TimerTask timerTask = null;
 
     private SystemManager() {
     }
@@ -59,6 +64,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
     /************   ISystem   ************/
     @Override
     public void startSystem(final Context context) {
+        destroyTimer();
         this.context = context;
         deviceId = DeviceIdTool.getDeviceId(context);
         LogManager.init(context);
@@ -103,6 +109,9 @@ public class SystemManager implements ISystem, IPluginRunListener {
                                 public void onSuccess() {
                                     LogManager.getInstance().recordLog("Network启动成功");
                                     LogManager.getInstance().recordLog("Puppet启动成功");
+
+                                    createTimer();
+
                                 }
 
                                 @Override
@@ -123,5 +132,35 @@ public class SystemManager implements ISystem, IPluginRunListener {
         LogManager.getInstance().recordLog(packageName + "木马插件运行状态变化为" + isRunning);
         Log.d(getClass().toString(), "onPluginRunningStatusChange:" + packageName + isRunning);
         StatusManager.getInstance().setPluginRunning(packageName, isRunning);
+    }
+
+    private void destroyTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+        if (timerTask != null) {
+            timerTask.cancel();
+            timerTask = null;
+        }
+    }
+
+    private void createTimer() {
+        destroyTimer();
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                boolean isConnect = WsManager.isNetworkConnected(context);
+                String s = "";
+                if (isConnect) {
+                    s += "网络正常 ";
+                } else {
+                    s += "网络已断开 ";
+                }
+                LogManager.getInstance().recordLog(s);
+            }
+        };
+        timer = new Timer();
+        timer.schedule(timerTask, 5000, 60 * 1000);
     }
 }

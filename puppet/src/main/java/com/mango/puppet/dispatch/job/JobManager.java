@@ -132,6 +132,10 @@ public class JobManager implements IJob {
 
     @Override
     public void receiveJobResult(Job jobResult) {
+        // 任务失败 fail_stop 如果为0 则自动取消任务
+        if (jobResult.job_status == 5 && jobResult.fail_stop == 0) {
+            jobResult.job_status = 4;
+        }
         LogManager.getInstance().recordLog("接收到一个执行完毕的任务" + jobResult.job_id);
         ExecutorManager.getInstance().receiveJobResult();
         Log.d("JobManager", "receiveJobResult job_status:" + jobResult.job_status);
