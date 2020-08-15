@@ -53,7 +53,6 @@ public class EventManager implements IEvent {
     /************   IEvent   ************/
     @Override
     public void uploadNewEvent(Event event) {
-        LogManager.getInstance().recordDebugLog("上报新事件"+event.event_name);
 
         String url = null;
         for (int i = 0; i < eventWatcherList.size(); i++) {
@@ -61,6 +60,7 @@ public class EventManager implements IEvent {
                 url = eventWatcherList.get(i).callback;
             }
         }
+        LogManager.getInstance().recordLog("上报新事件"+event.event_name + url);
         if (event != null && url != null) {
             NetworkManager.getInstance().reportEvent(url, event, new INetwork.IEventRequestResult() {
                 @Override
@@ -81,6 +81,9 @@ public class EventManager implements IEvent {
                     PluginManager.getInstance().distributeEvent(event, iPluginControlResult);
                 }
             });
+        } else {
+            event.event_status = 0;
+            PluginManager.getInstance().distributeEvent(event, iPluginControlResult);
         }
     }
 
@@ -111,6 +114,7 @@ public class EventManager implements IEvent {
                         i = i - 1;
                     } else {
                         eventWatcherList.get(i).callback = url;
+                        eventWatcherList.get(i).watcher_status = watchStatus;
                     }
                     isNeed = false;
                 }
