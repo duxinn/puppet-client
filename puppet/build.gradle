@@ -34,7 +34,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    implementation "com.github.zyswyq:testforrelationship:$model_version"
+    implementation "com.github.zyswyq:testforrelationship:latest.release"
     implementation project(path: ':loadlibtool')
     implementation 'com.google.code.gson:gson:2.8.2'
     annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
