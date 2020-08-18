@@ -144,7 +144,7 @@ public class NetworkManager implements INetwork {
                             final String event_name = ((com.alibaba.fastjson.JSONObject) data).getString("event_name");
                             final String package_name = ((com.alibaba.fastjson.JSONObject) data).getString("package_name");
                             final String callback = ((com.alibaba.fastjson.JSONObject) data).getString("callback");
-                            final int watcher_status = ((com.alibaba.fastjson.JSONObject) data).getInteger("watcher_status");
+                            final int watcher_status = ((com.alibaba.fastjson.JSONObject) data).getIntValue("watcher_status");
                             if (!TextUtils.isEmpty(event_name)
                                     && !TextUtils.isEmpty(package_name)
                                     && !TextUtils.isEmpty(callback)

@@ -76,7 +76,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
         wechatModel.setPackageName("com.tencent.mm");
         wechatModel.setActivityName("ui.LauncherUI");
         wechatModel.setDexName("wechat.apk");
-        wechatModel.setClassName("com.mango.wechattool.business.WechatEntrance");
+        wechatModel.setClassName("com.mango.wechatplugin.WechatEntrance");
         wechatModel.setMethodName("entrance");
         wechatModel.setDexVersion("7.0.16");
         ArrayList<PluginModel> models = new ArrayList<>();

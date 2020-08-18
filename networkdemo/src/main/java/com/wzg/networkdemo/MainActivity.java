@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 final String event_name = ((com.alibaba.fastjson.JSONObject) data).getString("event_name");
                                 final String package_name = ((com.alibaba.fastjson.JSONObject) data).getString("package_name");
                                 final String callback = ((com.alibaba.fastjson.JSONObject) data).getString("callback");
-                                final int watcher_status = ((com.alibaba.fastjson.JSONObject) data).getInteger("watcher_status");
+                                final int watcher_status = ((com.alibaba.fastjson.JSONObject) data).getIntValue("watcher_status");
                                 Log.d(TAG, "setEventWatcher-----event_name: " + event_name);
                                 Log.d(TAG, "setEventWatcher-----package_name: " + package_name);
                                 Log.d(TAG, "setEventWatcher-----callback: " + callback);

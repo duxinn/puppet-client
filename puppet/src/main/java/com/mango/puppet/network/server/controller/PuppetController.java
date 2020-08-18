@@ -51,7 +51,7 @@ class PuppetController {
         final String event_name = ((com.alibaba.fastjson.JSONObject) o).getString("event_name");
         final String package_name = ((com.alibaba.fastjson.JSONObject) o).getString("package_name");
         final String callback = ((com.alibaba.fastjson.JSONObject) o).getString("callback");
-        final int watcher_status = ((com.alibaba.fastjson.JSONObject) o).getInteger("watcher_status");
+        final int watcher_status = ((com.alibaba.fastjson.JSONObject) o).getIntValue("watcher_status");
 
         ReturnData returnData = new ReturnData();
         returnData.deviceid = SystemManager.getInstance().getDeviceId();
