@@ -13,7 +13,7 @@ public class PuppetTool {
             Job.SINGLE_RED,
             Job.SEND_TRANSFER,
 
-            Job.GET_BALANCE,
+//            Job.GET_BALANCE,
             Job.GET_CHATROOM_QRCODE,
 //            Job.SEND_VIDEO_TIMELINE,
 //            Job.SEND_NORMAL_TIMELINE,
