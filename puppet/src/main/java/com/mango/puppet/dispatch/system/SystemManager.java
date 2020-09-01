@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.mango.puppet.bean.PluginModel;
+import com.mango.puppet.config.PuppetConfig;
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.dispatch.system.i.ISystem;
@@ -75,7 +76,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
         PluginModel wechatModel = new PluginModel();
         wechatModel.setPackageName("com.tencent.mm");
         wechatModel.setActivityName("ui.LauncherUI");
-        wechatModel.setDexName("wechat.apk");
+        wechatModel.setDexName(PuppetConfig.WECHAT_APK_NAME);
         wechatModel.setClassName("com.mango.wechatplugin.WechatEntrance");
         wechatModel.setMethodName("entrance");
         wechatModel.setDexVersion("7.0.16");
@@ -104,7 +105,7 @@ public class SystemManager implements ISystem, IPluginRunListener {
                         } else {
                             LogManager.getInstance().recordLog("Event启动成功");
                             // 4 网络模块
-                            NetworkManager.getInstance().setupNetwork(context, false, new INetwork.ISetupResult() {
+                            NetworkManager.getInstance().setupNetwork(context, PuppetConfig.IS_LOCAL_SERVER, new INetwork.ISetupResult() {
                                 @Override
                                 public void onSuccess() {
                                     LogManager.getInstance().recordLog("Network启动成功");

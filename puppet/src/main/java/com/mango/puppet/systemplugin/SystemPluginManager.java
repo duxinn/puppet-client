@@ -1,20 +1,17 @@
 package com.mango.puppet.systemplugin;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.text.TextUtils;
 
+import com.mango.loadlibtool.CommandTool;
 import com.mango.puppet.log.LogManager;
 import com.mango.puppet.systemplugin.i.ISystemPluginExecute;
 import com.mango.puppet.systemplugin.i.ISystemPluginListener;
 import com.mango.puppet.systemplugin.i.ISystemPluginQuery;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,7 +21,7 @@ import java.util.List;
  * @date: 2020/05/18
  */
 @SuppressWarnings("unused")
-public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQuery, ISystemPluginListener{
+public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQuery, ISystemPluginListener {
     private static final SystemPluginManager ourInstance = new SystemPluginManager();
 
     public static SystemPluginManager getInstance() {
@@ -43,83 +40,19 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
     /************   ISystemPluginExecute   ************/
     @Override
     public int execRootCmd(String commandString) {
-        LogManager.getInstance().recordDebugLog("root权限执行命令行"+commandString);
-        int result = -1;
-        DataOutputStream dos = null;
-
-        try {
-            Process p = Runtime.getRuntime().exec("su");
-            dos = new DataOutputStream(p.getOutputStream());
-
-            dos.writeBytes(commandString + "\n");
-            dos.flush();
-            dos.writeBytes("exit\n");
-            dos.flush();
-            p.waitFor();
-            result = p.exitValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (dos != null) {
-                try {
-                    dos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return result;
+        LogManager.getInstance().recordDebugLog("root权限执行命令行" + commandString);
+        return CommandTool.execRootCmdSilent(commandString);
     }
 
     @Override
     public String execRootCmdWithResult(String commandString) {
-        LogManager.getInstance().recordDebugLog("root权限执行命令行并输出结果"+commandString);
-        StringBuilder result = new StringBuilder();
-        DataOutputStream dos = null;
-        DataInputStream dis = null;
-
-        try {
-            Process p = Runtime.getRuntime().exec("su");// 经过Root处理的android系统即有su命令
-            dos = new DataOutputStream(p.getOutputStream());
-            dis = new DataInputStream(p.getInputStream());
-
-            dos.writeBytes(commandString + "\n");
-            dos.flush();
-            dos.writeBytes("exit\n");
-            dos.flush();
-            String line;
-            while ((line = dis.readLine()) != null) {
-                result.append(line);
-                result.append("\n");
-            }
-            if (!TextUtils.isEmpty(result.toString())) {
-                result = new StringBuilder(result.substring(0, result.length() - 1));
-            }
-            p.waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (dos != null) {
-                try {
-                    dos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (dis != null) {
-                try {
-                    dis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return result.toString();
+        LogManager.getInstance().recordDebugLog("root权限执行命令行并输出结果" + commandString);
+        return CommandTool.execRootCmd(commandString);
     }
 
     @Override
     public void changeForegroundApplication(String packageName, String activityName, ISystemPluginResult result) {
-        LogManager.getInstance().recordDebugLog("更改前台应用"+packageName+activityName);
+        LogManager.getInstance().recordDebugLog("更改前台应用" + packageName + activityName);
         if (!judgeRoot(result)) {
             return;
         }
@@ -141,7 +74,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public void installApplication(String apkPath, ISystemPluginResult result) {
-        LogManager.getInstance().recordDebugLog("安装应用"+apkPath);
+        LogManager.getInstance().recordDebugLog("安装应用" + apkPath);
         if (!judgeRoot(result)) {
             return;
         }
@@ -160,7 +93,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public void uninstallApplication(final String packageName, ISystemPluginResult result) {
-        LogManager.getInstance().recordDebugLog("卸载应用"+packageName);
+        LogManager.getInstance().recordDebugLog("卸载应用" + packageName);
         if (!judgeRoot(result)) {
             return;
         }
@@ -173,7 +106,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public void exitApplication(final String packageName, final ISystemPluginResult result) {
-        LogManager.getInstance().recordDebugLog("退出应用"+packageName);
+        LogManager.getInstance().recordDebugLog("退出应用" + packageName);
         if (!judgeRoot(result)) {
             return;
         }
@@ -186,7 +119,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
 
     @Override
     public void restartApplication(String packageName, String activityName, ISystemPluginResult result) {
-        LogManager.getInstance().recordDebugLog("重启应用"+packageName);
+        LogManager.getInstance().recordDebugLog("重启应用" + packageName);
         if (!judgeRoot(result)) {
             return;
         }
@@ -221,35 +154,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
     @Override
     public boolean hasRootPermission() {
         LogManager.getInstance().recordDebugLog("检测手机是否root");
-        Boolean flag;
-        Process process = null;
-        DataOutputStream os = null;
-        try {
-            String cmd = "su";
-            process = Runtime.getRuntime().exec(cmd);
-            os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes("exit\n");
-            os.flush();
-            process.waitFor();
-            int exitValue = process.waitFor();
-            if (exitValue == 0) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                }
-                process.destroy();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
+        return CommandTool.hasRoot();
     }
 
     @Override

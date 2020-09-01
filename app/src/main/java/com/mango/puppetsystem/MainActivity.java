@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initView();
         initData();
-        boolean isRoot = hasRoot();
+        boolean isRoot = CommandTool.hasRoot();
         if (!isRoot) {
             writeLog("请先开启ROOT权限");
         }
@@ -158,41 +158,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         string += "...";
         tvLog.setText(string);
-    }
-
-
-    // 判断及申请root权限
-    public static boolean hasRoot() {
-        boolean flag = true;
-        Process process = null;
-        DataOutputStream os = null;
-        try {
-            String cmd = "su";
-            process = Runtime.getRuntime().exec(cmd);
-            os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes("exit\n");
-            os.flush();
-            process.waitFor();
-            int exitValue = process.waitFor();
-            if (exitValue == 0) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            flag = false;
-        } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                }
-                process.destroy();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return flag;
     }
 
     private void startFloatBallService() {
