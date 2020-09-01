@@ -53,10 +53,6 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
     @Override
     public void changeForegroundApplication(String packageName, String activityName, ISystemPluginResult result) {
         LogManager.getInstance().recordDebugLog("更改前台应用" + packageName + activityName);
-        if (!judgeRoot(result)) {
-            return;
-        }
-
         String current = getCurrentForegroundApplication();
         if (current != null && current.equals(packageName)) {
             if (result != null) {
@@ -137,11 +133,7 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
     @Override
     public String getCurrentForegroundApplication() {
         LogManager.getInstance().recordDebugLog("获取当前前台应用");
-        if (!judgeRoot(null)) {
-            return null;
-        }
-
-        String ret = execRootCmdWithResult("dumpsys window windows | grep mFocusedApp");
+        String ret = CommandTool.execCmd("dumpsys window windows | grep mFocusedApp");
         if (ret.contains("u0 ")) {
             ret = ret.substring(ret.indexOf("u0 ") + 3);
             if (ret.contains("/")) {
@@ -175,11 +167,11 @@ public class SystemPluginManager implements ISystemPluginExecute, ISystemPluginQ
         return version;
     }
 
-    /************   private   ************/
-    private void startActivity(String packageName, String activityName) {
+    public void startActivity(String packageName, String activityName) {
         String s = "am start -n '" + packageName + "/" + packageName + "." + activityName + "' -a android.intent.action.MAIN -c android.intent.category.LAUNCHER";
-        execRootCmd(s);
+        CommandTool.execCmd(s);
     }
+    /************   private   ************/
 
     private boolean judgeRoot(ISystemPluginResult result) {
         boolean flag = hasRootPermission();

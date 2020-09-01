@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
@@ -26,17 +27,24 @@ import androidx.core.app.ActivityCompat;
 
 import com.mango.loadlibtool.CommandTool;
 import com.mango.puppet.bean.NormalConst;
+import com.mango.puppet.bean.PluginModel;
+import com.mango.puppet.config.PuppetConfig;
 import com.mango.puppet.tool.PreferenceUtils;
 import com.mango.puppetsystem.floatball.FloatBallService;
 import com.mango.puppetsystem.floatball.FloatWindowService;
 
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import static com.mango.puppet.network.wsmanager.WsManager.KEY_SOCKET_URL;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private LinearLayout retryLL;
+    private LinearLayout copyLL;
     private ArrayList<String> logList = new ArrayList<>();
     private TextView tvLog, tvNet, tvJobCount, tvJobResultCount, tvJobEngineStatus, tvLocalStatus, tvEventWatcher;
     private EditText mEditWsUrl;
@@ -57,9 +65,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initView();
         initData();
-        boolean isRoot = CommandTool.hasRoot();
-        if (!isRoot) {
-            writeLog("请先开启ROOT权限");
+        if (PuppetConfig.IS_NEED_ROOT) {
+            boolean isRoot = CommandTool.hasRoot();
+            if (!isRoot) {
+                writeLog("请先开启ROOT权限");
+            }
+            copyLL.setVisibility(View.GONE);
+        } else {
+            copyLL.setVisibility(View.VISIBLE);
         }
     }
 
@@ -93,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         retryLL = findViewById(R.id.retryTv);
+        copyLL = findViewById(R.id.copyTv);
         mEditWsUrl = findViewById(R.id.edit_ws_url);
         mBtnSetWsUrl = findViewById(R.id.btn_set_ws_url);
         mBtnSetWsUrl.setOnClickListener(this);
@@ -109,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvLocalStatus = findViewById(R.id.tvLocalStatus);
         tvEventWatcher = findViewById(R.id.tvEventWatcher);
         retryLL.setOnClickListener(this);
+        copyLL.setOnClickListener(this);
     }
 
     private void initData() {
@@ -196,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        CommandTool.execRootCmdSilent(CommandTool.stopApplicationCommand(getPackageName()));
+                        int pid = android.os.Process.myPid();
+                        android.os.Process.killProcess(pid);
                     }
                 }, 2500);
             }
@@ -209,6 +225,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(this, QrCodeActivity.class);
                 startActivityForResult(intent, 100);
             }
+        } else if (v.getId() == R.id.copyTv) {
+            copyFile();
+        }
+    }
+
+    private void copyFile() {
+        ArrayList<String> needCopyFileList = new ArrayList<>();
+        needCopyFileList.add(PuppetConfig.WECHAT_APK_NAME);
+        needCopyFileList.add("libhardc++.so");
+        needCopyFileList.add("signaturewx");
+
+        for (int i = 0; i < needCopyFileList.size(); i++) {
+            copyDetail(this, needCopyFileList.get(i), i == 0);
+        }
+
+        Toast.makeText(this, "拷贝完成", Toast.LENGTH_LONG).show();
+    }
+
+    private void copyDetail(Context context, String name, boolean needReplace) {
+
+        File targetFile = new File(Environment.getExternalStoragePublicDirectory(""), name);
+        if (targetFile.exists() && !needReplace) {
+            return;
+        }
+        if (targetFile.exists()) {
+            targetFile.delete();
+        }
+
+        try {
+            InputStream is = context.getAssets().open("armeabi-v7a/" + name);
+            FileOutputStream fos = new FileOutputStream(targetFile);
+            byte[] buffer = new byte[1024];
+            int byteCount;
+            while ((byteCount = is.read(buffer)) != -1) {
+                fos.write(buffer, 0, byteCount);
+            }
+            fos.flush();
+            is.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -257,7 +314,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        CommandTool.execRootCmdSilent(CommandTool.stopApplicationCommand(getPackageName()));
+                        int pid = android.os.Process.myPid();
+                        android.os.Process.killProcess(pid);
                     }
                 }, 2500);
             }

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView;
-import com.mango.loadlibtool.CommandTool;
 
 /**
  * QrCodeActivity

@@ -100,14 +100,13 @@ public class CommandTool {
         return result;
     }
 
-    // 执行命令并且输出结果
-    public static String execRootCmd(String cmd) {
+    private static String execCmd(String cmd, String rootString) {
         String result = "";
         DataOutputStream dos = null;
         DataInputStream dis = null;
 
         try {
-            Process p = Runtime.getRuntime().exec("su");// 经过Root处理的android系统即有su命令
+            Process p = Runtime.getRuntime().exec(rootString);// 经过Root处理的android系统即有su命令
             dos = new DataOutputStream(p.getOutputStream());
             dis = new DataInputStream(p.getInputStream());
 
@@ -143,6 +142,15 @@ public class CommandTool {
             }
         }
         return result;
+    }
+
+    public static String execCmd(String cmd) {
+        return execCmd(cmd, "");
+    }
+
+    // 执行命令并且输出结果
+    public static String execRootCmd(String cmd) {
+        return execCmd(cmd, "su");
     }
 
     /**

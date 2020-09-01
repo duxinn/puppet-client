@@ -78,6 +78,7 @@
                 android:layout_width="0dp"
                 android:layout_height="65dp"
                 android:layout_weight="1"
+                android:layout_margin="@dimen/dimens_10_dp"
                 android:background="@drawable/button_background"
                 android:orientation="vertical">
 
@@ -86,6 +87,25 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="打开浮窗"
+                    android:textColor="#eeeeee"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/copyTv"
+                android:layout_width="0dp"
+                android:layout_height="65dp"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/dimens_10_dp"
+                android:background="@drawable/button_background"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="拷贝必要文件"
                     android:textColor="#eeeeee"
                     android:textSize="18sp" />
 

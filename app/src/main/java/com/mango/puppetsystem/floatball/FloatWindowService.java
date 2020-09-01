@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import com.mango.loadlibtool.CommandTool;
 import com.mango.puppet.bean.NormalConst;
 import com.mango.puppet.dispatch.system.SystemManager;
 import com.mango.puppet.log.LogManager;
@@ -131,7 +129,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             StatusManager.getInstance().setNetworkStatus(StatusManager.getInstance().getNetworkStatus());//重设网络状态
             windowManager.addView(displayView, layoutParams);
             windowmanagerOut.addView(displayViewOut, layoutParamsOut);
-            TextTool.setText(tvLog, tvNet,tvJobEngineStatus,tvEventWatcher,tvLocalStatus,tvJobCount,tvJobResultCount);
+            TextTool.setText(tvLog, tvNet, tvJobEngineStatus, tvEventWatcher, tvLocalStatus, tvJobCount, tvJobResultCount);
         }
     }
 
@@ -140,7 +138,8 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         if (view.getId() == R.id.runTv) {
             SystemManager.getInstance().startSystem(AppApplication.instance);
         } else if (view.getId() == R.id.closeTv) {
-            CommandTool.execRootCmdSilent(CommandTool.stopApplicationCommand(getPackageName()));
+            int pid = android.os.Process.myPid();
+            android.os.Process.killProcess(pid);
         }
     }
 
@@ -172,7 +171,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
         }
         string += "...";
         tvLog.setText(string);
-        TextTool.statusChange(NormalConst.TYPE_LOG,string);
+        TextTool.statusChange(NormalConst.TYPE_LOG, string);
     }
 
     @Override
@@ -196,7 +195,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
     @Override
     public void onNetworkStatusChanged(boolean isNetOk) {
         tvNet.setText(isNetOk ? "网络状态:已连接" : "网络状态:已断开");
-        TextTool.statusChange(NormalConst.TYPE_NET,tvNet.getText().toString());
+        TextTool.statusChange(NormalConst.TYPE_NET, tvNet.getText().toString());
         sendBroadCastToActivity(tvNet.getText().toString(), NormalConst.TYPE_NET);
     }
 
@@ -215,7 +214,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             text = "未知状态";
         }
         tvJobEngineStatus.setText(text);
-        TextTool.statusChange(NormalConst.TYPE_JOB_ENGINE_STATUS,tvJobEngineStatus.getText().toString());
+        TextTool.statusChange(NormalConst.TYPE_JOB_ENGINE_STATUS, tvJobEngineStatus.getText().toString());
         sendBroadCastToActivity(tvJobEngineStatus.getText().toString(), NormalConst.TYPE_JOB_ENGINE_STATUS);
     }
 
@@ -237,7 +236,7 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             }
         }
         tvEventWatcher.setText(sb.toString());
-        TextTool.statusChange(NormalConst.TYPE_EVENT_WATCHER,tvEventWatcher.getText().toString());
+        TextTool.statusChange(NormalConst.TYPE_EVENT_WATCHER, tvEventWatcher.getText().toString());
         sendBroadCastToActivity(tvEventWatcher.getText().toString(), NormalConst.TYPE_EVENT_WATCHER);
     }
 
@@ -258,21 +257,21 @@ public class FloatWindowService extends Service implements View.OnClickListener,
             }
         }
         tvLocalStatus.setText(sb);
-        TextTool.statusChange(NormalConst.TYPE_PLUGIN_RUNNING,tvLocalStatus.getText().toString());
+        TextTool.statusChange(NormalConst.TYPE_PLUGIN_RUNNING, tvLocalStatus.getText().toString());
         sendBroadCastToActivity(sb.toString(), NormalConst.TYPE_PLUGIN_RUNNING);
     }
 
     @Override
     public void onJobCountChanged(int count) {
         tvJobCount.setText(count + "");
-        TextTool.statusChange(NormalConst.TYPE_JOB,tvJobCount.getText().toString());
+        TextTool.statusChange(NormalConst.TYPE_JOB, tvJobCount.getText().toString());
         sendBroadCastToActivity(count + "", NormalConst.TYPE_JOB);
     }
 
     @Override
     public void onJobResultCountChanged(int count) {
         tvJobResultCount.setText(count + "");
-        TextTool.statusChange(NormalConst.TYPE_JOB_RESULT,tvJobResultCount.getText().toString());
+        TextTool.statusChange(NormalConst.TYPE_JOB_RESULT, tvJobResultCount.getText().toString());
         sendBroadCastToActivity(count + "", NormalConst.TYPE_JOB_RESULT);
     }
 

@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.mango.loadlibtool.InjectTool;
 import com.mango.puppet.bean.PluginModel;
+import com.mango.puppet.config.PuppetConfig;
 import com.mango.puppet.dispatch.event.EventManager;
 import com.mango.puppet.dispatch.job.JobManager;
 import com.mango.puppet.dispatch.system.SystemManager;
@@ -90,44 +91,58 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         isRunningPlugin = true;
         final PluginModel pluginModel = toStartPllugin.get(0);
         LogManager.getInstance().recordDebugLog("启动插件" + pluginModel.getPackageName() + pluginModel.getDexName());
-        InjectTool.inject(context, pluginModel.getPackageName(), pluginModel.getDexName(), pluginModel.getClassName(), pluginModel.getMethodName(), pluginModel.getActivityName(), new InjectTool.InjectResult() {
-            @Override
-            public void injectFinished(boolean isSuccess, String failReason) {
-                isRunningPlugin = false;
-                if (isSuccess) {
-                    LogManager.getInstance().recordDebugLog("注入成功:" + pluginModel.getPackageName());
-                    runningPackageNames.add(pluginModel.getPackageName());
-                    if (listener != null) {
-                        listener.onPluginRunningStatusChange(pluginModel.getPackageName(), true);
-                    }
-                    for (PluginModel model : models) {
-                        if (pluginModel.getPackageName().equals(model.getPackageName())) {
-                            model.setRun(true);
-                        }
-                    }
-                    toStartPllugin.remove(0);
-                    if (toStartPllugin.size() > 0) {
-                        runPuppetPlugin();
-                    } else {
-                        if (!callBack) {
-                            iPluginControlResult.onFinished(true, "");
-                            iPluginControlResult = null;
-                            sendHeart();
-                            callBack = true;
-                        } else {
-                            JobManager.getInstance().startJobSystem(SystemManager.getInstance().getContext());
-                        }
-                    }
-                } else {
-                    LogManager.getInstance().recordDebugLog("注入失败:" + pluginModel.getPackageName() + " " + failReason);
-                    if (!callBack) {
-                        iPluginControlResult.onFinished(false, "注入失败:" + pluginModel.getPackageName() + " " + failReason);
-                        iPluginControlResult = null;
-                        callBack = true;
-                    }
+        if (PuppetConfig.IS_NEED_ROOT) {
+            InjectTool.inject(context, pluginModel.getPackageName(), pluginModel.getDexName(), pluginModel.getClassName(), pluginModel.getMethodName(), pluginModel.getActivityName(), new InjectTool.InjectResult() {
+                @Override
+                public void injectFinished(boolean isSuccess, String failReason) {
+                    dealInjectResult(pluginModel, isSuccess, failReason);
+                }
+            });
+        } else {
+            SystemPluginManager.getInstance().startActivity(pluginModel.getPackageName(), pluginModel.getActivityName());
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dealInjectResult(pluginModel, true, "");
+                }
+            }, 4000);
+        }
+    }
+
+    private void dealInjectResult(final PluginModel pluginModel, boolean isSuccess, String failReason) {
+        isRunningPlugin = false;
+        if (isSuccess) {
+            LogManager.getInstance().recordDebugLog("注入成功:" + pluginModel.getPackageName());
+            runningPackageNames.add(pluginModel.getPackageName());
+            if (listener != null) {
+                listener.onPluginRunningStatusChange(pluginModel.getPackageName(), true);
+            }
+            for (PluginModel model : models) {
+                if (pluginModel.getPackageName().equals(model.getPackageName())) {
+                    model.setRun(true);
                 }
             }
-        });
+            toStartPllugin.remove(0);
+            if (toStartPllugin.size() > 0) {
+                runPuppetPlugin();
+            } else {
+                if (!callBack) {
+                    iPluginControlResult.onFinished(true, "");
+                    iPluginControlResult = null;
+                    sendHeart();
+                    callBack = true;
+                } else {
+                    JobManager.getInstance().startJobSystem(SystemManager.getInstance().getContext());
+                }
+            }
+        } else {
+            LogManager.getInstance().recordDebugLog("注入失败:" + pluginModel.getPackageName() + " " + failReason);
+            if (!callBack) {
+                iPluginControlResult.onFinished(false, "注入失败:" + pluginModel.getPackageName() + " " + failReason);
+                iPluginControlResult = null;
+                callBack = true;
+            }
+        }
     }
 
     /**
@@ -209,10 +224,10 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                                     event.event_data = object;
                                     EventManager.getInstance().uploadNewEvent(event);
                                     runningPackageNames.remove(model.getPackageName());
-                                    if (!restarted){
+                                    if (!restarted) {
                                         heartModel.clear();
                                     }
-                                    restarted =true;
+                                    restarted = true;
                                     new Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
@@ -270,7 +285,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
         models = pluginModels;
         this.context = context;
         iPluginControlResult = result;
-        if (!SystemPluginManager.getInstance().hasRootPermission()) {
+        if (PuppetConfig.IS_NEED_ROOT && !SystemPluginManager.getInstance().hasRootPermission()) {
             result.onFinished(false, "未开启Root权限");
             iPluginControlResult = null;
         } else {

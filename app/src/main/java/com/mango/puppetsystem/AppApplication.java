@@ -1,10 +1,7 @@
 package com.mango.puppetsystem;
 
 import android.app.Application;
-import android.util.Log;
 
-import com.mango.puppet.systemplugin.SystemPluginManager;
-import com.mango.puppet.systemplugin.i.ISystemPluginListener;
 import com.mango.puppet.tool.PreferenceUtils;
 import com.mango.puppet.tool.TextTool;
 import com.umeng.commonsdk.UMConfigure;
