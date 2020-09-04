@@ -202,7 +202,7 @@ public class PluginManager implements IPluginControl, IPluginJob, IPluginEvent, 
                     @Override
                     public void run() {
                         for (final PluginModel model : models) {
-                            if (model.isRun()) {
+                            if (model.isRun() || PuppetConfig.IS_PLUGIN_DEBUG) {
                                 if (!runningPackageNames.contains(model.getPackageName())) {
                                     runningPackageNames.add(model.getPackageName());
                                     if (listener != null) {
