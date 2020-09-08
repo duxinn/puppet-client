@@ -48,6 +48,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     public void onJobInsert(Job job) {
         boolean flag = canDistributeJob();
         if (flag) {
+            Log.d("exejob", "onJobInsert " + job.job_id);
             distributeJob();
         }
     }
@@ -56,6 +57,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     public void onJobDelete(Job job) {
         boolean flag = canDistributeJob();
         if (flag) {
+            Log.d("exejob", "onJobDelete " + job.job_id);
             distributeJob();
         }
     }
@@ -64,6 +66,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     public void onJobStatusChange(Job job) {
         boolean flag = canDistributeJob();
         if (job.job_status != 1 &&  flag) {
+            Log.d("exejob", "onJobStatusChange " + job.job_id + " " + job.job_status);
             distributeJob();
         }
     }
@@ -73,6 +76,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
     public void onFinished(Job job, boolean isSucceed, String failReason) {
         if (!isSucceed) {
             isDistributedJob = false;
+            Log.d("exejob", "isDistributedJob false onFinished " + job.job_id);
             job.job_status = 0;
             boolean b = DBManager.updateJobStatus(job);
             if (!b) {
@@ -81,8 +85,9 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
         }
     }
 
-    void receiveJobResult() {
+    void receiveJobResult(Job job) {
         isDistributedJob = false;
+        Log.d("exejob", "isDistributedJob false receiveJobResult" + job.job_id);
     }
 
     /* private */
@@ -119,6 +124,7 @@ public class ExecutorManager implements DBManager.OnJobDBChangeListener, IPlugin
         Job currentJob = isInit ?
                 DBManager.getSingleNotDoneJobsFromDb() : DBManager.getSingleNewJobFromDb();
         if (currentJob != null) {
+            Log.d("exejob", "onJobExe " + currentJob.job_id);
             JobManager.getInstance().setStatus("", JobManager.STATUS.RUNNING);
             isDistributedJob = true;
             PluginManager.getInstance().distributeJob(currentJob, this);

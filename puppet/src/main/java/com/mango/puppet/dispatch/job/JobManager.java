@@ -137,7 +137,13 @@ public class JobManager implements IJob {
             jobResult.job_status = 4;
         }
         LogManager.getInstance().recordLog("接收到一个执行完毕的任务" + jobResult.job_id);
-        ExecutorManager.getInstance().receiveJobResult();
+
+        // 多步任务第二步完成不能重置任务开关
+        if (jobResult.job_status == 10) {
+            jobResult.job_status = 3;
+        } else {
+            ExecutorManager.getInstance().receiveJobResult(jobResult);
+        }
         Log.d("JobManager", "receiveJobResult job_status:" + jobResult.job_status);
         boolean b = DBManager.updateJobStatus(jobResult);
         if (!b) {
