@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -27,13 +26,12 @@ import androidx.core.app.ActivityCompat;
 
 import com.mango.loadlibtool.CommandTool;
 import com.mango.puppet.bean.NormalConst;
-import com.mango.puppet.bean.PluginModel;
 import com.mango.puppet.config.PuppetConfig;
 import com.mango.puppet.tool.PreferenceUtils;
 import com.mango.puppetsystem.floatball.FloatBallService;
 import com.mango.puppetsystem.floatball.FloatWindowService;
+import com.mango.puppetsystem.update.UpdateManager;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -129,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initData() {
         myReceiver = new MyReceiver();
         registerReceiver(myReceiver, new IntentFilter(NormalConst.ACTION));
+
+        //检查更新
+        UpdateManager.getInstance().doUpdate(MainActivity.this);
     }
 
     private void initEvent() {

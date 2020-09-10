@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="330dp"
+    android:layout_height="wrap_content"
+    android:background="@mipmap/dialog_bg_large_shadow"
+    android:gravity="left"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="left"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="@dimen/dimens_10_dp"
+        android:gravity="center"
+        android:lineSpacingExtra="@dimen/dimens_4_dp"
+        android:text="标题"
+        android:textColor="@color/color_333333"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        />
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="@dimen/dimens_20_dp"
+        android:layout_marginTop="@dimen/dimens_15_dp"
+        android:lineSpacingExtra="@dimen/dimens_4_dp"
+        android:text="是否升级到..版本"
+        android:textColor="@color/color_333333"
+        android:textSize="18sp" />
+    <TextView
+        android:id="@+id/tv_description"
+        android:layout_marginTop="@dimen/dimens_10_dp"
+        android:layout_width="wrap_content"
+        android:maxEms="12"
+        android:singleLine="false"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_333333"
+        android:layout_marginLeft="@dimen/dimens_20_dp"
+        android:text=""
+        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimens_5_dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="暂不升级"
+            android:textColor="@color/color_cc1b14"
+            android:textSize="14sp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dimens_90_dp"
+            />
+
+        <TextView
+            android:id="@+id/tv_ok"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dimens_30_dp"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="升级"
+            android:textColor="@color/color_cc1b14"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+</LinearLayout>
+
+
